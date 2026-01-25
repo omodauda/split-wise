@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="onboarding_first_titles">
+        <item>Split Bills</item>
+        <item>Track Balances</item>
+        <item>Groups Made</item>
+        <item>Settle Up</item>
+    </string-array>
+    <string-array name="onboarding_second_titles">
+        <item>Not Friendships</item>
+        <item>In Real-Time</item>
+        <item>Simple</item>
+        <item>Instantly</item>
+    </string-array>
+    <string-array name="descriptions">
+        <item>Keep track of shared expenses with friends and never let money come between great relationships.</item>
+        <item>See who owes you and who you owe at a glance. Stay on top of your finances effortlessly.</item>
+        <item>Create groups for trips, roommates, or any shared expenses. Split bills fairly with multiple friends.</item>
+        <item>Record payments and settle balances with just a few taps. Everyone stays happy and in the loop.</item>
+    </string-array>
+    <string name="next">Next</string>
+    <string name="get_started">Get Started</string>
+</resources>

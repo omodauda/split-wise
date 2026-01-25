@@ -184,3 +184,11 @@ val ButtonLarge = TextStyle(
     lineHeight = 24.sp,
     letterSpacing = 0.5.sp
 )
+
+val OnboardingTitle = TextStyle(
+    fontFamily = inter,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 36.sp,
+    lineHeight = 40.sp,
+    letterSpacing = 0.37.sp
+)
