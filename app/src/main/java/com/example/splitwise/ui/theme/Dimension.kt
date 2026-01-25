@@ -81,4 +81,5 @@ object ScreenDimensions {
     val contentPadding = 16.dp
     val sectionSpacing = 24.dp
     val itemSpacing = 12.dp
+    val largePadding = 32.dp
 }
