@@ -23,10 +23,11 @@ val Shapes = Shapes(
 
 // Custom shape tokens for specific components
 object SplitWiseShapes {
-    val button = RoundedCornerShape(12.dp)
+    val button = RoundedCornerShape(16.dp)
     val buttonSmall = RoundedCornerShape(8.dp)
     val card = RoundedCornerShape(16.dp)
     val dialog = RoundedCornerShape(24.dp)
+    val onboardingImage = RoundedCornerShape(24.dp)
     val bottomSheet = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     val chip = RoundedCornerShape(8.dp)
     val inputField = RoundedCornerShape(12.dp)
