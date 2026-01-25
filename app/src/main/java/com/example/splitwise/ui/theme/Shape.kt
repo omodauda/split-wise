@@ -28,9 +28,9 @@ object SplitWiseShapes {
     val card = RoundedCornerShape(16.dp)
     val dialog = RoundedCornerShape(24.dp)
     val onboardingImage = RoundedCornerShape(24.dp)
-    val bottomSheet = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+    val bottomSheet = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
     val chip = RoundedCornerShape(8.dp)
-    val inputField = RoundedCornerShape(12.dp)
+    val inputField = RoundedCornerShape(16.dp)
     val avatar = RoundedCornerShape(50) // Circular
     val appIcon = RoundedCornerShape(24.dp)
     val badge = RoundedCornerShape(12.dp)
