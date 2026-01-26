@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_title">Welcome Back</string>
+    <string name="login_description">Sign in to continue splitting bills with friends</string>
+    <string name="email">Email</string>
+    <string name="email_placeholder">you@example.com</string>
+    <string name="password">Password</string>
+    <string name="password_placeholder">Enter your password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="continue_with">Or continue with</string>
+    <string name="google">Google</string>
+    <string name="no_account">Don\'t have an account?</string>
+</resources>
