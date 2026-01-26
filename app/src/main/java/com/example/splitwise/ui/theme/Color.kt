@@ -55,6 +55,10 @@ val md_theme_light_onWarning = Color(0xFFFFFFFF)
 val md_theme_light_info = Color(0xFF3B82F6) // blue-500
 val md_theme_light_onInfo = Color(0xFFFFFFFF)
 
+// Disabled Button Colors (Light Theme)
+val md_theme_light_disabledContainer = Color(0xFFF3F4F6) // gray-100
+val md_theme_light_onDisabledContainer = Color(0xFF9CA3AF) // gray-400
+
 // ============= DARK THEME =============
 
 // Primary - Emerald
@@ -109,6 +113,10 @@ val md_theme_dark_warning = Color(0xFFFBBF24) // amber-400
 val md_theme_dark_onWarning = Color(0xFF78350F) // amber-900
 val md_theme_dark_info = Color(0xFF60A5FA) // blue-400
 val md_theme_dark_onInfo = Color(0xFF1E3A8A) // blue-900
+
+// Disabled Button Colors (Dark Theme)
+val md_theme_dark_disabledContainer = Color(0xFF374151) // gray-700
+val md_theme_dark_onDisabledContainer = Color(0xFF6B7280) // gray-500
 
 // ============= BRAND COLORS =============
 
