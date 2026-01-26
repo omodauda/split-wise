@@ -26,7 +26,9 @@ data class ExtendedColorScheme(
     val warning: Color,
     val onWarning: Color,
     val info: Color,
-    val onInfo: Color
+    val onInfo: Color,
+    val disabledContainer: Color,
+    val onDisabledContainer: Color
 )
 
 private val LightExtendedColorScheme = ExtendedColorScheme(
@@ -35,7 +37,9 @@ private val LightExtendedColorScheme = ExtendedColorScheme(
     warning = md_theme_light_warning,
     onWarning = md_theme_light_onWarning,
     info = md_theme_light_info,
-    onInfo = md_theme_light_onInfo
+    onInfo = md_theme_light_onInfo,
+    disabledContainer = md_theme_light_disabledContainer,
+    onDisabledContainer = md_theme_light_onDisabledContainer
 )
 
 private val DarkExtendedColorScheme = ExtendedColorScheme(
@@ -44,7 +48,9 @@ private val DarkExtendedColorScheme = ExtendedColorScheme(
     warning = md_theme_dark_warning,
     onWarning = md_theme_dark_onWarning,
     info = md_theme_dark_info,
-    onInfo = md_theme_dark_onInfo
+    onInfo = md_theme_dark_onInfo,
+    disabledContainer = md_theme_dark_disabledContainer,
+    onDisabledContainer = md_theme_dark_onDisabledContainer
 )
 
 val LocalExtendedColorScheme = staticCompositionLocalOf { LightExtendedColorScheme }
