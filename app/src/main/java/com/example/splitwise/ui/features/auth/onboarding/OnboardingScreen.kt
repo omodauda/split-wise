@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -50,6 +51,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
+    goToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val data = onboardingData
@@ -58,19 +60,22 @@ fun OnboardingScreen(
     })
     val coroutineScope = rememberCoroutineScope()
     val goToNextPage = {
-        coroutineScope.launch {
-            pagerState.scrollToPage(pagerState.settledPage + 1)
+        if (pagerState.currentPage < data.size - 1) {
+            coroutineScope.launch {
+                pagerState.scrollToPage(pagerState.settledPage + 1)
+            }
+        } else {
+            goToLogin()
         }
     }
 
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) { innerPadding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-//                .padding(innerPadding)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             HorizontalPager(
@@ -209,6 +214,6 @@ fun PagerView(
 @Composable
 fun OnboardingScreenPreview() {
     SplitWiseTheme {
-        OnboardingScreen()
+        OnboardingScreen(goToLogin = {})
     }
 }
