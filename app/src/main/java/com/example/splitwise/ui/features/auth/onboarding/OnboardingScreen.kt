@@ -50,6 +50,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
+    goToLogin: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val data = onboardingData
@@ -58,8 +59,12 @@ fun OnboardingScreen(
     })
     val coroutineScope = rememberCoroutineScope()
     val goToNextPage = {
-        coroutineScope.launch {
-            pagerState.scrollToPage(pagerState.settledPage + 1)
+        if (pagerState.currentPage < data.size - 1) {
+            coroutineScope.launch {
+                pagerState.scrollToPage(pagerState.settledPage + 1)
+            }
+        } else {
+            goToLogin()
         }
     }
 
@@ -209,6 +214,6 @@ fun PagerView(
 @Composable
 fun OnboardingScreenPreview() {
     SplitWiseTheme {
-        OnboardingScreen()
+        OnboardingScreen(goToLogin = {})
     }
 }

@@ -50,6 +50,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
+    goToSignup: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,7 +65,7 @@ fun LoginScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) { innerPadding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -165,7 +166,7 @@ fun LoginScreen(
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
                 DividerView()
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
-                AlternativeLoginView()
+                AlternativeLoginView(goToSignup)
             }
         }
 
@@ -198,7 +199,10 @@ fun DividerView(
 }
 
 @Composable
-fun AlternativeLoginView() {
+fun AlternativeLoginView(
+    goToSignup: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val annotatedString = buildAnnotatedString {
         // Append the first part of the text with the default style
         append(stringResource(R.string.no_account) + " ")
@@ -215,7 +219,6 @@ fun AlternativeLoginView() {
         ) {
             append(stringResource(R.string.sign_up))
         }
-
         pop()
     }
     GoogleButton(onClicked = {})
@@ -226,8 +229,8 @@ fun AlternativeLoginView() {
         modifier = Modifier.fillMaxWidth(),
         onClick = { offset ->
             annotatedString.getStringAnnotations(tag = "SIGNUP", start = offset, end = offset)
-                .firstOrNull()?.let { annotation ->
-                    // TODO: Handle sign up navigation
+                .firstOrNull()?.let {
+                    goToSignup()
                 }
         }
     )
@@ -247,6 +250,6 @@ uiMode = Configuration.UI_MODE_NIGHT_NO
 @Composable
 fun LoginScreenPreview() {
     SplitWiseTheme {
-        LoginScreen()
+        LoginScreen(goToSignup = {})
     }
 }

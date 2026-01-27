@@ -23,7 +23,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,8 +48,6 @@ import com.example.splitwise.R
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.GoogleButton
-import com.example.splitwise.ui.features.auth.login.AlternativeLoginView
-import com.example.splitwise.ui.features.auth.login.DividerView
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -60,6 +57,7 @@ import com.example.splitwise.ui.theme.emerald_50
 @Composable
 fun SignupScreen(
     viewModel: SignupViewModel = viewModel(),
+    goBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -102,7 +100,7 @@ fun SignupScreen(
 //                .windowInsetsPadding(WindowInsets.statusBars)
         ) {
             IconButton(
-                onClick = {}
+                onClick = {goBack()}
             ) {
                 Icon(
                     painter = painterResource(R.drawable.back_icon),
@@ -251,7 +249,7 @@ fun SignupScreen(
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
                 com.example.splitwise.ui.features.auth.signup.DividerView()
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
-                AlternativeSignupView()
+                AlternativeSignupView(goToLogin = {goBack()})
                 Spacer(Modifier.height(Spacing.extraLarge))
             }
         }
@@ -312,7 +310,7 @@ fun DividerView(
 }
 
 @Composable
-fun AlternativeSignupView() {
+fun AlternativeSignupView(goToLogin: () -> Unit) {
     val annotatedString = buildAnnotatedString {
         // Append the first part of the text with the default style
         append(stringResource(R.string.existing_account) + " ")
@@ -339,9 +337,9 @@ fun AlternativeSignupView() {
         style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
         modifier = Modifier.fillMaxWidth(),
         onClick = { offset ->
-            annotatedString.getStringAnnotations(tag = "SIGNUP", start = offset, end = offset)
-                .firstOrNull()?.let { annotation ->
-                    // TODO: Handle sign up navigation
+            annotatedString.getStringAnnotations(tag = "SIGN IN", start = offset, end = offset)
+                .firstOrNull()?.let {
+                    goToLogin()
                 }
         }
     )
@@ -361,6 +359,6 @@ fun AlternativeSignupView() {
 @Composable
 fun SignupScreenPreview() {
     SplitWiseTheme {
-        SignupScreen()
+        SignupScreen(goBack = {})
     }
 }

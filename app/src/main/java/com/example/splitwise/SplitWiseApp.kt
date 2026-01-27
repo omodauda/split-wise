@@ -4,15 +4,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.splitwise.ui.features.auth.login.LoginScreen
-import com.example.splitwise.ui.features.auth.signup.SignupScreen
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.example.splitwise.ui.navigation.authNavGraph
 
 @Composable
 fun SplitWiseApp() {
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-    ) { innerPadding ->
-        SignupScreen()
+    ) {
+        val navController = rememberNavController()
+        NavHost(
+            navController = navController,
+            startDestination = "auth_graph"
+        ) {
+            authNavGraph(navController)
+        }
     }
 }
