@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="create_account">Create Account</string>
+    <string name="signup_description">Join us and start splitting bills easily</string>
+    <string name="full_name">Full Name</string>
+    <string name="full_name_placeholder">John Doe</string>
+    <string name="create_password">Create a password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_password_placeholder">Confirm your password</string>
+    <string name="password_guide">Password must contain:</string>
+    <string-array name="password_guide_items">
+        <item>• At least 8 characters</item>
+        <item>• One uppercase and one lowercase letter</item>
+        <item>• One number</item>
+    </string-array>
+    <string name="alt_signup">Or sign up with</string>
+    <string name="existing_account">Already have an account?</string>
+</resources>
