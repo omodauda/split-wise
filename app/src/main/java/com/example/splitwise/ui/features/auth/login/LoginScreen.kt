@@ -51,6 +51,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
     goToSignup: () -> Unit,
+    goToForgotPassword: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -148,7 +149,7 @@ fun LoginScreen(
                     errorMessage = state.passwordError
                 )
                 TextButton(
-                    onClick = {},
+                    onClick = {goToForgotPassword()},
                     modifier = Modifier
                         .align(alignment = Alignment.End)
                 ) {
@@ -250,6 +251,6 @@ uiMode = Configuration.UI_MODE_NIGHT_NO
 @Composable
 fun LoginScreenPreview() {
     SplitWiseTheme {
-        LoginScreen(goToSignup = {})
+        LoginScreen(goToSignup = {}, goToForgotPassword = {})
     }
 }
