@@ -48,7 +48,7 @@ fun SplitWiseApp() {
                 startDestination = startDestination
             ) {
                 authNavGraph(navController, authViewModel)
-                mainNavGraph(navController, authViewModel)
+                mainNavGraph(navController)
             }
         }
     }
