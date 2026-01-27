@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard">Dashboard</string>
+    <string name="net_balance">Your Net Balance</string>
+    <string name="total_owed">You\'re owed</string>
+    <string name="total_owing">You\'re owing</string>
+    <string name="add_bill">Add Bill</string>
+    <string name="owes_you">owes you</string>
+    <string name="settle">Settle</string>
+    <string name="you_owe">You owe</string>
+    <string name="pay">Pay</string>
+    <string name="no_bill">No bills yet</string>
+    <string name="no_bill_desc">Start splitting expenses with your friends by adding your first bill</string>
+    <string name="add_first_bill">Add your first bill</string>
+</resources>
