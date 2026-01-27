@@ -39,9 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.GoogleButton
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -50,6 +52,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
+    authViewModel: AuthViewModel,
     goToSignup: () -> Unit,
     goToForgotPassword: () -> Unit,
     modifier: Modifier = Modifier
@@ -59,7 +62,7 @@ fun LoginScreen(
 
     fun handleLogin() {
         if (viewModel.validateForm()){
-            Log.d("LOGIN", "handleLogin: proceed to login")
+            authViewModel.authenticate()
         }
     }
 
@@ -250,7 +253,9 @@ uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Composable
 fun LoginScreenPreview() {
+    val container = FakeAppContainer()
+    val vm = AuthViewModel(container.authRepository)
     SplitWiseTheme {
-        LoginScreen(goToSignup = {}, goToForgotPassword = {})
+        LoginScreen(goToSignup = {}, goToForgotPassword = {}, authViewModel = vm)
     }
 }
