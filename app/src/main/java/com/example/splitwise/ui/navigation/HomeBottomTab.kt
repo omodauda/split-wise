@@ -78,7 +78,6 @@ fun BottomNavigationBar(
         val currentDestination = navController.currentBackStackEntryAsState().value?.destination
 
         items.forEach { screen ->
-//            val isSelected = currentDestination?.route == screen.route
             val icon = when (screen) {
                 Screen.Home -> R.drawable.home_icon
                 Screen.Groups -> R.drawable.group_icon
@@ -88,12 +87,15 @@ fun BottomNavigationBar(
                 else -> R.drawable.home_icon
             }
 
+            val selected = currentDestination?.route == screen.route
             NavigationBarItem(
-                selected = currentDestination?.route == screen.route,
+                selected = selected,
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(Screen.Home.route)
-                        launchSingleTop = true
+                    if (!selected) {
+                        navController.navigate(screen.route) {
+                            popUpTo(Screen.Home.route)
+                            launchSingleTop = true
+                        }
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
