@@ -36,6 +36,7 @@ class SignupViewModel: ViewModel() {
 
         val fullNameError = when {
             fullName.isBlank() -> "Full name is required"
+            !fullName.trim().contains(" ") -> "Enter your first and last name"
             else -> null
         }
 
@@ -48,6 +49,9 @@ class SignupViewModel: ViewModel() {
         val passwordError = when {
             password.isBlank() -> "Password is required"
             password.length < 8 -> "Password must be at least 8 characters"
+            !password.any { it.isUpperCase() } -> "Password must contain at least one uppercase letter"
+            !password.any { it.isLowerCase() } -> "Password must contain at least one lowercase letter"
+            !password.any { it.isDigit() } -> "Password must contain at least one digit"
             else -> null
         }
 
