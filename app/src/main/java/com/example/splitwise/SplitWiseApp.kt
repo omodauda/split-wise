@@ -5,6 +5,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.splitwise.ui.features.auth.login.LoginScreen
+import com.example.splitwise.ui.features.auth.signup.SignupScreen
 
 @Composable
 fun SplitWiseApp() {
@@ -12,6 +13,6 @@ fun SplitWiseApp() {
         modifier = Modifier
             .fillMaxSize()
     ) { innerPadding ->
-        LoginScreen()
+        SignupScreen()
     }
 }
