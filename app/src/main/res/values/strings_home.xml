@@ -12,4 +12,5 @@
     <string name="no_bill">No bills yet</string>
     <string name="no_bill_desc">Start splitting expenses with your friends by adding your first bill</string>
     <string name="add_first_bill">Add your first bill</string>
+    <string name="you_are_owed">You are owed</string>
 </resources>
