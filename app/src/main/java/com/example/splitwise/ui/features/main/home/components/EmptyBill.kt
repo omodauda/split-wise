@@ -1,4 +1,4 @@
-package com.example.splitwise.ui.features.main.home
+package com.example.splitwise.ui.features.main.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
