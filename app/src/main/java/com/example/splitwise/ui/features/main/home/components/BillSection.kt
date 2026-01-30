@@ -28,13 +28,14 @@ import java.util.Locale
 
 @Composable
 fun OwedView(
+    openReminderModal: () -> Unit,
     modifier: Modifier = Modifier
 ){
     BillSection(
         titleRes = R.string.you_are_owed,
         iconRes = R.drawable.arrow_down,
         itemCount = 5,
-        itemContent = { OwedItem() },
+        itemContent = { OwedItem( openReminderModal) },
         modifier = modifier
     )
 }
