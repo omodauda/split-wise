@@ -9,9 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,18 +26,23 @@ import com.example.splitwise.ui.components.AppIconTextButton
 import com.example.splitwise.ui.features.main.home.components.DashBoard
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
+import com.example.splitwise.ui.features.main.home.components.ReminderModal
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
+    val sheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -40,9 +51,16 @@ fun HomeScreen(
             DashBoard()
             ContentView(
                 onAddBill = {},
+                openReminderModal = {showBottomSheet = true},
                 modifier = Modifier
                     .weight(1f)
             )
+            if (showBottomSheet) {
+                ReminderModal(
+                    sheetState,
+                    onDismissRequest = {showBottomSheet = false}
+                )
+            }
         }
     }
 }
@@ -50,6 +68,7 @@ fun HomeScreen(
 @Composable
 fun ContentView(
     onAddBill: () -> Unit,
+    openReminderModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -68,7 +87,7 @@ fun ContentView(
 //            modifier = Modifier
 //                .weight(1f)
 //        )
-        OwedView()
+        OwedView(openReminderModal = {openReminderModal()})
         Spacer(Modifier.height(Spacing.large))
         OwingView()
         Spacer(Modifier.height(Spacing.large))
