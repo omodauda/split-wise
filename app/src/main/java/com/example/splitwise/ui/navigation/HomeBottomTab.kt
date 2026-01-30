@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -35,10 +36,11 @@ fun HomeBottomTab(
 
     Scaffold(
         bottomBar = {BottomNavigationBar(bottomNavController)}
-    ) {
+    ) { innerPadding ->
         NavHost(
             navController = bottomNavController,
-            startDestination = startDestination
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = Screen.Home.route) {
                 HomeScreen()

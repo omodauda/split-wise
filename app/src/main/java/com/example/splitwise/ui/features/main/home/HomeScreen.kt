@@ -31,18 +31,16 @@ fun HomeScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) { innerPadding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(innerPadding)
         ) {
             DashBoard()
             ContentView(
                 onAddBill = {},
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
                     .weight(1f)
             )
         }
@@ -56,6 +54,7 @@ fun ContentView(
 ) {
     Column(
         modifier = modifier
+            .verticalScroll(rememberScrollState())
             .padding(start = ScreenDimensions.sectionSpacing, end = ScreenDimensions.sectionSpacing, top = ScreenDimensions.verticalPadding)
     ) {
         AppIconTextButton(
