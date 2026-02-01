@@ -28,7 +28,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -43,7 +42,6 @@ fun AppTextField(
     @DrawableRes leadingIcon: Int? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     isPassword: Boolean = false,
-    isRequired: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorMessage: String? = null,
@@ -63,11 +61,6 @@ fun AppTextField(
                 buildAnnotatedString {
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
                         append(label)
-                    }
-                    if (isRequired) {
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.error)) {
-                            append(" *")
-                        }
                     }
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -113,8 +106,8 @@ fun AppTextField(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
                 cursorColor = MaterialTheme.colorScheme.primary,
-                focusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
             modifier = Modifier.fillMaxWidth().onFocusChanged {focusState -> isFocused = focusState.isFocused}
         )
