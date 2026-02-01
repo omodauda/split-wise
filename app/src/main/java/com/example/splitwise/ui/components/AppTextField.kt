@@ -37,6 +37,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    readOnly: Boolean? = false,
     label: String? = null,
     placeholder: String? = null,
     @DrawableRes leadingIcon: Int? = null,
@@ -70,6 +71,7 @@ fun AppTextField(
         OutlinedTextField(
             value,
             onValueChange,
+            readOnly = readOnly ?: false,
             placeholder = { if (!placeholder.isNullOrEmpty()) Text(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)},
             leadingIcon = if (leadingIcon != null) {
                 {
