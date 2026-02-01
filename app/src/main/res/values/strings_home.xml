@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dashboard">Dashboard</string>
+    <string name="net_balance">Your Net Balance</string>
+    <string name="total_owed">You\'re owed</string>
+    <string name="total_owing">You\'re owing</string>
+    <string name="add_bill">Add Bill</string>
+    <string name="owes_you">owes you</string>
+    <string name="settle">Settle</string>
+    <string name="you_owe">You owe</string>
+    <string name="pay">Pay</string>
+    <string name="no_bill">No bills yet</string>
+    <string name="no_bill_desc">Start splitting expenses with your friends by adding your first bill</string>
+    <string name="add_first_bill">Add your first bill</string>
+    <string name="you_are_owed">You are owed</string>
+    <string name="send_reminder">Send Reminder</string>
+    <string name="record_payment">Record Payment</string>
+    <string name="settlement_amount">Settlement Amount</string>
+    <string name="payment_method">Payment Method</string>
+    <string name="cash">Cash</string>
+    <string name="bank_transfer">Bank Transfer</string>
+    <string name="credit_card">Credit Card</string>
+    <string name="record_payment_received">Record Payment Received</string>
+    <string name="settle_up">Settle Up</string>
+    <string name="confirm_payment">Confirm Payment</string>
+</resources>

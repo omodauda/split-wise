@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -35,10 +36,11 @@ fun HomeBottomTab(
 
     Scaffold(
         bottomBar = {BottomNavigationBar(bottomNavController)}
-    ) {
+    ) { innerPadding ->
         NavHost(
             navController = bottomNavController,
-            startDestination = startDestination
+            startDestination = startDestination,
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = Screen.Home.route) {
                 HomeScreen()
@@ -78,7 +80,6 @@ fun BottomNavigationBar(
         val currentDestination = navController.currentBackStackEntryAsState().value?.destination
 
         items.forEach { screen ->
-//            val isSelected = currentDestination?.route == screen.route
             val icon = when (screen) {
                 Screen.Home -> R.drawable.home_icon
                 Screen.Groups -> R.drawable.group_icon
@@ -88,12 +89,15 @@ fun BottomNavigationBar(
                 else -> R.drawable.home_icon
             }
 
+            val selected = currentDestination?.route == screen.route
             NavigationBarItem(
-                selected = currentDestination?.route == screen.route,
+                selected = selected,
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(Screen.Home.route)
-                        launchSingleTop = true
+                    if (!selected) {
+                        navController.navigate(screen.route) {
+                            popUpTo(Screen.Home.route)
+                            launchSingleTop = true
+                        }
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(

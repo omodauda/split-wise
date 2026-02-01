@@ -137,7 +137,7 @@ val Typography = Typography(
 // Currency/Amount display
 val CurrencyLarge = TextStyle(
     fontFamily = inter,
-    fontWeight = FontWeight.Bold,
+    fontWeight = FontWeight.Normal,
     fontSize = 32.sp,
     lineHeight = 40.sp,
     letterSpacing = 0.sp

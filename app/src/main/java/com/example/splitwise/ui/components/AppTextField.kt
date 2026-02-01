@@ -28,7 +28,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -38,12 +37,12 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    readOnly: Boolean? = false,
     label: String? = null,
     placeholder: String? = null,
     @DrawableRes leadingIcon: Int? = null,
     trailingIcon: (@Composable () -> Unit)? = null,
     isPassword: Boolean = false,
-    isRequired: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorMessage: String? = null,
@@ -64,11 +63,6 @@ fun AppTextField(
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
                         append(label)
                     }
-                    if (isRequired) {
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.error)) {
-                            append(" *")
-                        }
-                    }
                 },
                 style = MaterialTheme.typography.bodyMedium,
             )
@@ -77,6 +71,7 @@ fun AppTextField(
         OutlinedTextField(
             value,
             onValueChange,
+            readOnly = readOnly ?: false,
             placeholder = { if (!placeholder.isNullOrEmpty()) Text(text = placeholder, color = MaterialTheme.colorScheme.onSurfaceVariant)},
             leadingIcon = if (leadingIcon != null) {
                 {
@@ -113,8 +108,8 @@ fun AppTextField(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
                 cursorColor = MaterialTheme.colorScheme.primary,
-                focusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.inverseOnSurface
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
             modifier = Modifier.fillMaxWidth().onFocusChanged {focusState -> isFocused = focusState.isFocused}
         )
