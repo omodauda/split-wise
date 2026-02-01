@@ -43,13 +43,14 @@ fun OwedView(
 
 @Composable
 fun OwingView(
+    openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
         titleRes = R.string.you_owe,
         iconRes = R.drawable.arrow_up,
         itemCount = 1,
-        itemContent = { OwingItem() },
+        itemContent = { OwingItem(openSettleUpModal) },
         modifier = modifier
     )
 }

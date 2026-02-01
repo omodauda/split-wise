@@ -46,7 +46,7 @@ fun OwedItem(
         descriptionText = stringResource(R.string.owes_you),
         amountText = "$138.63",
         amountColor = MaterialTheme.colorScheme.primary,
-        buttonText = "Settle",
+        buttonText = R.string.settle,
         buttonContainerColor = emerald_200,
         buttonContentColor = MaterialTheme.colorScheme.primary,
         actOnBill = {openRecordPaymentModal()},
@@ -57,6 +57,7 @@ fun OwedItem(
 
 @Composable
 fun OwingItem(
+    openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillItem(
@@ -66,10 +67,10 @@ fun OwingItem(
         descriptionText = stringResource(R.string.you_owe),
         amountText = "$36.44",
         amountColor = MaterialTheme.colorScheme.error,
-        buttonText = "Pay",
+        buttonText = R.string.pay,
         buttonContainerColor = MaterialTheme.colorScheme.errorContainer,
         buttonContentColor = MaterialTheme.colorScheme.error,
-        actOnBill = {},
+        actOnBill = {openSettleUpModal()},
         modifier = modifier
     )
 }
@@ -82,7 +83,7 @@ private fun BillItem(
     descriptionText: String,
     amountText: String,
     amountColor: Color,
-    buttonText: String,
+    buttonText: Int,
     buttonContainerColor: Color,
     buttonContentColor: Color,
     actOnBill: () -> Unit,
@@ -148,14 +149,14 @@ private fun BillItem(
                 contentPadding = PaddingValues(vertical = Spacing.extraSmall, horizontal = ScreenDimensions.itemSpacing),
             ) {
                 Text(
-                    text = buttonText,
+                    text = stringResource(buttonText),
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }
             if (sendReminder != null) {
                 Icon(
                     painter = painterResource(id = R.drawable.bell_icon),
-                    contentDescription = "Send Reminder",
+                    contentDescription = stringResource(R.string.send_reminder),
                     tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .clickable(
