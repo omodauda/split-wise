@@ -28,6 +28,7 @@ import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
 import com.example.splitwise.ui.features.main.home.components.RecordPaymentModal
 import com.example.splitwise.ui.features.main.home.components.ReminderModal
+import com.example.splitwise.ui.features.main.home.components.SettleUpModal
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
@@ -43,6 +44,9 @@ fun HomeScreen(
     val recordPaymentModalState = rememberModalBottomSheetState()
     var showRecordPaymentModal by remember { mutableStateOf(false) }
 
+    val settleUpModalState = rememberModalBottomSheetState()
+    var showSettleUpModal by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -57,6 +61,7 @@ fun HomeScreen(
                 onAddBill = {},
                 openRecordPaymentModal = {showRecordPaymentModal = true},
                 openReminderModal = {showBottomSheet = true},
+                openSettleUpModal = {showSettleUpModal = true},
                 modifier = Modifier
                     .weight(1f)
             )
@@ -72,6 +77,12 @@ fun HomeScreen(
                     onDismissRequest = {showRecordPaymentModal = false}
                 )
             }
+            if (showSettleUpModal) {
+                SettleUpModal(
+                    sheetState = settleUpModalState,
+                    onDismissRequest = {showSettleUpModal = false}
+                )
+            }
         }
     }
 }
@@ -81,6 +92,7 @@ fun ContentView(
     onAddBill: () -> Unit,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
+    openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -101,7 +113,7 @@ fun ContentView(
 //        )
         OwedView(openReminderModal = {openReminderModal()}, openRecordPaymentModal = {openRecordPaymentModal()})
         Spacer(Modifier.height(Spacing.large))
-        OwingView()
+        OwingView(openSettleUpModal)
         Spacer(Modifier.height(Spacing.large))
     }
 }
