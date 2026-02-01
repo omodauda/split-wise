@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
@@ -57,7 +58,7 @@ fun RecordPaymentModal(
                     shape = SplitWiseShapes.bottomSheet
                 )
         ) {
-            RecordPaymentModalHeader(onDismiss = {onDismissRequest()})
+            RecordPaymentModalHeader(onDismiss = {onDismissRequest()}, title = R.string.record_payment)
             RecordPaymentModalContent()
         }
     }
@@ -65,6 +66,7 @@ fun RecordPaymentModal(
 
 @Composable
 fun RecordPaymentModalHeader(
+    title: Int,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -76,7 +78,7 @@ fun RecordPaymentModalHeader(
             .padding(start = Spacing.large, end = Spacing.large, bottom = Spacing.extraSmall)
     ) {
         Text(
-            text = "Record Payment",
+            text = stringResource(title),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -97,7 +99,7 @@ fun RecordPaymentModalContent(
     modifier: Modifier = Modifier
 ) {
     var settlementAmount by remember { mutableStateOf("") }
-    val paymentMethods = listOf("Cash", "Credit Card", "Bank Transfer")
+    val paymentMethods = listOf(R.string.cash, R.string.credit_card, R.string.bank_transfer)
     var selectedPaymentMethod by remember { mutableStateOf(paymentMethods[0]) }
 
     Column(
@@ -105,10 +107,15 @@ fun RecordPaymentModalContent(
         modifier = modifier
             .padding(Spacing.large)
     ) {
-        OwesView()
+        PaymentDetailView(
+            fullName = "Sarah Johnson",
+            amount = "$138.63",
+            title = R.string.owes_you,
+            owe = false
+        )
         Spacer(Modifier.height(ScreenDimensions.sectionSpacing))
         AppTextField(
-            label = "Settlement Amount",
+            label = stringResource(R.string.settlement_amount),
             placeholder = "0.00",
             value = settlementAmount,
             onValueChange = { newValue ->
@@ -123,21 +130,25 @@ fun RecordPaymentModalContent(
             )
         )
         AppDropdownPicker(
-            label = "Payment method",
+            label = R.string.payment_method,
             options = paymentMethods,
             onOptionSelected = { selectedPaymentMethod = it },
             selectedOption = selectedPaymentMethod
         )
         Spacer(Modifier.height(ScreenDimensions.sectionSpacing))
         AppTextButton(
-            title = "Record Payment Received",
+            title = stringResource(R.string.record_payment_received),
             onClick = {}
         )
     }
 }
 
 @Composable
-fun OwesView(
+fun PaymentDetailView(
+    fullName: String,
+    amount: String,
+    title: Int,
+    owe: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -162,28 +173,28 @@ fun OwesView(
                     .background(color = emerald_50, shape = CircleShape)
             ) {
                 Text(
-                    text = "Y",
+                    text = fullName[0].toString().uppercase(),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
             Column {
                 Text(
-                    text = "Sarah Johnson",
+                    text = fullName,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "owes you",
+                    text = stringResource(title),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
         Text(
-            text = "$130.00",
+            text = amount,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            color = if (owe) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
         )
     }
 }
