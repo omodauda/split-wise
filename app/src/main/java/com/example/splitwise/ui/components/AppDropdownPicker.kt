@@ -12,14 +12,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppDropdownPicker(
-    label: String,
-    options: List<String>,
-    selectedOption: String,
-    onOptionSelected: (String) -> Unit,
+    label: Int,
+    options: List<Int>,
+    selectedOption: Int,
+    onOptionSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -32,9 +33,9 @@ fun AppDropdownPicker(
         AppTextField(
             modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
             readOnly = true,
-            value = selectedOption,
+            value = stringResource(selectedOption),
             onValueChange = {},
-            label = label,
+            label = stringResource(label),
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
         )
         ExposedDropdownMenu(
@@ -43,7 +44,7 @@ fun AppDropdownPicker(
         ) {
             options.forEach { selectionOption ->
                 DropdownMenuItem(
-                    text = { Text(selectionOption) },
+                    text = { Text(text = stringResource(selectionOption)) },
                     onClick = {
                         onOptionSelected(selectionOption)
                         expanded = false
