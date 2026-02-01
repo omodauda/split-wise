@@ -31,6 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.ui.components.AppDropdownPicker
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -96,6 +97,9 @@ fun RecordPaymentModalContent(
     modifier: Modifier = Modifier
 ) {
     var settlementAmount by remember { mutableStateOf("") }
+    val paymentMethods = listOf("Cash", "Credit Card", "Bank Transfer")
+    var selectedPaymentMethod by remember { mutableStateOf(paymentMethods[0]) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -106,7 +110,7 @@ fun RecordPaymentModalContent(
         AppTextField(
             label = "Settlement Amount",
             placeholder = "0.00",
-            value = settlementAmount, // 2. Use the state variable
+            value = settlementAmount,
             onValueChange = { newValue ->
                 val regex = """^\d*(\.\d{0,2})?$""".toRegex()
                 if (newValue.matches(regex)) {
@@ -118,12 +122,11 @@ fun RecordPaymentModalContent(
                 keyboardType = KeyboardType.Number
             )
         )
-        AppTextField(
+        AppDropdownPicker(
             label = "Payment method",
-            placeholder = "",
-            value = "",
-            onValueChange = {},
-            leadingIcon = R.drawable.group_icon
+            options = paymentMethods,
+            onOptionSelected = { selectedPaymentMethod = it },
+            selectedOption = selectedPaymentMethod
         )
         Spacer(Modifier.height(ScreenDimensions.sectionSpacing))
         AppTextButton(
