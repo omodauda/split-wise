@@ -36,6 +36,7 @@ import com.example.splitwise.ui.theme.emerald_200
 @Composable
 fun OwedItem(
     openReminderModal: () -> Unit,
+    openRecordPaymentModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillItem(
@@ -48,7 +49,7 @@ fun OwedItem(
         buttonText = "Settle",
         buttonContainerColor = emerald_200,
         buttonContentColor = MaterialTheme.colorScheme.primary,
-        actOnBill = {},
+        actOnBill = {openRecordPaymentModal()},
         sendReminder = {openReminderModal()},
         modifier = modifier
     )
