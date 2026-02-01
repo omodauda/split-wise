@@ -26,6 +26,7 @@ import com.example.splitwise.ui.components.AppIconTextButton
 import com.example.splitwise.ui.features.main.home.components.DashBoard
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
+import com.example.splitwise.ui.features.main.home.components.RecordPaymentModal
 import com.example.splitwise.ui.features.main.home.components.ReminderModal
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -39,6 +40,9 @@ fun HomeScreen(
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    val recordPaymentModalState = rememberModalBottomSheetState()
+    var showRecordPaymentModal by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -51,6 +55,7 @@ fun HomeScreen(
             DashBoard()
             ContentView(
                 onAddBill = {},
+                openRecordPaymentModal = {showRecordPaymentModal = true},
                 openReminderModal = {showBottomSheet = true},
                 modifier = Modifier
                     .weight(1f)
@@ -61,6 +66,12 @@ fun HomeScreen(
                     onDismissRequest = {showBottomSheet = false}
                 )
             }
+            if (showRecordPaymentModal) {
+                RecordPaymentModal(
+                    sheetState = recordPaymentModalState,
+                    onDismissRequest = {showRecordPaymentModal = false}
+                )
+            }
         }
     }
 }
@@ -69,6 +80,7 @@ fun HomeScreen(
 fun ContentView(
     onAddBill: () -> Unit,
     openReminderModal: () -> Unit,
+    openRecordPaymentModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -87,7 +99,7 @@ fun ContentView(
 //            modifier = Modifier
 //                .weight(1f)
 //        )
-        OwedView(openReminderModal = {openReminderModal()})
+        OwedView(openReminderModal = {openReminderModal()}, openRecordPaymentModal = {openRecordPaymentModal()})
         Spacer(Modifier.height(Spacing.large))
         OwingView()
         Spacer(Modifier.height(Spacing.large))
