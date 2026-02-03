@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="step">Step</string>
+    <string name="of">of</string>
+    <string name="bill_amount">Bill Amount</string>
+    <string name="add_bill_desc">Description</string>
+    <string name="desc_placeholder">What\'s this bill for?</string>
+    <string name="category">Category</string>
+    <string name="food_dining">Food &amp; Dining</string>
+    <string name="transport">Transport</string>
+    <string name="home">Home</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="shopping">Shopping</string>
+    <string name="other">Other</string>
+    <string name="date">Date</string>
+    <string name="Continue">Continue</string>
+</resources>
