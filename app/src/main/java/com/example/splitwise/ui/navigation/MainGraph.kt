@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.splitwise.ui.features.main.addBill.AddBillScreen
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController
@@ -16,6 +17,9 @@ fun NavGraphBuilder.mainNavGraph(
             HomeBottomTab(
                 navController
             )
+        }
+        composable(route = Screen.AddBill.route){
+            AddBillScreen(goBack = {navController.popBackStack()})
         }
 
     }
