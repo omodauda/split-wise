@@ -105,11 +105,13 @@ fun AppTextField(
             shape = SplitWiseShapes.inputField,
             isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedBorderColor = MaterialTheme.colorScheme.primary
+//                focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
+//                cursorColor = MaterialTheme.colorScheme.primary,
+//                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
             modifier = Modifier.fillMaxWidth().onFocusChanged {focusState -> isFocused = focusState.isFocused}
         )
