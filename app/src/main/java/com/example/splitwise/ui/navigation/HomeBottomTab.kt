@@ -21,6 +21,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
 import com.example.splitwise.ui.features.main.activity.ActivityScreen
+import com.example.splitwise.ui.features.main.addBill.AddBillScreen
 import com.example.splitwise.ui.features.main.friends.FriendScreen
 import com.example.splitwise.ui.features.main.groups.GroupScreen
 import com.example.splitwise.ui.features.main.home.HomeScreen
@@ -40,10 +41,10 @@ fun HomeBottomTab(
         NavHost(
             navController = bottomNavController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(route = Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(goToAddBill = {navController.navigate(Screen.AddBill.route)})
             }
             composable(route = Screen.Groups.route) {
                 GroupScreen()
