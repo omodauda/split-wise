@@ -65,4 +65,8 @@
     <string name="notifications_sent">Notifications Sent</string>
     <string name="everyone_notified">Everyone has been notified</string>
     <string name="back_to_home">Back to Home</string>
+    <plurals name="member_count">
+        <item quantity="one">%d member</item>
+        <item quantity="other">%d members</item>
+    </plurals>
 </resources>
