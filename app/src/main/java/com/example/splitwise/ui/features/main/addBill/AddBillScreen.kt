@@ -20,13 +20,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
@@ -35,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.features.main.addBill.components.stepOne.StepOne
+import com.example.splitwise.ui.features.main.addBill.components.stepTwo.StepTwo
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -45,10 +45,25 @@ fun AddBillScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var currentStep by rememberSaveable { mutableStateOf(1) }
+    val totalSteps = 6
+    var currentStep by rememberSaveable { mutableIntStateOf(1) }
+
+    fun goToNextStep() {
+        if (currentStep < totalSteps) {
+            currentStep++
+        }
+    }
+
+    fun goToPrevStep() {
+        if (currentStep > 1) {
+            currentStep--
+        } else {
+            goBack()
+        }
+    }
 
     Scaffold(
-        bottomBar = {AddBillFooter()},
+        bottomBar = {AddBillFooter(goToNextStep = {goToNextStep()})},
         modifier = modifier
             .fillMaxSize()
     ) {innerPadding ->
@@ -56,21 +71,31 @@ fun AddBillScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(innerPadding)
         ) {
-            AddBillHeader(goBack, currentStep)
-            StepOne()
+            AddBillHeader(currentStep, totalSteps, goToPrevStep = {goToPrevStep()})
+            when (currentStep) {
+                1 -> StepOne()
+                2 -> StepTwo()
+            }
         }
     }
 }
 
 @Composable
 fun AddBillHeader(
-    goBack: () -> Unit,
     currentStep: Int,
+    totalSteps: Int,
+    goToPrevStep: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var currentProgress by remember { mutableFloatStateOf(0.5f) }
+    val currentProgress = currentStep.toFloat() / totalSteps.toFloat()
+
+    val title = when (currentStep) {
+        1 -> R.string.add_bill
+        2 -> R.string.select_group_or_friends
+        else -> R.string.add_bill}
+
     Column(
         modifier = modifier
             .padding(vertical = Spacing.extraMedium, horizontal = Spacing.large)
@@ -82,7 +107,7 @@ fun AddBillHeader(
                 .fillMaxWidth()
         ) {
             IconButton(
-                onClick = {goBack()},
+                onClick = {goToPrevStep()},
                 modifier = Modifier
                     .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = CircleShape)
             ) {
@@ -94,12 +119,12 @@ fun AddBillHeader(
             }
             Column {
                 Text(
-                    text = stringResource(R.string.add_bill),
+                    text = stringResource(title),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "${stringResource(R.string.step)} 1 ${stringResource(R.string.of)} 6",
+                    text = "${stringResource(R.string.step)} $currentStep ${stringResource(R.string.of)} $totalSteps",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -107,17 +132,18 @@ fun AddBillHeader(
         }
         Spacer(Modifier.height(Spacing.medium))
         LinearProgressIndicator(
-            progress = { currentProgress },
-            trackColor = MaterialTheme.colorScheme.surfaceContainer,
+            progress = {currentProgress},
+            modifier = Modifier.fillMaxWidth().clip(shape = CircleShape),
             color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.surfaceContainer,
             strokeCap = StrokeCap.Round,
-            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 @Composable
 fun AddBillFooter(
+    goToNextStep: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -129,7 +155,7 @@ fun AddBillFooter(
     ) {
         AppTextButton(
             title = stringResource(R.string.Continue),
-            onClick = {}
+            onClick = {goToNextStep()}
         )
     }
 }
