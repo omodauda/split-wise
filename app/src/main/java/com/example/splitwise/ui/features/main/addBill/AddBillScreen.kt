@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.features.main.addBill.components.stepOne.StepOne
+import com.example.splitwise.ui.features.main.addBill.components.stepThree.StepThree
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.StepTwo
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -45,7 +46,7 @@ fun AddBillScreen(
     goBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val totalSteps = 6
+    val totalSteps = 7
     var currentStep by rememberSaveable { mutableIntStateOf(1) }
 
     fun goToNextStep() {
@@ -77,6 +78,7 @@ fun AddBillScreen(
             when (currentStep) {
                 1 -> StepOne()
                 2 -> StepTwo()
+                3 -> StepThree()
             }
         }
     }
@@ -94,6 +96,11 @@ fun AddBillHeader(
     val title = when (currentStep) {
         1 -> R.string.add_bill
         2 -> R.string.select_group_or_friends
+        3 -> R.string.select_members
+        4 -> R.string.who_paid
+        5 -> R.string.split_method
+        6 -> R.string.adjust_perc //& exact amounts
+        7 -> R.string.review
         else -> R.string.add_bill}
 
     Column(
