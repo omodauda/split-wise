@@ -111,7 +111,7 @@ fun StepTwoContent(
         }
         StepTwoNavHost(
             navController = navController,
-            modifier = Modifier.padding(top = Spacing.large)
+            modifier = Modifier.padding(top = Spacing.medium)
         )
     }
 }
