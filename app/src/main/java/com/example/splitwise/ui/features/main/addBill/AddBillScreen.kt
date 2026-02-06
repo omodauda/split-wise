@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
 import com.example.splitwise.ui.components.AppTextButton
+import com.example.splitwise.ui.features.main.addBill.components.stepFive.StepFive
 import com.example.splitwise.ui.features.main.addBill.components.stepFour.StepFour
 import com.example.splitwise.ui.features.main.addBill.components.stepOne.StepOne
 import com.example.splitwise.ui.features.main.addBill.components.stepThree.StepThree
@@ -81,6 +82,7 @@ fun AddBillScreen(
                 2 -> StepTwo()
                 3 -> StepThree()
                 4 -> StepFour()
+                5 -> StepFive()
             }
         }
     }
