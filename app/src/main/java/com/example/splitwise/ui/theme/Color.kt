@@ -153,3 +153,7 @@ val error_light = Color(0xFFDC2626)
 val error_dark = Color(0xFFFCA5A5)
 val info_light = Color(0xFF3B82F6)
 val info_dark = Color(0xFF60A5FA)
+
+val blue_chalk = Color(color = 0xFFF3E8FF)
+val papaya_whip = Color(color = 0xFFFFEDD4)
+val crystalPeak = Color(color = 0xFFDBEAFE)
