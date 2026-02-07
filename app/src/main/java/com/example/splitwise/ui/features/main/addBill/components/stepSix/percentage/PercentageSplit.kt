@@ -137,13 +137,14 @@ fun PercentageSplit(
             )
         }
         item {
-            TotalPercentageNote()
+            BillSplitNote(stringResource(R.string.perc_must_add_up))
         }
     }
 }
 
 @Composable
-fun TotalPercentageNote(
+fun BillSplitNote(
+    note: String,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -154,7 +155,7 @@ fun TotalPercentageNote(
             .padding(ScreenDimensions.contentPadding)
     ) {
         Text(
-            text = stringResource(R.string.perc_must_add_up),
+            text = note,
             style = MaterialTheme.typography.bodyMedium,
             color = acorn
         )
