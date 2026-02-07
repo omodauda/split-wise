@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
+import com.example.splitwise.ui.features.main.addBill.components.stepSix.exactAmount.ExactAmountSplit
 import com.example.splitwise.ui.features.main.addBill.components.stepSix.percentage.PercentageSplit
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -33,7 +34,8 @@ fun StepSix(
     ) {
         BalanceDetails()
         Spacer(Modifier.height(ScreenDimensions.contentPadding))
-        PercentageSplit()
+//        PercentageSplit()
+        ExactAmountSplit()
     }
 }
 
