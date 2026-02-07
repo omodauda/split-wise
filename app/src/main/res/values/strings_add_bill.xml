@@ -44,7 +44,6 @@
     <string name="set_perc_for_each">Set percentage for each person</string>
     <string name="percentage">Percentage</string>
     <string name="amount">Amount</string>
-    <string name="perc_must_add_up">Percentage must add up to 100%</string>
     <string name="almost_there">Almost There!</string>
     <string name="review_desc">Review the details before adding this bill</string>
     <string name="split_breakdown">Split Breakdown</string>
@@ -69,4 +68,5 @@
         <item quantity="one">%d member</item>
         <item quantity="other">%d members</item>
     </plurals>
+    <string name="perc_must_add_up">⚠️ Percentages must add up to 100%</string>
 </resources>
