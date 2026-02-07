@@ -69,4 +69,5 @@
         <item quantity="other">%d members</item>
     </plurals>
     <string name="perc_must_add_up">⚠️ Percentages must add up to 100%</string>
+    <string name="amount_must_add_up">⚠️ Amounts must add up to %s</string>
 </resources>
