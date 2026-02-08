@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.splitwise.ui.features.main.addBill.AddBillScreen
+import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController
@@ -19,8 +20,18 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
         composable(route = Screen.AddBill.route){
-            AddBillScreen(goBack = {navController.popBackStack()})
+            AddBillScreen(
+                goBack = {navController.popBackStack()},
+                goToAddBillSuccess = {navController.navigate(Screen.AddBillSuccess.route)}
+            )
         }
-
+        composable( route = Screen.AddBillSuccess.route){
+            AddBillSuccessScreen(goHome = {
+                navController.navigate(Screen.Home.route) {
+                    popUpTo(Screen.Home.route)
+                    launchSingleTop =true
+                }
+            })
+        }
     }
 }

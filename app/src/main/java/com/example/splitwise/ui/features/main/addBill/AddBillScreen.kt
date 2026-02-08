@@ -48,6 +48,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 @Composable
 fun AddBillScreen(
     goBack: () -> Unit,
+    goToAddBillSuccess: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val totalSteps = 7
@@ -56,6 +57,9 @@ fun AddBillScreen(
     fun goToNextStep() {
         if (currentStep < totalSteps) {
             currentStep++
+            return
+        }else if (currentStep == totalSteps) {
+            goToAddBillSuccess()
         }
     }
 
@@ -188,6 +192,6 @@ fun AddBillFooter(
 @Composable
 fun AddBillScreenPreview() {
     SplitWiseTheme {
-        AddBillScreen(goBack = {})
+        AddBillScreen(goBack = {}, goToAddBillSuccess = {})
     }
 }

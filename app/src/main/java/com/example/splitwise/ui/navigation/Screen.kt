@@ -12,4 +12,5 @@ sealed class Screen(val route: String) {
     object Friends: Screen(route = "Friends")
     object Profile: Screen(route = "Profile")
     object AddBill: Screen(route = "AddBill")
+    object AddBillSuccess: Screen(route = "AddBillSuccess")
 }
