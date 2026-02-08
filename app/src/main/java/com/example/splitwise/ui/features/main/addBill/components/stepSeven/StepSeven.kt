@@ -77,7 +77,7 @@ fun StepSeven(
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large)
+            .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large, bottom = Spacing.large)
             .verticalScroll(rememberScrollState())
     ) {
         ReviewHeader()
