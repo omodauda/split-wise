@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.model.SplitEntryState
 import com.example.splitwise.model.User
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.theme.ComponentDimensions
@@ -49,11 +50,7 @@ import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.spectrumBlue
 import com.example.splitwise.ui.theme.zumthor
 
-data class PercentageEntryState(
-    val user: User,
-    val percentage: String = "",
-    val amount: Double = 0.0
-)
+
 @Composable
 fun PercentageSplit(
     modifier: Modifier = Modifier
@@ -67,8 +64,8 @@ fun PercentageSplit(
 
     // The single source of truth for the state of all entries
     val entryStates = remember {
-        mutableStateListOf<PercentageEntryState>().apply {
-            addAll(users.map { PercentageEntryState(user = it) })
+        mutableStateListOf<SplitEntryState>().apply {
+            addAll(users.map { SplitEntryState(user = it) })
         }
     }
 
@@ -82,7 +79,7 @@ fun PercentageSplit(
         val evenAmount = totalBillAmount / users.size
 
         val newStates = users.map { user ->
-            PercentageEntryState(
+            SplitEntryState(
                 user = user,
                 percentage = String.format(java.util.Locale.US, "%.1f", evenPercentage),
                 amount = evenAmount
@@ -164,7 +161,7 @@ fun BillSplitNote(
 
 @Composable
 fun PercentageEntry(
-    state: PercentageEntryState,
+    state: SplitEntryState,
     onPercentageChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
