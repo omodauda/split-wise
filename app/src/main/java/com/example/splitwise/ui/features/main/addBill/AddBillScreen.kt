@@ -36,6 +36,7 @@ import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.features.main.addBill.components.stepFive.StepFive
 import com.example.splitwise.ui.features.main.addBill.components.stepFour.StepFour
 import com.example.splitwise.ui.features.main.addBill.components.stepOne.StepOne
+import com.example.splitwise.ui.features.main.addBill.components.stepSeven.StepSeven
 import com.example.splitwise.ui.features.main.addBill.components.stepSix.StepSix
 import com.example.splitwise.ui.features.main.addBill.components.stepThree.StepThree
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.StepTwo
@@ -85,6 +86,7 @@ fun AddBillScreen(
                 4 -> StepFour()
                 5 -> StepFive()
                 6 -> StepSix()
+                7 -> StepSeven()
             }
         }
     }
