@@ -7,8 +7,10 @@ sealed class Screen(val route: String) {
     object ForgotPassword: Screen("ForgotPassword")
 
     object Home: Screen("Home")
-    object Groups: Screen(route = "Groups")
+//    object Groups: Screen(route = "Groups")
     object Activity: Screen(route = "Activity")
     object Friends: Screen(route = "Friends")
     object Profile: Screen(route = "Profile")
+    object AddBill: Screen(route = "AddBill")
+    object AddBillSuccess: Screen(route = "AddBillSuccess")
 }

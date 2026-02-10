@@ -36,6 +36,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    goToAddBill: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -58,7 +59,7 @@ fun HomeScreen(
         ) {
             DashBoard()
             ContentView(
-                onAddBill = {},
+                onAddBill = {goToAddBill()},
                 openRecordPaymentModal = {showRecordPaymentModal = true},
                 openReminderModal = {showBottomSheet = true},
                 openSettleUpModal = {showSettleUpModal = true},
@@ -131,6 +132,6 @@ fun ContentView(
 @Composable
 fun HomeScreenPreview() {
     SplitWiseTheme {
-        HomeScreen()
+        HomeScreen(goToAddBill = {})
     }
 }

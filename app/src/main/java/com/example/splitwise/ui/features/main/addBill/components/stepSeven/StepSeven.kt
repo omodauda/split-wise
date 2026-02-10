@@ -1,0 +1,340 @@
+package com.example.splitwise.ui.features.main.addBill.components.stepSeven
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.splitwise.R
+import com.example.splitwise.model.SplitEntryState
+import com.example.splitwise.model.User
+import com.example.splitwise.ui.theme.BalanceNegative
+import com.example.splitwise.ui.theme.ComponentDimensions
+import com.example.splitwise.ui.theme.ScreenDimensions
+import com.example.splitwise.ui.theme.Spacing
+import com.example.splitwise.ui.theme.SplitWiseShapes
+import com.example.splitwise.ui.theme.SplitWiseTheme
+import com.example.splitwise.ui.theme.crystalPeak
+import com.example.splitwise.ui.theme.emerald_50
+import com.example.splitwise.ui.theme.hermes
+import com.example.splitwise.ui.theme.zumthor
+import java.util.Locale
+
+@Composable
+fun StepSeven(
+    modifier: Modifier = Modifier
+) {
+    val breakDowns = listOf(
+        SplitEntryState(
+            user = User(
+                id = "1",
+                name = "You",
+                email = "you@example.com"
+            ),
+            percentage = "30",
+            amount = 180.0
+        ),
+        SplitEntryState(
+            user = User(
+                id = "2",
+                name = "Sarah Johnson",
+                email = "sarah@example.com"
+            ),
+            percentage = "30",
+            amount = 180.0
+        ),
+        SplitEntryState(
+            user = User(
+                id = "3",
+                name = "Mick Chen",
+                email = "mike@example.com"
+            ),
+            percentage = "40",
+            amount = 240.0
+        )
+    )
+    Column(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large, bottom = Spacing.large)
+            .verticalScroll(rememberScrollState())
+    ) {
+        ReviewHeader()
+        Spacer(Modifier.height(Spacing.large))
+        ReviewDetail()
+        Spacer(Modifier.height(Spacing.medium))
+        ReviewBreakDown(breakDowns)
+        Spacer(Modifier.height(Spacing.medium))
+        NextStepView()
+    }
+}
+
+@Composable
+fun ReviewHeader(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        Image(
+            painter = painterResource(R.drawable.review_logo),
+            contentDescription = null
+        )
+        Text(
+            text = stringResource(R.string.almost_there),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(Modifier.height(Spacing.extraSmall))
+        Text(
+            text = stringResource(R.string.review_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+fun ReviewDetail(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.background, shape = SplitWiseShapes.dialog)
+            .border(width = ComponentDimensions.borderWidthMedium, color = MaterialTheme.colorScheme.surfaceVariant, shape = SplitWiseShapes.dialog)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .padding(Spacing.large)
+        ) {
+            Text(
+                text = stringResource(R.string.total_amount),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            Spacer(Modifier.height(Spacing.extraSmall))
+            Text(
+                text = "$600.00",
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(ScreenDimensions.contentPadding),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                .padding(Spacing.large)
+        ) {
+            ReviewDetailItem(label = R.string.add_bill_desc, value = "food")
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                .fillMaxWidth()
+            ) {
+                ReviewDetailItem(label = R.string.category, value = stringResource(R.string.food_dining))
+                ReviewDetailItem(label = R.string.date, value = "08/02/2026")
+            }
+            ReviewDetailItem(label = R.string.paid_by, value = "You")
+            ReviewDetailItem(label = R.string.split_method, value = "By Percentage")
+        }
+    }
+}
+
+@Composable
+fun ReviewDetailItem(
+    label: Int,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = stringResource(label),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(Spacing.extraSmall))
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+@Composable
+fun ReviewBreakDown(
+    breakDowns: List<SplitEntryState>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier
+    ) {
+        Text(
+            text = stringResource(R.string.split_breakdown),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(Modifier.height(ScreenDimensions.itemSpacing))
+
+        breakDowns.forEach {
+            SplitBreakDownItem(state = it)
+            Spacer(Modifier.height(Spacing.small))
+        }
+    }
+}
+
+@Composable
+fun SplitBreakDownItem(
+    state: SplitEntryState,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.background, shape = MaterialTheme.shapes.large)
+            .border(width = ComponentDimensions.borderWidthMedium, color = MaterialTheme.colorScheme.surfaceVariant, shape = MaterialTheme.shapes.large)
+            .padding(Spacing.medium)
+
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(ComponentDimensions.iconSizeExtraLarge)
+                    .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape)
+            ) {
+                Text(
+                    text = "M",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Column{
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.small)
+                ) {
+                    Text(
+                        text = state.user.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    if (state.user.name == "You") {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .background(color = emerald_50, shape = SplitWiseShapes.dialog)
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "Me",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = "${state.percentage}% ${stringResource(R.string.of)} ${stringResource(R.string.total)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        Text(
+            text = "$${String.format(Locale.US, "%.2f", state.amount)}",
+            style = BalanceNegative,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+@Composable
+fun NextStepView(
+    modifier: Modifier = Modifier
+) {
+    val nextSteps = stringArrayResource(R.array.next_items)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(color = zumthor, shape = SplitWiseShapes.card)
+            .border(width = ComponentDimensions.borderWidthMedium, color = crystalPeak, shape = SplitWiseShapes.card)
+            .padding(ScreenDimensions.contentPadding)
+    ) {
+        Text(
+            text = stringResource(R.string.what_next),
+            style = MaterialTheme.typography.titleSmall,
+            color = hermes
+        )
+        Spacer(Modifier.height(Spacing.small))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(Spacing.small)
+        ) {
+            nextSteps.forEach { stepText ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "•",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = hermes
+                    )
+                    Text(
+                        text = stepText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = hermes
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+fun StepSevenPreview() {
+    SplitWiseTheme {
+        StepSeven()
+    }
+}

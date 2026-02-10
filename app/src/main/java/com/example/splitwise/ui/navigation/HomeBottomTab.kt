@@ -22,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
 import com.example.splitwise.ui.features.main.activity.ActivityScreen
 import com.example.splitwise.ui.features.main.friends.FriendScreen
-import com.example.splitwise.ui.features.main.groups.GroupScreen
+//import com.example.splitwise.ui.features.main.groups.GroupScreen
 import com.example.splitwise.ui.features.main.home.HomeScreen
 import com.example.splitwise.ui.features.main.profile.ProfileScreen
 import com.example.splitwise.ui.theme.Elevation
@@ -40,14 +40,14 @@ fun HomeBottomTab(
         NavHost(
             navController = bottomNavController,
             startDestination = startDestination,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(route = Screen.Home.route) {
-                HomeScreen()
+                HomeScreen(goToAddBill = {navController.navigate(Screen.AddBill.route)})
             }
-            composable(route = Screen.Groups.route) {
-                GroupScreen()
-            }
+//            composable(route = Screen.Groups.route) {
+//                GroupScreen()
+//            }
             composable(route = Screen.Activity.route) {
                 ActivityScreen()
             }
@@ -67,7 +67,7 @@ fun BottomNavigationBar(
 ) {
     val items = listOf(
         Screen.Home,
-        Screen.Groups,
+//        Screen.Groups,
         Screen.Activity,
         Screen.Friends,
         Screen.Profile
@@ -82,7 +82,7 @@ fun BottomNavigationBar(
         items.forEach { screen ->
             val icon = when (screen) {
                 Screen.Home -> R.drawable.home_icon
-                Screen.Groups -> R.drawable.group_icon
+//                Screen.Groups -> R.drawable.group_icon
                 Screen.Activity -> R.drawable.activity_icon
                 Screen.Friends -> R.drawable.friends_icon
                 Screen.Profile -> R.drawable.profile_icon

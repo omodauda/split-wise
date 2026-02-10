@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="step">Step</string>
+    <string name="of">of</string>
+    <string name="bill_amount">Bill Amount</string>
+    <string name="add_bill_desc">Description</string>
+    <string name="desc_placeholder">What\'s this bill for?</string>
+    <string name="category">Category</string>
+    <string name="food_dining">Food &amp; Dining</string>
+    <string name="transport">Transport</string>
+    <string name="home">Home</string>
+    <string name="entertainment">Entertainment</string>
+    <string name="shopping">Shopping</string>
+    <string name="other">Other</string>
+    <string name="date">Date</string>
+    <string name="Continue">Continue</string>
+    <string name="select_group_or_friends">Select Group or Friends</string>
+    <string name="groups">Groups</string>
+    <string name="friends">Friends</string>
+    <string name="select_a_group">Select a group</string>
+    <string name="select_friends">Select friends(multiple)</string>
+    <string name="select_members">Select Members</string>
+    <string name="who_paid">Who Paid?</string>
+    <string name="split_method">Split Method</string>
+    <string name="adjust_perc">Adjust Percentages</string>
+    <string name="review">Review &amp; Confirm</string>
+    <string name="enter_exact_amounts">Enter Exact Amounts</string>
+    <string name="who_is_splitting">Who is splitting this bill?</string>
+    <string name="me">Me</string>
+    <string name="you">You</string>
+    <string name="who_paid_bill">Who paid for this bill?</string>
+    <string name="total_amount">Total Amount</string>
+    <string name="paid_by">Paid by</string>
+    <string name="how_to_split">How do you want to split this?</string>
+    <string name="split_equally">Split Equally</string>
+    <string name="equal_desc">Everyone pays the same amount</string>
+    <string name="per_person">per person</string>
+    <string name="by_percentage">By Percentage</string>
+    <string name="perc_desc">Set custom percentage for each person</string>
+    <string name="exact_amounts">Exact Amounts</string>
+    <string name="exact_desc">Enter exact amount for each person</string>
+    <string name="remaining">Remaining</string>
+    <string name="distribute_evenly">Distribute Evenly</string>
+    <string name="set_perc_for_each">Set percentage for each person</string>
+    <string name="percentage">Percentage</string>
+    <string name="amount">Amount</string>
+    <string name="almost_there">Almost There!</string>
+    <string name="review_desc">Review the details before adding this bill</string>
+    <string name="split_breakdown">Split Breakdown</string>
+    <string name="people">people </string>
+    <string name="total">total</string>
+    <string name="what_next">ℹ️ What happens next?</string>
+    <string-array name="next_items">
+        <item>All participants will be notified</item>
+        <item>Balances will update automatically</item>
+        <item>You can edit or delete anytime</item>
+    </string-array>
+    <string-array name="enter_each_amount_desc">Enter exact amount for each person</string-array>
+    <string name="bill_added">Bill Added Successfully!</string>
+    <string name="bill_success_desc">Your $%s bill has been split</string>
+    <string name="notify_people">%s people will be notified</string>
+    <string name="balances_update">Balances Updated</string>
+    <string name="account_synced">All accounts synced</string>
+    <string name="notifications_sent">Notifications Sent</string>
+    <string name="everyone_notified">Everyone has been notified</string>
+    <string name="back_to_home">Back to Home</string>
+    <plurals name="member_count">
+        <item quantity="one">%d member</item>
+        <item quantity="other">%d members</item>
+    </plurals>
+    <string name="perc_must_add_up">⚠️ Percentages must add up to 100%</string>
+    <string name="amount_must_add_up">⚠️ Amounts must add up to %s</string>
+</resources>

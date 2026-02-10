@@ -47,6 +47,7 @@ fun AppTextField(
     isError: Boolean = false,
     errorMessage: String? = null,
     modifier: Modifier = Modifier,
+    enabled: Boolean? = true
 ) {
     var isFocused by remember { mutableStateOf(false
     )}
@@ -105,12 +106,15 @@ fun AppTextField(
             shape = SplitWiseShapes.inputField,
             isError = isError,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
-                cursorColor = MaterialTheme.colorScheme.primary,
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                focusedBorderColor = MaterialTheme.colorScheme.primary
+//                focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
+//                cursorColor = MaterialTheme.colorScheme.primary,
+//                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+//                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
+            enabled = enabled == true,
             modifier = Modifier.fillMaxWidth().onFocusChanged {focusState -> isFocused = focusState.isFocused}
         )
         if (isError && !errorMessage.isNullOrEmpty()) {
