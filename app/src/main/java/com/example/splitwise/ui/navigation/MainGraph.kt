@@ -4,11 +4,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.addBill.AddBillScreen
 import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
 
 fun NavGraphBuilder.mainNavGraph(
-    navController: NavHostController
+    navController: NavHostController,
+    authViewModel: AuthViewModel
 ) {
     navigation(
         startDestination = Screen.Home.route,
@@ -16,7 +18,8 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         composable(route = Screen.Home.route) {
             HomeBottomTab(
-                navController
+                navController,
+                authViewModel
             )
         }
         composable(route = Screen.AddBill.route){

@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.activity.ActivityScreen
 import com.example.splitwise.ui.features.main.friends.FriendScreen
 //import com.example.splitwise.ui.features.main.groups.GroupScreen
@@ -30,6 +31,7 @@ import com.example.splitwise.ui.theme.Elevation
 @Composable
 fun HomeBottomTab(
     navController: NavController,
+    authViewModel: AuthViewModel,
     startDestination: String = Screen.Home.route
 ) {
     val bottomNavController = rememberNavController()
@@ -55,7 +57,7 @@ fun HomeBottomTab(
                 FriendScreen()
             }
             composable(route = Screen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(authViewModel = authViewModel)
             }
         }
     }
