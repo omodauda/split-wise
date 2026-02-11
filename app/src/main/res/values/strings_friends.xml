@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="friends">Friends</string>
+    <string name="search_friends">Search friends...</string>
+    <string name="no_friends">No friends yet</string>
+    <string name="no_friends_desc">Invite friends to start splitting bills together</string>
+    <string name="invite_first_friend">Invite Your First Friend</string>
+    <string name="empty_friend">No friends found</string>
+    <string name="empty_friend_desc">Try a different search</string>
+    <string name="invite_friends">Invite Friends</string>
+    <string name="invite_via_email">Invite via email</string>
+    <string name="send">Send</string>
+    <string name="or_via">Or invite via</string>
+    <string name="sms">SMS</string>
+    <string name="share">Share</string>
+    <string name="invite_placeholder">friend@example.com</string>
+    <plurals name="friend_count">
+        <item quantity="one">%d friend</item>
+        <item quantity="other">%d friends</item>
+    </plurals>
+</resources>
