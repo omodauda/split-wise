@@ -20,4 +20,10 @@ class AuthViewModel(private val repo: AuthRepository): ViewModel() {
             repo.authenticate()
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            repo.logout()
+        }
+    }
 }

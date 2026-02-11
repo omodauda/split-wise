@@ -31,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -40,7 +42,8 @@ import java.time.Year
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    authViewModel: AuthViewModel
 ) {
     Scaffold(
         modifier = modifier
@@ -52,7 +55,9 @@ fun ProfileScreen(
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
             ProfileHeader()
-            ProfileContent()
+            ProfileContent(
+                onLogout = {authViewModel.logout()}
+            )
         }
     }
 }
@@ -113,6 +118,7 @@ fun ProfileHeader(
 
 @Composable
 fun ProfileContent(
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val currentYear = Year.now().value
@@ -134,28 +140,32 @@ fun ProfileContent(
             title = R.string.account_settings,
             subTitle = R.string.account_settings_desc,
             icon = R.drawable.settings_icon,
-            onClick = {}
+
         )
         Spacer(Modifier.height(Spacing.medium))
         ProfileItem(
             title = R.string.notifications,
             subTitle = R.string.notifications_desc,
             icon = R.drawable.notification_icon,
-            onClick = {}
+
         )
         Spacer(Modifier.height(Spacing.medium))
         ProfileItem(
             title = R.string.help_support,
             subTitle = R.string.help_desc,
             icon = R.drawable.help_icon,
-            onClick = {}
+
         )
         Spacer(Modifier.height(Spacing.medium))
         ProfileItem(
             title = R.string.logout,
             icon = R.drawable.logout_icon,
             color = MaterialTheme.colorScheme.error,
-            onClick = {}
+            modifier = Modifier
+                .clickable(
+                    enabled = true,
+                    onClick = {onLogout()}
+                )
         )
         Spacer(Modifier.height(Spacing.extraLarge))
         Column(
@@ -184,7 +194,6 @@ fun ProfileItem(
     title: Int,
     subTitle: Int? = null,
     icon: Int,
-    onClick: () -> Unit,
     color: Color? = null,
     modifier: Modifier = Modifier
 ) {
@@ -196,10 +205,6 @@ fun ProfileItem(
             .shadow(elevation = 1.dp, shape = SplitWiseShapes.card)
             .background(color = MaterialTheme.colorScheme.background, shape = SplitWiseShapes.card)
             .padding(Spacing.medium)
-            .clickable(
-                enabled = true,
-                onClick = {onClick()}
-            )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -247,7 +252,9 @@ fun ProfileItem(
 )
 @Composable
 fun ProfileScreenPreview() {
+    val container = FakeAppContainer()
+    val vm = AuthViewModel(container.authRepository)
     SplitWiseTheme {
-        ProfileScreen()
+        ProfileScreen(authViewModel = vm)
     }
 }
