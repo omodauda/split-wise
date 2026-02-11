@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="activity">Activity</string>
+    <string name="activity_sub_title">All your recent transactions</string>
+    <string name="no_activity">No activity yet</string>
+    <string name="no_activity_desc">Your transaction history will appear here once you start adding bills and making settlements</string>
+</resources>
