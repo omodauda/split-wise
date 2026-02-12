@@ -70,6 +70,7 @@ enum class SplitMethod(
 fun StepFive(
     modifier: Modifier = Modifier
 ) {
+    val billAmount = 600.00
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -77,7 +78,7 @@ fun StepFive(
     ) {
         PaymentDetails()
         Spacer(Modifier.height(Spacing.medium))
-        SplitMethodsView()
+        SplitMethodsView(billAmount = billAmount)
     }
 }
 
@@ -127,6 +128,7 @@ fun PaymentDetails(
 
 @Composable
 fun SplitMethodsView(
+    billAmount: Double,
     modifier: Modifier = Modifier
 ) {
     var selectedMethod by rememberSaveable { mutableStateOf(SplitMethod.EQUAL) }
@@ -143,8 +145,10 @@ fun SplitMethodsView(
             SplitMethodItem(
                 method = method,
                 isSelected = selectedMethod == method,
+                billAmount,
                 modifier = Modifier.clickable { selectedMethod = method } // Update state on click
             )
+            Spacer(Modifier.height(Spacing.medium))
         }
     }
 }
@@ -153,6 +157,7 @@ fun SplitMethodsView(
 fun SplitMethodItem(
     method: SplitMethod,
     isSelected: Boolean,
+    billAmount: Double,
     modifier: Modifier = Modifier
 ) {
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
@@ -201,10 +206,11 @@ fun SplitMethodItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                val exactPerPerson = billAmount / 3
                 if (method == SplitMethod.EQUAL) {
                     Spacer(Modifier.height(Spacing.extraSmall))
                     Text(
-                        text = "$200.00 ${stringResource(R.string.per_person)}",
+                        text = "$$exactPerPerson ${stringResource(R.string.per_person)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
