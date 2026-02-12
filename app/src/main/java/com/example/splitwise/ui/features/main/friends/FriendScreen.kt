@@ -34,8 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.model.User
 import com.example.splitwise.ui.components.AppTextField
-import com.example.splitwise.ui.features.main.friends.components.EmptyFriendView
-import com.example.splitwise.ui.features.main.friends.components.EmptySearchView
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -54,7 +52,7 @@ fun FriendScreen(
 
         val sendIntent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_INTENT, shareMessage)
+            putExtra(Intent.EXTRA_TEXT, shareMessage)
             putExtra(Intent.EXTRA_SUBJECT, shareTitle)
             type = "text/plain"
         }

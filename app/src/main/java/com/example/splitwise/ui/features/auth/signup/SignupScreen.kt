@@ -8,16 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -56,7 +52,6 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.emerald_50
 
 @Composable
 fun SignupScreen(
@@ -95,7 +90,7 @@ fun SignupScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -152,7 +147,7 @@ fun SignupScreen(
                         color = MaterialTheme.colorScheme.background,
                         shape = SplitWiseShapes.bottomSheet
                     )
-                    .padding(top = Spacing.extraLarge, start = Spacing.large, end = Spacing.large)
+                    .padding(top = Spacing.extraLarge, start = Spacing.large, end = Spacing.large, bottom = innerPadding.calculateBottomPadding())
                     .verticalScroll(state = scrollState)
             ) {
                 AppTextField(
@@ -251,7 +246,7 @@ fun SignupScreen(
                     onClick = {handleSignup()}
                 )
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
-                com.example.splitwise.ui.features.auth.signup.DividerView()
+                DividerView()
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
                 AlternativeSignupView(goToLogin = {goBack()})
                 Spacer(Modifier.height(Spacing.extraLarge))
@@ -268,20 +263,19 @@ fun PasswordGuide(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = emerald_50, shape = RoundedCornerShape(14.dp))
-            .padding(ScreenDimensions.itemSpacing)
+            .padding(vertical = ScreenDimensions.itemSpacing)
     ) {
         Text(
             text = stringResource(R.string.password_guide),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(3.dp))
         repeat(items.size) {iteration ->
             Text(
                 text = items[iteration],
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(2.dp))
         }
@@ -338,7 +332,7 @@ fun AlternativeSignupView(goToLogin: () -> Unit) {
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onBackground),
         modifier = Modifier.fillMaxWidth(),
         onClick = { offset ->
             annotatedString.getStringAnnotations(tag = "SIGN IN", start = offset, end = offset)

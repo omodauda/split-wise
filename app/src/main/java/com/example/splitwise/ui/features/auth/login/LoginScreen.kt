@@ -1,7 +1,6 @@
 package com.example.splitwise.ui.features.auth.login
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,7 +68,7 @@ fun LoginScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -115,7 +114,7 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.background,
                         shape = SplitWiseShapes.bottomSheet
                     )
-                    .padding(vertical = Spacing.extraLarge, horizontal = Spacing.large)
+                    .padding(top = Spacing.extraLarge, start = Spacing.large, end = Spacing.large, bottom = innerPadding.calculateBottomPadding())
                     .verticalScroll(state = scrollState)
             ) {
                 AppTextField(
@@ -171,6 +170,7 @@ fun LoginScreen(
                 DividerView()
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
                 AlternativeLoginView(goToSignup)
+                Spacer(Modifier.height(Spacing.extraLarge))
             }
         }
 
@@ -205,7 +205,7 @@ fun DividerView(
 @Composable
 fun AlternativeLoginView(
     goToSignup: () -> Unit,
-    modifier: Modifier = Modifier
+//    modifier: Modifier = Modifier
 ) {
     val annotatedString = buildAnnotatedString {
         // Append the first part of the text with the default style
@@ -229,7 +229,7 @@ fun AlternativeLoginView(
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onBackground),
         modifier = Modifier.fillMaxWidth(),
         onClick = { offset ->
             annotatedString.getStringAnnotations(tag = "SIGNUP", start = offset, end = offset)

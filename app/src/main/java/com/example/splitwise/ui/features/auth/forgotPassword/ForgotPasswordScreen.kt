@@ -152,6 +152,7 @@ fun ForgotPasswordScreen(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }
+                Spacer(Modifier.height(24.dp))
             }
         }
     }

@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
 import com.example.splitwise.ui.components.AppIconTextButton
 import com.example.splitwise.ui.features.main.home.components.DashBoard
+import com.example.splitwise.ui.features.main.home.components.EmptyBillView
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
 import com.example.splitwise.ui.features.main.home.components.RecordPaymentModal
@@ -57,7 +58,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            DashBoard()
+            DashBoard(paddingTop = innerPadding.calculateTopPadding())
             ContentView(
                 onAddBill = {goToAddBill()},
                 openRecordPaymentModal = {showRecordPaymentModal = true},

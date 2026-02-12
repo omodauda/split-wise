@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -28,7 +26,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
@@ -36,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.splitwise.R
@@ -72,11 +70,12 @@ fun OnboardingScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -92,9 +91,9 @@ fun OnboardingScreen(
                     image = currentPageData.image,
                     title1 = titles1[page],
                     title2 = titles2[page],
-                    description = descriptions[page]
+                    description = descriptions[page],
+                    paddingTop = innerPadding.calculateTopPadding()
                 )
-
             }
             Spacer(Modifier.height(80.dp))
             Row(
@@ -141,7 +140,7 @@ fun OnboardingScreen(
                     )
                 }
             }
-            Spacer(Modifier.height(44.dp))
+//            Spacer(Modifier.height(44.dp))
         }
 
     }
@@ -153,6 +152,7 @@ fun PagerView(
     title1: String,
     title2: String,
     description: String,
+    paddingTop: Dp,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -163,7 +163,7 @@ fun PagerView(
                 .fillMaxWidth()
                 .weight(0.5f)
                 .background(MaterialTheme.colorScheme.primary)
-                .padding(ScreenDimensions.sectionSpacing)
+                .padding(top = paddingTop + ScreenDimensions.sectionSpacing, start = ScreenDimensions.sectionSpacing, end = ScreenDimensions.sectionSpacing, bottom = ScreenDimensions.sectionSpacing)
         ) {
             Image(
                 painter = painterResource(image),
@@ -195,7 +195,6 @@ fun PagerView(
                 style = TextStyle(fontFamily = inter, fontWeight = FontWeight.Normal, fontSize = 18.sp, lineHeight = 29.3.sp),
                 color = MaterialTheme.colorScheme.onBackground
             )
-
         }
     }
 }

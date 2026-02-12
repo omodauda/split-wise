@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import com.example.splitwise.R
 import com.example.splitwise.ui.theme.CurrencyLarge
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -26,14 +27,15 @@ import com.example.splitwise.ui.theme.emerald_500
 
 @Composable
 fun DashBoard(
+    paddingTop: Dp,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary)
-            .systemBarsPadding()
-            .padding(horizontal = Spacing.large, vertical = ScreenDimensions.verticalPadding)
+//            .systemBarsPadding()
+            .padding(top = paddingTop + ScreenDimensions.verticalPadding, start = Spacing.large, end = Spacing.large, bottom = ScreenDimensions.verticalPadding)
     ) {
         Text(
             text = stringResource(R.string.dashboard),

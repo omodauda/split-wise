@@ -77,7 +77,7 @@ fun AddBillSuccessScreen(
         )
         Spacer(Modifier.height(Spacing.medium))
         SuccessItem(
-            logo = R.drawable.review_logo,
+            logo = R.drawable.check_circle_icon,
             title = R.string.balances_update,
             desc = R.string.account_synced,
             color = emerald_50
