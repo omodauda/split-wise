@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.mock.FakeAppContainer
@@ -48,13 +48,13 @@ fun ProfileScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) {
+    ) {innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
-            ProfileHeader()
+            ProfileHeader(paddingTop = innerPadding.calculateTopPadding())
             ProfileContent(
                 onLogout = {authViewModel.logout()}
             )
@@ -64,14 +64,14 @@ fun ProfileScreen(
 
 @Composable
 fun ProfileHeader(
+    paddingTop: Dp,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary)
-            .systemBarsPadding()
-            .padding(horizontal = Spacing.large, vertical = ScreenDimensions.verticalPadding)
+            .padding(start = Spacing.large, end = Spacing.large, top = paddingTop + ScreenDimensions.verticalPadding, bottom = ScreenDimensions.verticalPadding)
     ) {
         Text(
             text = stringResource(R.string.profile),
