@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -53,7 +52,6 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.emerald_50
 
 @Composable
 fun SignupScreen(
@@ -265,20 +263,19 @@ fun PasswordGuide(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(color = emerald_50, shape = RoundedCornerShape(14.dp))
-            .padding(ScreenDimensions.itemSpacing)
+            .padding(vertical = ScreenDimensions.itemSpacing)
     ) {
         Text(
             text = stringResource(R.string.password_guide),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(3.dp))
         repeat(items.size) {iteration ->
             Text(
                 text = items[iteration],
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(2.dp))
         }
@@ -335,7 +332,7 @@ fun AlternativeSignupView(goToLogin: () -> Unit) {
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onBackground),
         modifier = Modifier.fillMaxWidth(),
         onClick = { offset ->
             annotatedString.getStringAnnotations(tag = "SIGN IN", start = offset, end = offset)

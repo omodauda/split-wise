@@ -229,7 +229,7 @@ fun AlternativeLoginView(
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,
-        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+        style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onBackground),
         modifier = Modifier.fillMaxWidth(),
         onClick = { offset ->
             annotatedString.getStringAnnotations(tag = "SIGNUP", start = offset, end = offset)

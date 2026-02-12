@@ -99,7 +99,7 @@ fun Group(
         horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
         modifier = modifier
             .fillMaxWidth()
-            .background(color = if (isSelected) emerald_50 else MaterialTheme.colorScheme.background)
+            .background(color = MaterialTheme.colorScheme.background)
             .border(
                 width = ComponentDimensions.borderWidthMedium, shape = MaterialTheme.shapes.large,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant

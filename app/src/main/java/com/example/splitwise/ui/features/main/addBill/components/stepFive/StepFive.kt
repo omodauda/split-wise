@@ -168,7 +168,7 @@ fun SplitMethodItem(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = if (isSelected) emerald_50 else MaterialTheme.colorScheme.background,
+                color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.large
             )
             .border(
