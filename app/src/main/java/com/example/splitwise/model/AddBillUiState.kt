@@ -20,4 +20,16 @@ data class AddBillUiState(
 
     val splitMethod: AddBillSplitMethod = AddBillSplitMethod.EQUAL,
     val splitEntries: List<SplitEntryState> = emptyList()
-)
+) {
+    val sumOfSplitPercentage: Double
+        get() = splitEntries.sumOf { it.percentage }
+
+    val remainingPercentage: Double
+        get() = (100.00 - sumOfSplitPercentage).coerceAtLeast(0.0)
+
+    val sumOfSplitAmount: Double
+        get() = splitEntries.sumOf { it.amount }
+
+    val remainingAmount: Double
+        get() = (billAmount - sumOfSplitAmount).coerceAtLeast(0.0)
+}
