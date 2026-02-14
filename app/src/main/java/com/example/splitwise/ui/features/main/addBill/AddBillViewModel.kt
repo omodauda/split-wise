@@ -17,6 +17,9 @@ class AddBillViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AddBillUiState())
     val uiState: StateFlow<AddBillUiState> = _uiState.asStateFlow()
 
+    fun resetState() {
+        _uiState.update { AddBillUiState() }
+    }
     fun onBillAmountChange(amount: Double) {
         _uiState.update { it.copy(billAmount = amount) }
         // when amount changes, re-calc splits
@@ -28,7 +31,7 @@ class AddBillViewModel: ViewModel() {
         _uiState.update { it.copy(description = description) }
         validateStep((1))
     }
-    fun onCategoryChange(category: String) {
+    fun onCategoryChange(category: Int) {
         _uiState.update { it.copy(category = category) }
         validateStep((1))
     }
@@ -36,7 +39,6 @@ class AddBillViewModel: ViewModel() {
         _uiState.update { it.copy(date = date) }
         validateStep((1))
     }
-
     fun onGroupSelected(groupId: String) {
         _uiState.update {
             it.copy(
@@ -51,7 +53,6 @@ class AddBillViewModel: ViewModel() {
         validateStep((2))
         // TODO: set group members as participants
     }
-
     fun onGroupMemberSelected(member: User) {
         _uiState.update { currentState ->
             val updatedParticipants = currentState.participants.toMutableList()
@@ -62,7 +63,6 @@ class AddBillViewModel: ViewModel() {
             } else {
                 updatedParticipants.add(member)
             }
-
             // Also update the split entries to match the new participant list
             val newEntries = updatedParticipants.map { user ->
                 currentState.splitEntries.find { it.user.id == user.id } ?: SplitEntryState(user)
@@ -76,7 +76,6 @@ class AddBillViewModel: ViewModel() {
         recalculateSplits()
          validateStep(3)
     }
-
     fun onFriendSelected(friend: User) {
         _uiState.update { currentState ->
             val updatedFriends = currentState.selectedFriends.toMutableList()
@@ -105,14 +104,25 @@ class AddBillViewModel: ViewModel() {
         }
         recalculateSplits()
         validateStep((2))
-        // TODO: set friends as participants
     }
 
+    fun clearParticipants() {
+        _uiState.update {
+            it.copy(
+                isGroupSplit = false,
+                selectedGroupId = null,
+                selectedFriends = emptyList(),
+                participants = emptyList(),
+                paidByUserId = null,
+                splitEntries = emptyList()
+            )
+        }
+        validateStep(2)
+    }
     fun onPayerSelected(userId: String) {
         _uiState.update { it.copy(paidByUserId = userId) }
         validateStep(4)
     }
-
     fun onSplitMethodChanged(method: AddBillSplitMethod) {
         _uiState.update { it.copy(splitMethod = method) }
         // When the method changes, apply the default logic for it
@@ -122,21 +132,18 @@ class AddBillViewModel: ViewModel() {
         }
         validateStep(5)
     }
-
     fun onPercentageChanged(userId: String, newPercentage: String) {
         val percentage = newPercentage.toDoubleOrNull() ?: 0.00
         val amount = (_uiState.value.billAmount * percentage) / 100.0
         updateSplitEntry(userId, amount, percentage)
         validateStep(6)
     }
-
     fun onExactAmountChanged(userId: String, newAmount: String) {
         val amount = newAmount.toDoubleOrNull() ?: 0.00
         val percentage = if (_uiState.value.billAmount > 0) (amount / _uiState.value.billAmount) * 100 else 0.00
         updateSplitEntry(userId, amount, percentage)
         validateStep(6)
     }
-
     fun splitEqually() {
         viewModelScope.launch {
             val state = _uiState.value
@@ -148,13 +155,12 @@ class AddBillViewModel: ViewModel() {
             _uiState.update {
                 it.copy(
                     splitEntries = it.participants.map { user ->
-                        SplitEntryState(user, equalAmount, equalPercentage)
+                        SplitEntryState(user, equalPercentage, equalAmount)
                     }
                 )
             }
         }
     }
-
     fun distributeEvenly() {
         when (_uiState.value.splitMethod) {
             AddBillSplitMethod.PERCENTAGE -> {
@@ -177,17 +183,6 @@ class AddBillViewModel: ViewModel() {
         }
         validateStep((6))
     }
-
-
-    private fun initializeSplitEntries(participants: List<User>) {
-        val entries = participants.map { user -> SplitEntryState(user = user) }
-        _uiState.update { it.copy(splitEntries = entries) }
-        // If the default method is EQUAL, immediately perform the split.
-        if (_uiState.value.splitMethod == AddBillSplitMethod.EQUAL) {
-//            splitEqually()
-        }
-    }
-
     private fun updateSplitEntry(userId: String, newAmount: Double, newPercentage: Double) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -201,7 +196,6 @@ class AddBillViewModel: ViewModel() {
             )
         }
     }
-
     private fun updateAllSplitEntries(newAmount: Double, newPercentage: Double) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -211,11 +205,9 @@ class AddBillViewModel: ViewModel() {
             )
         }
     }
-
     private fun clearSplitValues() {
         updateAllSplitEntries(0.0, 0.0)
     }
-
     private fun recalculateSplits() {
         viewModelScope.launch {
             val state = _uiState.value
@@ -225,7 +217,8 @@ class AddBillViewModel: ViewModel() {
                 // If the method is EQUAL, re-distribute the new total bill amount equally.
                 AddBillSplitMethod.EQUAL -> {
                     val equalAmount = state.billAmount / state.participants.size
-                    state.splitEntries.map { it.copy(amount = equalAmount) }
+                    val equalPercentage = if (state.billAmount > 0) (equalAmount / state.billAmount) * 100.0 else 0.0
+                    state.splitEntries.map { it.copy(amount = equalAmount, percentage = equalPercentage) }
                 }
 
                 // If the method is PERCENTAGE, keep the percentages and re-calculate the amounts.
@@ -245,7 +238,6 @@ class AddBillViewModel: ViewModel() {
                     }
                 }
             }
-
             // Update the state with the newly calculated entries
             _uiState.update { it.copy(splitEntries = newEntries) }
         }
@@ -260,11 +252,11 @@ class AddBillViewModel: ViewModel() {
             4 -> isStepFourValid()
             5 -> isStepFiveValid()
             6 -> isStepSixValid()
+            7 -> true
             else -> false
         }
         _uiState.update { it.copy(isCurrentStepValid = isValid) }
     }
-
     private fun isStepOneValid(): Boolean {
         val state = _uiState.value
         return state.billAmount > 0.0 &&
@@ -275,7 +267,7 @@ class AddBillViewModel: ViewModel() {
     private fun isStepTwoValid(): Boolean{
         val state = _uiState.value
         return (state.isGroupSplit && state.selectedGroupId !== null) ||
-                (!state.isGroupSplit && state.selectedFriends.isNotEmpty())
+                (!state.isGroupSplit && state.selectedFriends.size > 1)
     }
     private fun isStepThreeValid(): Boolean {
         val state = _uiState.value
@@ -291,7 +283,6 @@ class AddBillViewModel: ViewModel() {
     private fun isStepSixValid(): Boolean {
         val state = _uiState.value
         val tolerance = 0.01 // A small tolerance for comparing floating-point numbers
-
         return when (state.splitMethod) {
             // For PERCENTAGE, the percentages must sum to 100 AND the resulting amounts must sum to the total bill amount.
             AddBillSplitMethod.PERCENTAGE -> {
@@ -305,7 +296,7 @@ class AddBillViewModel: ViewModel() {
                 val isPercentageSumValid = (state.sumOfSplitPercentage - 100.0).absoluteValue < tolerance
                 isAmountSumValid && isPercentageSumValid
             }
-            // EQUAL split is always mathematically valid by definition, as the app calculates it.
+            // FOR EQUAL, we skip step six.
             AddBillSplitMethod.EQUAL -> true
         }
     }
