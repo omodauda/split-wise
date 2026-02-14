@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.addBillSuccess
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,6 +44,8 @@ fun AddBillSuccessScreen(
     goHome: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    BackHandler(enabled = true) { }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
