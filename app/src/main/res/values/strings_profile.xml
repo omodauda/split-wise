@@ -30,8 +30,8 @@
     <string name="current_password_placeholder">Enter current password</string>
     <string name="new_password">New Password</string>
     <string name="new_password_placeholder">Enter new password</string>
-    <string name="confirm_password">Confirm New Password</string>
-    <string name="current_password_placeholder">Re-enter new password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="confirm_new_password_placeholder">Re-enter new password</string>
     <string name="cancel">Cancel</string>
     <string-array name="change_password_guide_items">
         <item>At least 8 characters</item>
