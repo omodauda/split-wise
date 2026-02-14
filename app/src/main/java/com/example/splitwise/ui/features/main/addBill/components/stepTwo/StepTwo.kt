@@ -20,6 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.splitwise.model.AddBillUiState
+import com.example.splitwise.model.User
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.navigation.StepTwoDestination
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.navigation.StepTwoNavHost
 import com.example.splitwise.ui.theme.Spacing
@@ -27,6 +29,9 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 
 @Composable
 fun StepTwo(
+    uiState: AddBillUiState,
+    onSelectGroup: (groupId: String) -> Unit,
+    onSelectFriend: (user: User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -53,6 +58,9 @@ fun StepTwo(
                 restoreState = true
             }
         },
+        uiState,
+        onSelectGroup,
+        onSelectFriend,
         modifier = modifier
     )
 }
@@ -63,9 +71,11 @@ fun StepTwoContent(
     navController: NavHostController,
     currentTab: StepTwoDestination,
     onTabSelected: (StepTwoDestination) -> Unit,
+   uiState: AddBillUiState,
+    onSelectGroup: (groupId: String) -> Unit,
+   onSelectFriend: (user: User) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // This "dumb" composable just displays the UI based on the state it's given.
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -111,7 +121,10 @@ fun StepTwoContent(
         }
         StepTwoNavHost(
             navController = navController,
-            modifier = Modifier.padding(top = Spacing.medium)
+            modifier = Modifier.padding(top = Spacing.medium),
+            uiState = uiState,
+            onSelectGroup = onSelectGroup,
+            onSelectFriend = onSelectFriend
         )
     }
 }
@@ -128,8 +141,8 @@ fun StepTwoContent(
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable
-fun StepOnePreview() {
+fun StepTwoPreview() {
     SplitWiseTheme {
-        StepTwo()
+        StepTwo(uiState = AddBillUiState(), onSelectGroup = {}, onSelectFriend = {})
     }
 }
