@@ -31,6 +31,7 @@ import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.emerald_500
+import java.util.Locale
 
 
 @Composable
@@ -190,7 +191,7 @@ fun SplitMethodItem(
                 if (method == AddBillSplitMethod.EQUAL) {
                     Spacer(Modifier.height(Spacing.extraSmall))
                     Text(
-                        text = "$$exactPerPerson ${stringResource(R.string.per_person)}",
+                        text = "$${String.format(Locale.US, "%.2f", exactPerPerson)} ${stringResource(R.string.per_person)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
