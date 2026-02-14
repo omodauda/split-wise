@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
+import com.example.splitwise.model.AddBillUiState
+import com.example.splitwise.ui.features.main.addBill.AddBillSplitMethod
 import com.example.splitwise.ui.features.main.addBill.components.stepSix.exactAmount.ExactAmountSplit
 import com.example.splitwise.ui.features.main.addBill.components.stepSix.percentage.PercentageSplit
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -22,9 +24,13 @@ import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.brightYellow
+import java.util.Locale
 
 @Composable
 fun StepSix(
+    uiState: AddBillUiState,
+    onPercentageChange: (userId: String, newPercentage: String) -> Unit,
+    onDistributePercentageEvenly: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -32,15 +38,32 @@ fun StepSix(
             .background(MaterialTheme.colorScheme.background)
             .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large)
     ) {
-        BalanceDetails()
+        BalanceDetails(
+            billAmount = uiState.billAmount,
+            splitMethod = uiState.splitMethod,
+            remainingPercentage = uiState.remainingPercentage,
+            remainingBillAmount = uiState.remainingAmount
+        )
         Spacer(Modifier.height(ScreenDimensions.contentPadding))
-//        PercentageSplit()
-        ExactAmountSplit()
+        if(uiState.splitMethod == AddBillSplitMethod.EQUAL) {
+            ExactAmountSplit()
+        } else if (uiState.splitMethod == AddBillSplitMethod.PERCENTAGE) {
+            PercentageSplit(
+                splitEntries = uiState.splitEntries,
+                onPercentageChange = {userId, newPercentage -> onPercentageChange(userId, newPercentage)},
+                onDistributePercEvenly = {onDistributePercentageEvenly()},
+                sumOfSplitPercentages = uiState.sumOfSplitPercentage
+            )
+        }
     }
 }
 
 @Composable
 fun BalanceDetails(
+    billAmount: Double,
+    splitMethod: AddBillSplitMethod,
+    remainingPercentage: Double,
+    remainingBillAmount: Double,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -58,7 +81,7 @@ fun BalanceDetails(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$600",
+                text = "$$billAmount",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -71,7 +94,8 @@ fun BalanceDetails(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "0.0%",
+                text = if (splitMethod == AddBillSplitMethod.PERCENTAGE) "${String.format(Locale.US, "%.2f", remainingPercentage)}%" else "$${String.format(
+                    Locale.US, "%.2f", remainingBillAmount)}",
                 style = MaterialTheme.typography.headlineSmall,
                 color = brightYellow
             )
@@ -83,6 +107,6 @@ fun BalanceDetails(
 @Composable
 fun StepSixPreview() {
     SplitWiseTheme {
-        StepSix()
+        StepSix(uiState = AddBillUiState(), onPercentageChange = {_,_ ->}, onDistributePercentageEvenly = {})
     }
 }
