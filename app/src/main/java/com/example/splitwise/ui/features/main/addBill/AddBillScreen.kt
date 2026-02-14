@@ -106,7 +106,7 @@ fun AddBillScreen(
             when (currentStep) {
                 1 -> StepOne(
                     uiState,
-                    onAmountChange = { addBillViewModel.onBillAmountChange(it.toDouble()) },
+                    onAmountChange = { addBillViewModel.onBillAmountChange(it) },
                     onDescriptionChange = {addBillViewModel.onDescriptionChange(it)},
                     onDateSelected = {
                         if (it == null) return@StepOne
@@ -126,13 +126,13 @@ fun AddBillScreen(
                     onMemberSelected = {addBillViewModel.onGroupMemberSelected(it)}
                 )
                 4 -> StepFour(
-                    billAmount = uiState.billAmount,
+                    billAmount = uiState.billAmountAsDouble,
                     payerId = uiState.paidByUserId,
                     onPayerSelected = {addBillViewModel.onPayerSelected(it)},
                     participants = uiState.participants
                 )
                 5 -> StepFive(
-                    billAmount = uiState.billAmount,
+                    billAmount = uiState.billAmountAsDouble,
                     numberOfPersons = uiState.participants.size,
                     splitMethod = uiState.splitMethod,
                     payerName = uiState.participants.find { it.id == uiState.paidByUserId }?.name ?: "",
