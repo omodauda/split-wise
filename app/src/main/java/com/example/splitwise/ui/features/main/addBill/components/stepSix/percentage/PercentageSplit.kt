@@ -15,7 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -92,7 +92,7 @@ fun PercentageSplit(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        itemsIndexed(splitEntries) {index, entryState ->
+        items(splitEntries) { entryState ->
             PercentageEntry(
                 state = entryState,
                 onPercentageChange = {userId, newPercentage -> onPercentageChange(userId, newPercentage)}
