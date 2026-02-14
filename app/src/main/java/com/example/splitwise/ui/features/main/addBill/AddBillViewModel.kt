@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import kotlin.math.absoluteValue
 
 class AddBillViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(AddBillUiState())
@@ -126,12 +127,14 @@ class AddBillViewModel: ViewModel() {
         val percentage = newPercentage.toDoubleOrNull() ?: 0.00
         val amount = (_uiState.value.billAmount * percentage) / 100.0
         updateSplitEntry(userId, amount, percentage)
+        validateStep(6)
     }
 
     fun onExactAmountChanged(userId: String, newAmount: String) {
         val amount = newAmount.toDoubleOrNull() ?: 0.00
         val percentage = if (_uiState.value.billAmount > 0) (amount / _uiState.value.billAmount) * 100 else 0.00
         updateSplitEntry(userId, amount, percentage)
+        validateStep(6)
     }
 
     fun splitEqually() {
@@ -172,6 +175,7 @@ class AddBillViewModel: ViewModel() {
                 // Already handled by splitEqually()
             }
         }
+        validateStep((6))
     }
 
 
@@ -255,6 +259,7 @@ class AddBillViewModel: ViewModel() {
             3 -> isStepThreeValid()
             4 -> isStepFourValid()
             5 -> isStepFiveValid()
+            6 -> isStepSixValid()
             else -> false
         }
         _uiState.update { it.copy(isCurrentStepValid = isValid) }
@@ -281,7 +286,27 @@ class AddBillViewModel: ViewModel() {
         return state.paidByUserId !== null
     }
     private fun isStepFiveValid(): Boolean {
-        val state = _uiState.value
         return true
+    }
+    private fun isStepSixValid(): Boolean {
+        val state = _uiState.value
+        val tolerance = 0.01 // A small tolerance for comparing floating-point numbers
+
+        return when (state.splitMethod) {
+            // For PERCENTAGE, the percentages must sum to 100 AND the resulting amounts must sum to the total bill amount.
+            AddBillSplitMethod.PERCENTAGE -> {
+                val isPercentageSumValid = (state.sumOfSplitPercentage - 100.0).absoluteValue < tolerance
+                val isAmountSumValid = (state.sumOfSplitAmount - state.billAmount).absoluteValue < tolerance
+                isPercentageSumValid && isAmountSumValid
+            }
+            // For EXACT, the amounts must sum to the total bill amount AND the resulting percentages must sum to 100.
+            AddBillSplitMethod.EXACT -> {
+                val isAmountSumValid = (state.sumOfSplitAmount - state.billAmount).absoluteValue < tolerance
+                val isPercentageSumValid = (state.sumOfSplitPercentage - 100.0).absoluteValue < tolerance
+                isAmountSumValid && isPercentageSumValid
+            }
+            // EQUAL split is always mathematically valid by definition, as the app calculates it.
+            AddBillSplitMethod.EQUAL -> true
+        }
     }
 }
