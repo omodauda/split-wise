@@ -30,25 +30,9 @@ fun StepFour(
     billAmount: Double,
     payerId: String? = null,
     onPayerSelected: (String) -> Unit,
+    participants: List<User>,
     modifier: Modifier = Modifier
 ) {
-    val friends = listOf(
-        User(
-            id = "1",
-            name = "Sarah Johnson",
-            email = "sarah@example.com"
-        ),
-        User(
-            id = "2",
-            name = "Mike Chen",
-            email = "mike@example.com"
-        ),
-        User(
-            id = "3",
-            name = "Emma Wilson",
-            email = "emma@example.com"
-        )
-    )
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -83,7 +67,7 @@ fun StepFour(
             verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
-            items(friends) {user ->
+            items(participants) {user ->
                 val isSelected = user.id == payerId
                 Friend(
                     user,
@@ -105,7 +89,8 @@ fun StepFourPreview() {
         StepFour(
             billAmount = 0.00,
             payerId = null,
-            onPayerSelected = {}
+            onPayerSelected = {},
+            participants = emptyList()
         )
     }
 }
