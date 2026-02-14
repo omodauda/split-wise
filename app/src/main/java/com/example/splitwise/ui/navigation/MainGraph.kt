@@ -37,15 +37,18 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
         composable( route = Screen.AddBillSuccess.route){
-            AddBillSuccessScreen(goHome = {
-                navController.navigate(Screen.Home.route) {
-                    popUpTo(Screen.Home.route) {
-                        inclusive = true
+            AddBillSuccessScreen(
+                goHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
                     }
-                    launchSingleTop =true
-                }
-                addBillViewModel.resetState()
-            })
+                    addBillViewModel.resetState()
+                },
+                addBillViewModel
+            )
         }
     }
 }
