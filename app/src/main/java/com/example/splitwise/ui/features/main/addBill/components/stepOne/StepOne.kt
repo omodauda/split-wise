@@ -46,7 +46,7 @@ fun StepOne(
     onAmountChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onDateSelected: (Long?) -> Unit,
-    onCategorySelected: (String) -> Unit,
+    onCategorySelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -120,8 +120,8 @@ fun StepOne(
 
 @Composable
 fun Categories(
-    selectedCategory: String? = null,
-    onSelect: (String) -> Unit,
+    selectedCategory: Int? = null,
+    onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val categories = listOf(
@@ -169,7 +169,7 @@ fun Categories(
                     category = category,
                     selectedCategory = selectedCategory,
                     modifier = Modifier
-                        .clickable(enabled = true, onClick = {onSelect(category.name.toString())})
+                        .clickable(enabled = true, onClick = {onSelect(category.name)})
                 )
             }
         }
@@ -178,11 +178,11 @@ fun Categories(
 
 @Composable
 fun Category(
-    selectedCategory: String? = null,
+    selectedCategory: Int? = null,
     category: BillCategory,
     modifier: Modifier = Modifier
 ) {
-    val isSelected = selectedCategory == category.name.toString()
+    val isSelected = selectedCategory == category.name
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,

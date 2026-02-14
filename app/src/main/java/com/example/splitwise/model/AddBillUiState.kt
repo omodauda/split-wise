@@ -8,7 +8,7 @@ data class AddBillUiState(
 
     val billAmount: Double = 0.00,
     val description: String = "",
-    val category: String? = null,
+    val category: Int? = null,
     val date: Date? = null,
 
     val isGroupSplit: Boolean = false,
