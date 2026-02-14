@@ -41,6 +41,7 @@ import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.crystalPeak
 import com.example.splitwise.ui.theme.emerald_50
+import java.util.Locale
 
 @Composable
 fun AddBillSuccessScreen(
@@ -72,7 +73,7 @@ fun AddBillSuccessScreen(
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         Text(
-            text = stringResource(R.string.bill_success_desc, uiState.billAmount),
+            text = stringResource(R.string.bill_success_desc, String.format(Locale.US, "%.2f", uiState.billAmountAsDouble)),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
