@@ -38,7 +38,7 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.emerald_50
+import com.example.splitwise.utils.CurrencyAmountInputVisualTransformation
 
 @Composable
 fun StepOne(
@@ -49,7 +49,6 @@ fun StepOne(
     onCategorySelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -74,7 +73,7 @@ fun StepOne(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             TextField(
-                value = if (uiState.billAmount == 0.0) "" else uiState.billAmount.toString(),
+                value = if (uiState.billAmountAsDouble == 0.0) "" else uiState.billAmount,
                 onValueChange = onAmountChange,
                 placeholder = {Text(text = "0.00", style = OnboardingTitle)},
                 textStyle = OnboardingTitle,
@@ -91,8 +90,9 @@ fun StepOne(
                 ),
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                )
+                    keyboardType = KeyboardType.NumberPassword
+                ),
+                visualTransformation = CurrencyAmountInputVisualTransformation()
             )
         }
         Spacer(Modifier.height(Spacing.large))
@@ -195,7 +195,7 @@ fun Category(
                 shape = MaterialTheme.shapes.large
             )
             .background(
-                color = if (isSelected) emerald_50 else MaterialTheme.colorScheme.background,
+                color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.large
             )
     ) {
