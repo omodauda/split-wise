@@ -58,7 +58,7 @@ fun StepSeven(
         ReviewHeader()
         Spacer(Modifier.height(Spacing.large))
         ReviewDetail(
-            billAmount = uiState.billAmount,
+            billAmount = uiState.billAmountAsDouble,
             description = uiState.description,
             category = uiState.category ?: 0,
             date = uiState.date,
@@ -258,7 +258,7 @@ fun SplitBreakDownItem(
 
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = "${state.percentage}% ${stringResource(R.string.of)} ${stringResource(R.string.total)}",
+                    text = "${String.format(Locale.US, "%.2f", state.percentage)}% ${stringResource(R.string.of)} ${stringResource(R.string.total)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

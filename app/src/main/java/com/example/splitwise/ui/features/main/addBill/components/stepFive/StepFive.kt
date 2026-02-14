@@ -76,7 +76,7 @@ fun PaymentDetails(
         )
         Spacer(Modifier.height(Spacing.extraSmall))
         Text(
-            text = "$$billAmount",
+            text = "$${String.format(Locale.US, "%.2f", billAmount)}",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onPrimary
         )

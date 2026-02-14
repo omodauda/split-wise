@@ -41,7 +41,7 @@ fun StepSix(
             .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large)
     ) {
         BalanceDetails(
-            billAmount = uiState.billAmount,
+            billAmount = uiState.billAmountAsDouble,
             splitMethod = uiState.splitMethod,
             remainingPercentage = uiState.remainingPercentage,
             remainingBillAmount = uiState.remainingAmount
@@ -50,7 +50,7 @@ fun StepSix(
         if(uiState.splitMethod == AddBillSplitMethod.EXACT) {
             ExactAmountSplit(
                 splitEntries = uiState.splitEntries,
-                billAmount = uiState.billAmount,
+                billAmount = uiState.billAmountAsDouble,
                 onExactAmountChange = {userId, newAmount -> onExactAmountChange(userId, newAmount)},
                 onDistributeAmountEvenly = {onDistributeAmountEvenly()},
                 sumOfSplitAmounts = uiState.sumOfSplitAmount
@@ -89,7 +89,7 @@ fun BalanceDetails(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$$billAmount",
+                text = "$${String.format(Locale.US, "%.2f", billAmount)}",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )

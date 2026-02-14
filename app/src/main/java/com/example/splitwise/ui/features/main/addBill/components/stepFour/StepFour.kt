@@ -24,14 +24,15 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
+import java.util.Locale
 
 @Composable
 fun StepFour(
     billAmount: Double,
-    payerId: String? = null,
     onPayerSelected: (String) -> Unit,
     participants: List<User>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    payerId: String? = null,
 ) {
     Column(
         modifier = modifier
@@ -51,7 +52,7 @@ fun StepFour(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$${billAmount}",
+                text = "$${String.format(Locale.US, "%.2f", billAmount)}",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )
