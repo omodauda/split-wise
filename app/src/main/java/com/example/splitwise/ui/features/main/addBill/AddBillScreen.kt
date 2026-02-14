@@ -92,7 +92,7 @@ fun AddBillScreen(
     }
 
     Scaffold(
-        bottomBar = {AddBillFooter(goToNextStep = {goToNextStep()}, enabled = uiState.isCurrentStepValid )},
+        bottomBar = {AddBillFooter(goToNextStep = {goToNextStep()}, enabled = uiState.isCurrentStepValid, isLastStep = currentStep == totalSteps )},
         modifier = modifier
             .fillMaxSize()
     ) {innerPadding ->
@@ -118,7 +118,8 @@ fun AddBillScreen(
                 2 -> StepTwo(
                     uiState,
                     onSelectGroup = {addBillViewModel.onGroupSelected(it)},
-                    onSelectFriend = {addBillViewModel.onFriendSelected(it)}
+                    onSelectFriend = {addBillViewModel.onFriendSelected(it)},
+                    onTabChanged = {addBillViewModel.clearParticipants()}
                 )
                 3 -> StepThree(
                     selectedParticipants = uiState.participants,
@@ -127,7 +128,8 @@ fun AddBillScreen(
                 4 -> StepFour(
                     billAmount = uiState.billAmount,
                     payerId = uiState.paidByUserId,
-                    onPayerSelected = {addBillViewModel.onPayerSelected(it)}
+                    onPayerSelected = {addBillViewModel.onPayerSelected(it)},
+                    participants = uiState.participants
                 )
                 5 -> StepFive(
                     billAmount = uiState.billAmount,
@@ -143,7 +145,9 @@ fun AddBillScreen(
                     onDistributePercentageEvenly = {addBillViewModel.distributeEvenly()},
                     onDistributeAmountEvenly = {addBillViewModel.distributeEvenly()}
                 )
-                7 -> StepSeven()
+                7 -> StepSeven(
+                    uiState
+                )
             }
         }
     }
@@ -217,6 +221,7 @@ fun AddBillHeader(
 @Composable
 fun AddBillFooter(
     enabled: Boolean,
+    isLastStep: Boolean,
     goToNextStep: () -> Unit,
     modifier: Modifier = Modifier
         .systemBarsPadding()
@@ -229,7 +234,7 @@ fun AddBillFooter(
 
     ) {
         AppTextButton(
-            title = stringResource(R.string.Continue),
+            title = stringResource(if (!isLastStep) R.string.Continue else R.string.add_bill),
             onClick = {goToNextStep()},
             enabled = enabled
         )

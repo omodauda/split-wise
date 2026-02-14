@@ -32,6 +32,7 @@ fun StepTwo(
     uiState: AddBillUiState,
     onSelectGroup: (groupId: String) -> Unit,
     onSelectFriend: (user: User) -> Unit,
+    onTabChanged: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -43,6 +44,9 @@ fun StepTwo(
         navController = navController,
         currentTab = currentTab,
         onTabSelected = { newTab ->
+            if (newTab.ordinal != currentTab.ordinal) {
+                onTabChanged()
+            }
             // Navigate with singleTop and launch an exclusive instance of the tab
             navController.navigate(newTab.route) {
                 // Pop up to the start destination of the graph to
@@ -143,6 +147,6 @@ fun StepTwoContent(
 @Composable
 fun StepTwoPreview() {
     SplitWiseTheme {
-        StepTwo(uiState = AddBillUiState(), onSelectGroup = {}, onSelectFriend = {})
+        StepTwo(uiState = AddBillUiState(), onSelectGroup = {}, onSelectFriend = {}, onTabChanged = {})
     }
 }
