@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.addBill
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.splitwise.model.AddBillUiState
@@ -20,8 +21,9 @@ class AddBillViewModel: ViewModel() {
     fun resetState() {
         _uiState.update { AddBillUiState() }
     }
-    fun onBillAmountChange(amount: Double) {
-        _uiState.update { it.copy(billAmount = amount) }
+    fun onBillAmountChange(amount: String) {
+        val filteredAmount = amount.filter { it.isDigit() }
+        _uiState.update { it.copy(billAmount = filteredAmount) }
         // when amount changes, re-calc splits
         recalculateSplits()
         validateStep((1))
@@ -134,13 +136,13 @@ class AddBillViewModel: ViewModel() {
     }
     fun onPercentageChanged(userId: String, newPercentage: String) {
         val percentage = newPercentage.toDoubleOrNull() ?: 0.00
-        val amount = (_uiState.value.billAmount * percentage) / 100.0
+        val amount = (_uiState.value.billAmountAsDouble * percentage) / 100.0
         updateSplitEntry(userId, amount, percentage)
         validateStep(6)
     }
     fun onExactAmountChanged(userId: String, newAmount: String) {
         val amount = newAmount.toDoubleOrNull() ?: 0.00
-        val percentage = if (_uiState.value.billAmount > 0) (amount / _uiState.value.billAmount) * 100 else 0.00
+        val percentage = if (_uiState.value.billAmountAsDouble > 0) (amount / _uiState.value.billAmountAsDouble) * 100 else 0.00
         updateSplitEntry(userId, amount, percentage)
         validateStep(6)
     }
@@ -149,8 +151,8 @@ class AddBillViewModel: ViewModel() {
             val state = _uiState.value
             if (state.participants.isEmpty()) return@launch
 
-            val equalAmount = state.billAmount / state.participants.size
-            val equalPercentage = if (state.billAmount > 0) (equalAmount / state.billAmount) * 100 else 0.0
+            val equalAmount = state.billAmountAsDouble / state.participants.size
+            val equalPercentage = if (state.billAmountAsDouble > 0) (equalAmount / state.billAmountAsDouble) * 100 else 0.0
 
             _uiState.update {
                 it.copy(
@@ -167,14 +169,14 @@ class AddBillViewModel: ViewModel() {
                 val state = _uiState.value
                 if (state.participants.isEmpty()) return
                 val evenPercentage = 100.0 / state.participants.size
-                val evenAmount = state.billAmount / state.participants.size
+                val evenAmount = state.billAmountAsDouble / state.participants.size
                 updateAllSplitEntries(evenAmount, evenPercentage)
             }
             AddBillSplitMethod.EXACT -> {
                 val state = _uiState.value
                 if (state.participants.isEmpty()) return
-                val evenAmount = state.billAmount / state.participants.size
-                val evenPercentage = if (state.billAmount > 0) (evenAmount / state.billAmount) * 100 else 0.0
+                val evenAmount = state.billAmountAsDouble / state.participants.size
+                val evenPercentage = if (state.billAmountAsDouble > 0) (evenAmount / state.billAmountAsDouble) * 100 else 0.0
                 updateAllSplitEntries(evenAmount, evenPercentage)
             }
             AddBillSplitMethod.EQUAL -> {
@@ -216,15 +218,15 @@ class AddBillViewModel: ViewModel() {
             val newEntries = when (state.splitMethod) {
                 // If the method is EQUAL, re-distribute the new total bill amount equally.
                 AddBillSplitMethod.EQUAL -> {
-                    val equalAmount = state.billAmount / state.participants.size
-                    val equalPercentage = if (state.billAmount > 0) (equalAmount / state.billAmount) * 100.0 else 0.0
+                    val equalAmount = state.billAmountAsDouble / state.participants.size
+                    val equalPercentage = if (state.billAmountAsDouble > 0) (equalAmount / state.billAmountAsDouble) * 100.0 else 0.0
                     state.splitEntries.map { it.copy(amount = equalAmount, percentage = equalPercentage) }
                 }
 
                 // If the method is PERCENTAGE, keep the percentages and re-calculate the amounts.
                 AddBillSplitMethod.PERCENTAGE -> {
                     state.splitEntries.map { entry ->
-                        val newAmount = (state.billAmount * entry.percentage) / 100.0
+                        val newAmount = (state.billAmountAsDouble * entry.percentage) / 100.0
                         entry.copy(amount = newAmount)
                     }
                 }
@@ -233,7 +235,7 @@ class AddBillViewModel: ViewModel() {
                 // need to re-calculate the new percentage that each fixed amount represents.
                 AddBillSplitMethod.EXACT -> {
                     state.splitEntries.map { entry ->
-                        val newPercentage = if (state.billAmount > 0) (entry.amount / state.billAmount) * 100 else 0.0
+                        val newPercentage = if (state.billAmountAsDouble > 0) (entry.amount / state.billAmountAsDouble) * 100 else 0.0
                         entry.copy(percentage = newPercentage)
                     }
                 }
@@ -259,7 +261,7 @@ class AddBillViewModel: ViewModel() {
     }
     private fun isStepOneValid(): Boolean {
         val state = _uiState.value
-        return state.billAmount > 0.0 &&
+        return state.billAmountAsDouble > 0.0 &&
                 state.description.isNotBlank() &&
                 state.category !== null &&
                 state.date !== null
@@ -287,12 +289,12 @@ class AddBillViewModel: ViewModel() {
             // For PERCENTAGE, the percentages must sum to 100 AND the resulting amounts must sum to the total bill amount.
             AddBillSplitMethod.PERCENTAGE -> {
                 val isPercentageSumValid = (state.sumOfSplitPercentage - 100.0).absoluteValue < tolerance
-                val isAmountSumValid = (state.sumOfSplitAmount - state.billAmount).absoluteValue < tolerance
+                val isAmountSumValid = (state.sumOfSplitAmount - state.billAmountAsDouble).absoluteValue < tolerance
                 isPercentageSumValid && isAmountSumValid
             }
             // For EXACT, the amounts must sum to the total bill amount AND the resulting percentages must sum to 100.
             AddBillSplitMethod.EXACT -> {
-                val isAmountSumValid = (state.sumOfSplitAmount - state.billAmount).absoluteValue < tolerance
+                val isAmountSumValid = (state.sumOfSplitAmount - state.billAmountAsDouble).absoluteValue < tolerance
                 val isPercentageSumValid = (state.sumOfSplitPercentage - 100.0).absoluteValue < tolerance
                 isAmountSumValid && isPercentageSumValid
             }
