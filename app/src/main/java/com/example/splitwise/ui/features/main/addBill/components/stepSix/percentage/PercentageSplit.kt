@@ -24,8 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -49,45 +47,18 @@ import com.example.splitwise.ui.theme.crystalBlue
 import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.spectrumBlue
 import com.example.splitwise.ui.theme.zumthor
+import java.util.Locale
+import kotlin.math.absoluteValue
 
 
 @Composable
 fun PercentageSplit(
+    splitEntries: List<SplitEntryState>,
+    onPercentageChange: (userId: String, newPercentage: String) -> Unit,
+    onDistributePercEvenly: () -> Unit,
+    sumOfSplitPercentages: Double,
     modifier: Modifier = Modifier
 ) {
-    val totalBillAmount = 800.0
-    val users = listOf(
-        User("1", "You", ""),
-        User("2", "Sarah Johnson", ""),
-        User("3", "Mike Chen", "")
-    )
-
-    // The single source of truth for the state of all entries
-    val entryStates = remember {
-        mutableStateListOf<SplitEntryState>().apply {
-            addAll(users.map { SplitEntryState(user = it) })
-        }
-    }
-
-//    val totalPercentage = entryStates.sumOf { it.percentage.toDoubleOrNull() ?: 0.0}
-//    val remainingPercentage = (100.0 - totalPercentage).coerceAtLeast(0.0)
-
-    fun distributeEvenly() {
-        if (users.isEmpty()) return
-
-        val evenPercentage = 100.0 / users.size
-        val evenAmount = totalBillAmount / users.size
-
-        val newStates = users.map { user ->
-            SplitEntryState(
-                user = user,
-                percentage = String.format(java.util.Locale.US, "%.1f", evenPercentage),
-                amount = evenAmount
-            )
-        }
-        entryStates.clear()
-        entryStates.addAll(newStates)
-    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -96,7 +67,7 @@ fun PercentageSplit(
     ) {
         item {
             Button(
-                onClick = {distributeEvenly()},
+                onClick = {onDistributePercEvenly()},
                 shape = SplitWiseShapes.button,
                 border = BorderStroke(width = ComponentDimensions.borderWidthMedium, color = crystalBlue),
                 colors = ButtonDefaults.buttonColors(
@@ -121,20 +92,17 @@ fun PercentageSplit(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        itemsIndexed(entryStates) {index, entryState ->
+        itemsIndexed(splitEntries) {index, entryState ->
             PercentageEntry(
                 state = entryState,
-                onPercentageChange = {newPercentage ->
-                    val newAmount = ((newPercentage.toDoubleOrNull() ?: 0.0) / 100.0) * totalBillAmount
-                    entryStates[index] = entryState.copy(
-                        percentage = newPercentage,
-                        amount = newAmount
-                    )
-                }
+                onPercentageChange = {userId, newPercentage -> onPercentageChange(userId, newPercentage)}
             )
         }
-        item {
-            BillSplitNote(stringResource(R.string.perc_must_add_up))
+        val tolerance = 0.01
+        if ((sumOfSplitPercentages - 100.0).absoluteValue > tolerance) {
+            item {
+                BillSplitNote(stringResource(R.string.perc_must_add_up))
+            }
         }
     }
 }
@@ -162,7 +130,7 @@ fun BillSplitNote(
 @Composable
 fun PercentageEntry(
     state: SplitEntryState,
-    onPercentageChange: (String) -> Unit,
+    onPercentageChange: (userId: String, newPercentage: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -181,10 +149,10 @@ fun PercentageEntry(
         ) {
             AppTextField(
                 label = stringResource(R.string.percentage),
-                value = state.percentage,
+                value = String.format(Locale.US, "%.2f", state.percentage),
                 onValueChange = { newValue ->
                     if((newValue.toDoubleOrNull() !== null && newValue.toDoubleOrNull()!! <= 100.0) || newValue.isEmpty()) {
-                        onPercentageChange(newValue)
+                        onPercentageChange(state.user.id, newValue)
                     }
                 },
                 placeholder = "0.0",
@@ -200,7 +168,7 @@ fun PercentageEntry(
             )
             AppTextField(
                 label = stringResource(R.string.amount),
-                value = String.format(java.util.Locale.US,"%.2f", state.amount),
+                value = String.format(Locale.US,"%.2f", state.amount),
                 onValueChange = {},
                 readOnly = true,
                 enabled = false,
@@ -265,6 +233,11 @@ fun PersonDetail(
 @Composable
 fun PercentageSplitPreview() {
     SplitWiseTheme {
-        PercentageSplit()
+        PercentageSplit(
+            splitEntries = emptyList(),
+            onPercentageChange = {_, _ ->},
+            onDistributePercEvenly = {},
+            sumOfSplitPercentages = 60.0
+        )
     }
 }
