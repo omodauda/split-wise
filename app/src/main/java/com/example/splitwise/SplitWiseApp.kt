@@ -15,6 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.auth.AuthViewModelFactory
+import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
+import com.example.splitwise.ui.features.main.addBill.AddBillViewModelFactory
 import com.example.splitwise.ui.navigation.authNavGraph
 import com.example.splitwise.ui.navigation.mainNavGraph
 
@@ -24,6 +26,10 @@ fun SplitWiseApp() {
     val authRepository = application.appContainer.authRepository
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(authRepository)
+    )
+
+    val addBillViewModel: AddBillViewModel = viewModel(
+        factory = AddBillViewModelFactory()
     )
 
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
@@ -48,7 +54,7 @@ fun SplitWiseApp() {
                 startDestination = startDestination
             ) {
                 authNavGraph(navController, authViewModel)
-                mainNavGraph(navController, authViewModel)
+                mainNavGraph(navController, authViewModel, addBillViewModel)
             }
         }
     }
