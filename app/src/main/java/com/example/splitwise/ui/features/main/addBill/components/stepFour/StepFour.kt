@@ -14,10 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,6 +27,9 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 
 @Composable
 fun StepFour(
+    billAmount: Double,
+    payerId: String? = null,
+    onPayerSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val friends = listOf(
@@ -50,7 +49,6 @@ fun StepFour(
             email = "emma@example.com"
         )
     )
-    var selectedFriend by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -69,7 +67,7 @@ fun StepFour(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$600",
+                text = "$${billAmount}",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -86,13 +84,13 @@ fun StepFour(
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
             items(friends) {user ->
-                val isSelected = user.id == selectedFriend
+                val isSelected = user.id == payerId
                 Friend(
                     user,
                     isSelected,
                     modifier = Modifier
                         .clickable {
-                            selectedFriend = user.id
+                            onPayerSelected(user.id)
                         }
                 )
             }
@@ -104,6 +102,10 @@ fun StepFour(
 @Composable
 fun StepFourPreview() {
     SplitWiseTheme {
-        StepFour()
+        StepFour(
+            billAmount = 0.00,
+            payerId = null,
+            onPayerSelected = {}
+        )
     }
 }
