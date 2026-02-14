@@ -30,7 +30,9 @@ import java.util.Locale
 fun StepSix(
     uiState: AddBillUiState,
     onPercentageChange: (userId: String, newPercentage: String) -> Unit,
+    onExactAmountChange: (userId: String, newAmount: String) -> Unit,
     onDistributePercentageEvenly: () -> Unit,
+    onDistributeAmountEvenly: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -45,8 +47,14 @@ fun StepSix(
             remainingBillAmount = uiState.remainingAmount
         )
         Spacer(Modifier.height(ScreenDimensions.contentPadding))
-        if(uiState.splitMethod == AddBillSplitMethod.EQUAL) {
-            ExactAmountSplit()
+        if(uiState.splitMethod == AddBillSplitMethod.EXACT) {
+            ExactAmountSplit(
+                splitEntries = uiState.splitEntries,
+                billAmount = uiState.billAmount,
+                onExactAmountChange = {userId, newAmount -> onExactAmountChange(userId, newAmount)},
+                onDistributeAmountEvenly = {onDistributeAmountEvenly()},
+                sumOfSplitAmounts = uiState.sumOfSplitAmount
+            )
         } else if (uiState.splitMethod == AddBillSplitMethod.PERCENTAGE) {
             PercentageSplit(
                 splitEntries = uiState.splitEntries,
@@ -107,6 +115,12 @@ fun BalanceDetails(
 @Composable
 fun StepSixPreview() {
     SplitWiseTheme {
-        StepSix(uiState = AddBillUiState(), onPercentageChange = {_,_ ->}, onDistributePercentageEvenly = {})
+        StepSix(
+            uiState = AddBillUiState(),
+            onPercentageChange = { _, _ -> },
+            onDistributePercentageEvenly = {},
+            onExactAmountChange = {_, _ ->},
+            onDistributeAmountEvenly = {}
+        )
     }
 }
