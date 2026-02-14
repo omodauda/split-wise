@@ -6,7 +6,7 @@ import java.util.Date
 data class AddBillUiState(
     val isCurrentStepValid: Boolean = false,
 
-    val billAmount: Double = 0.00,
+    val billAmount: String = "",
     val description: String = "",
     val category: Int? = null,
     val date: Date? = null,
@@ -21,6 +21,8 @@ data class AddBillUiState(
     val splitMethod: AddBillSplitMethod = AddBillSplitMethod.EQUAL,
     val splitEntries: List<SplitEntryState> = emptyList()
 ) {
+    val billAmountAsDouble: Double
+        get() = (billAmount.toDoubleOrNull() ?: 0.0) / 100.0
     val sumOfSplitPercentage: Double
         get() = splitEntries.sumOf { it.percentage }
 
@@ -31,5 +33,5 @@ data class AddBillUiState(
         get() = splitEntries.sumOf { it.amount }
 
     val remainingAmount: Double
-        get() = (billAmount - sumOfSplitAmount).coerceAtLeast(0.0)
+        get() = (billAmountAsDouble - sumOfSplitAmount).coerceAtLeast(0.0)
 }
