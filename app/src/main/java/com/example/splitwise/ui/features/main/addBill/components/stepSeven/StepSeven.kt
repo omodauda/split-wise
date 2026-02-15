@@ -40,6 +40,7 @@ import com.example.splitwise.ui.theme.crystalPeak
 import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.hermes
 import com.example.splitwise.ui.theme.zumthor
+import com.example.splitwise.utils.formatAsCurrency
 import com.example.splitwise.utils.formatDate
 import java.util.Date
 import java.util.Locale
@@ -128,7 +129,7 @@ fun ReviewDetail(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$${String.format(Locale.US, "%.2f", billAmount)}",
+                text = formatAsCurrency(billAmount),
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -265,7 +266,7 @@ fun SplitBreakDownItem(
             }
         }
         Text(
-            text = "$${String.format(Locale.US, "%.2f", state.amount)}",
+            text = formatAsCurrency(state.amount),
             style = BalanceNegative,
             color = MaterialTheme.colorScheme.onBackground
         )

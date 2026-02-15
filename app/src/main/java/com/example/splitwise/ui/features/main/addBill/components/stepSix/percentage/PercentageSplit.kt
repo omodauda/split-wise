@@ -162,7 +162,7 @@ fun PercentageEntry(
                         contentDescription = "percentage icon"
                     )
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 modifier = Modifier
                     .weight(1f)
             )

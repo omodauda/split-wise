@@ -24,6 +24,7 @@ import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.brightYellow
+import com.example.splitwise.utils.formatAsCurrency
 import java.util.Locale
 
 @Composable
@@ -89,7 +90,7 @@ fun BalanceDetails(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$${String.format(Locale.US, "%.2f", billAmount)}",
+                text = formatAsCurrency(billAmount),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -102,8 +103,7 @@ fun BalanceDetails(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = if (splitMethod == AddBillSplitMethod.PERCENTAGE) "${String.format(Locale.US, "%.2f", remainingPercentage)}%" else "$${String.format(
-                    Locale.US, "%.2f", remainingBillAmount)}",
+                text = if (splitMethod == AddBillSplitMethod.PERCENTAGE) "${String.format(Locale.US, "%.2f", remainingPercentage)}%" else formatAsCurrency(remainingBillAmount),
                 style = MaterialTheme.typography.headlineSmall,
                 color = brightYellow
             )

@@ -31,7 +31,7 @@ import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.emerald_500
-import java.util.Locale
+import com.example.splitwise.utils.formatAsCurrency
 
 
 @Composable
@@ -76,7 +76,7 @@ fun PaymentDetails(
         )
         Spacer(Modifier.height(Spacing.extraSmall))
         Text(
-            text = "$${String.format(Locale.US, "%.2f", billAmount)}",
+            text = formatAsCurrency(billAmount),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onPrimary
         )
@@ -191,7 +191,7 @@ fun SplitMethodItem(
                 if (method == AddBillSplitMethod.EQUAL) {
                     Spacer(Modifier.height(Spacing.extraSmall))
                     Text(
-                        text = "$${String.format(Locale.US, "%.2f", exactPerPerson)} ${stringResource(R.string.per_person)}",
+                        text = "${formatAsCurrency(exactPerPerson)} ${stringResource(R.string.per_person)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )

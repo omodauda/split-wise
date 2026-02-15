@@ -39,6 +39,7 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.crystalBlue
 import com.example.splitwise.ui.theme.spectrumBlue
 import com.example.splitwise.ui.theme.zumthor
+import com.example.splitwise.utils.formatAsCurrency
 import java.util.Locale
 import kotlin.math.absoluteValue
 
@@ -95,7 +96,7 @@ fun ExactAmountSplit(
         val tolerance = 0.01
         if ((sumOfSplitAmounts - billAmount).absoluteValue > tolerance) {
             item {
-                BillSplitNote(note = stringResource(R.string.amount_must_add_up, billAmount))
+                BillSplitNote(note = stringResource(R.string.amount_must_add_up, formatAsCurrency(billAmount)))
             }
         }
     }
@@ -130,6 +131,9 @@ fun AmountEntry(
                     }},
                 placeholder = "200.00",
                 leadingIcon = R.drawable.dollar_icon,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.NumberPassword
+                ),
                 modifier = Modifier
                     .weight(1f)
             )

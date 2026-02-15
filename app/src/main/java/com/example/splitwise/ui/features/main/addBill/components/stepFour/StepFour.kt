@@ -24,7 +24,7 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import java.util.Locale
+import com.example.splitwise.utils.formatAsCurrency
 
 @Composable
 fun StepFour(
@@ -52,7 +52,7 @@ fun StepFour(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$${String.format(Locale.US, "%.2f", billAmount)}",
+                text = formatAsCurrency(billAmount),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )
