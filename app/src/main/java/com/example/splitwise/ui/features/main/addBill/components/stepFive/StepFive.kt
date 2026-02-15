@@ -1,6 +1,5 @@
 package com.example.splitwise.ui.features.main.addBill.components.stepFive
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,72 +17,50 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.ui.features.main.addBill.AddBillSplitMethod
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.blue_chalk
-import com.example.splitwise.ui.theme.crystalPeak
-import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.emerald_500
-import com.example.splitwise.ui.theme.papaya_whip
-enum class SplitMethod(
-    val icon: String,
-    @StringRes val title: Int,
-    @StringRes val description: Int,
-    val color: Color
-) {
-    EQUAL(
-        icon = "⚖️",
-        title = R.string.split_equally,
-        description = R.string.equal_desc,
-        color = crystalPeak
-    ),
-    PERCENTAGE(
-        icon = "📊",
-        title = R.string.by_percentage,
-        description = R.string.perc_desc,
-        color = blue_chalk
-    ),
-    EXACT(
-        icon = "💵",
-        title = R.string.exact_amounts,
-        description = R.string.exact_desc,
-        color = papaya_whip
-    )
-}
+import com.example.splitwise.utils.formatAsCurrency
+
 
 @Composable
 fun StepFive(
+    billAmount: Double,
+    numberOfPersons: Int,
+    splitMethod: AddBillSplitMethod,
+    payerName: String,
+    selectSplitMethod: (method: AddBillSplitMethod) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val billAmount = 600.00
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = Spacing.large)
     ) {
-        PaymentDetails()
+        PaymentDetails(
+            billAmount,
+            payerName
+        )
         Spacer(Modifier.height(Spacing.medium))
-        SplitMethodsView(billAmount = billAmount)
+        SplitMethodsView(billAmount = billAmount, splitMethod = splitMethod, selectSplitMethod = selectSplitMethod, numberOfPersons = numberOfPersons)
     }
 }
 
 @Composable
 fun PaymentDetails(
+    billAmount: Double,
+    payerName: String,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -99,7 +76,7 @@ fun PaymentDetails(
         )
         Spacer(Modifier.height(Spacing.extraSmall))
         Text(
-            text = "$600",
+            text = formatAsCurrency(billAmount),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.onPrimary
         )
@@ -118,7 +95,7 @@ fun PaymentDetails(
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Text(
-                text = "You",
+                text = payerName,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -129,9 +106,11 @@ fun PaymentDetails(
 @Composable
 fun SplitMethodsView(
     billAmount: Double,
+    numberOfPersons: Int,
+    splitMethod: AddBillSplitMethod,
+    selectSplitMethod: (method: AddBillSplitMethod) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedMethod by rememberSaveable { mutableStateOf(SplitMethod.EQUAL) }
     Column(
         modifier = modifier
     ) {
@@ -141,12 +120,13 @@ fun SplitMethodsView(
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(Spacing.medium))
-        SplitMethod.entries.forEach { method ->
+        AddBillSplitMethod.entries.forEach { method ->
             SplitMethodItem(
                 method = method,
-                isSelected = selectedMethod == method,
+                isSelected = splitMethod == method,
                 billAmount,
-                modifier = Modifier.clickable { selectedMethod = method } // Update state on click
+                numberOfPersons,
+                modifier = Modifier.clickable { selectSplitMethod(method) }
             )
             Spacer(Modifier.height(Spacing.medium))
         }
@@ -155,11 +135,13 @@ fun SplitMethodsView(
 
 @Composable
 fun SplitMethodItem(
-    method: SplitMethod,
+    method: AddBillSplitMethod,
     isSelected: Boolean,
     billAmount: Double,
+    numberOfPersons: Int,
     modifier: Modifier = Modifier
 ) {
+    val exactPerPerson = billAmount / numberOfPersons
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
 
     Row(
@@ -206,11 +188,10 @@ fun SplitMethodItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                val exactPerPerson = billAmount / 3
-                if (method == SplitMethod.EQUAL) {
+                if (method == AddBillSplitMethod.EQUAL) {
                     Spacer(Modifier.height(Spacing.extraSmall))
                     Text(
-                        text = "$$exactPerPerson ${stringResource(R.string.per_person)}",
+                        text = "${formatAsCurrency(exactPerPerson)} ${stringResource(R.string.per_person)}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -239,6 +220,12 @@ fun SplitMethodItem(
 @Composable
 fun StepFivePreview() {
     SplitWiseTheme {
-        StepFive()
+        StepFive(
+            billAmount = 400.00,
+            numberOfPersons = 2,
+            splitMethod = AddBillSplitMethod.EXACT,
+            payerName = "You",
+            selectSplitMethod = {}
+        )
     }
 }

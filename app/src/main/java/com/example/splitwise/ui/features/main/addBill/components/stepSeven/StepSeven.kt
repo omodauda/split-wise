@@ -27,8 +27,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.SplitEntryState
-import com.example.splitwise.model.User
+import com.example.splitwise.ui.features.main.addBill.AddBillSplitMethod
 import com.example.splitwise.ui.theme.BalanceNegative
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -39,41 +40,16 @@ import com.example.splitwise.ui.theme.crystalPeak
 import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.hermes
 import com.example.splitwise.ui.theme.zumthor
+import com.example.splitwise.utils.formatAsCurrency
+import com.example.splitwise.utils.formatDate
+import java.util.Date
 import java.util.Locale
 
 @Composable
 fun StepSeven(
+    uiState: AddBillUiState,
     modifier: Modifier = Modifier
 ) {
-    val breakDowns = listOf(
-        SplitEntryState(
-            user = User(
-                id = "1",
-                name = "You",
-                email = "you@example.com"
-            ),
-            percentage = "30",
-            amount = 180.0
-        ),
-        SplitEntryState(
-            user = User(
-                id = "2",
-                name = "Sarah Johnson",
-                email = "sarah@example.com"
-            ),
-            percentage = "30",
-            amount = 180.0
-        ),
-        SplitEntryState(
-            user = User(
-                id = "3",
-                name = "Mick Chen",
-                email = "mike@example.com"
-            ),
-            percentage = "40",
-            amount = 240.0
-        )
-    )
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -82,9 +58,16 @@ fun StepSeven(
     ) {
         ReviewHeader()
         Spacer(Modifier.height(Spacing.large))
-        ReviewDetail()
+        ReviewDetail(
+            billAmount = uiState.billAmountAsDouble,
+            description = uiState.description,
+            category = uiState.category ?: 0,
+            date = uiState.date,
+            paidBy = (uiState.participants.find { it.id == uiState.paidByUserId }?.name ?: ""),
+            splitMethod = uiState.splitMethod
+        )
         Spacer(Modifier.height(Spacing.medium))
-        ReviewBreakDown(breakDowns)
+        ReviewBreakDown(breakDowns = uiState.splitEntries)
         Spacer(Modifier.height(Spacing.medium))
         NextStepView()
     }
@@ -119,6 +102,12 @@ fun ReviewHeader(
 
 @Composable
 fun ReviewDetail(
+    billAmount: Double,
+    description: String,
+    category: Int,
+    date: Date?,
+    paidBy: String,
+    splitMethod: AddBillSplitMethod,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -140,7 +129,7 @@ fun ReviewDetail(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$600.00",
+                text = formatAsCurrency(billAmount),
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -152,17 +141,17 @@ fun ReviewDetail(
                 .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                 .padding(Spacing.large)
         ) {
-            ReviewDetailItem(label = R.string.add_bill_desc, value = "food")
+            ReviewDetailItem(label = R.string.add_bill_desc, value = description)
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                 .fillMaxWidth()
             ) {
-                ReviewDetailItem(label = R.string.category, value = stringResource(R.string.food_dining))
-                ReviewDetailItem(label = R.string.date, value = "08/02/2026")
+                ReviewDetailItem(label = R.string.category, value = stringResource(category))
+                ReviewDetailItem(label = R.string.date, value = formatDate(date))
             }
-            ReviewDetailItem(label = R.string.paid_by, value = "You")
-            ReviewDetailItem(label = R.string.split_method, value = "By Percentage")
+            ReviewDetailItem(label = R.string.paid_by, value = paidBy)
+            ReviewDetailItem(label = R.string.split_method, value = stringResource(splitMethod.title))
         }
     }
 }
@@ -238,7 +227,7 @@ fun SplitBreakDownItem(
                     .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape)
             ) {
                 Text(
-                    text = "M",
+                    text = state.user.name[0].uppercase(),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -270,14 +259,14 @@ fun SplitBreakDownItem(
 
                 Spacer(Modifier.height(2.dp))
                 Text(
-                    text = "${state.percentage}% ${stringResource(R.string.of)} ${stringResource(R.string.total)}",
+                    text = "${String.format(Locale.US, "%.2f", state.percentage)}% ${stringResource(R.string.of)} ${stringResource(R.string.total)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
         Text(
-            text = "$${String.format(Locale.US, "%.2f", state.amount)}",
+            text = formatAsCurrency(state.amount),
             style = BalanceNegative,
             color = MaterialTheme.colorScheme.onBackground
         )
@@ -335,6 +324,6 @@ fun NextStepView(
 @Composable
 fun StepSevenPreview() {
     SplitWiseTheme {
-        StepSeven()
+        StepSeven(uiState = AddBillUiState())
     }
 }

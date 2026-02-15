@@ -3,7 +3,6 @@ package com.example.splitwise.ui.features.main.addBill
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -28,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -46,18 +46,31 @@ import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
+import java.util.Date
 
 @Composable
 fun AddBillScreen(
     goBack: () -> Unit,
     goToAddBillSuccess: () -> Unit,
+    addBillViewModel: AddBillViewModel,
     modifier: Modifier = Modifier
 ) {
+
+    val uiState by addBillViewModel.uiState.collectAsState()
+
     val totalSteps = 7
     var currentStep by rememberSaveable { mutableIntStateOf(1) }
 
+    LaunchedEffect(currentStep) {
+        addBillViewModel.validateStep(currentStep)
+    }
+
     fun goToNextStep() {
-        if (currentStep < totalSteps) {
+        if (currentStep == 2 && !uiState.isGroupSplit) {
+            currentStep += 2
+        }else if (currentStep == 5 && uiState.splitMethod == AddBillSplitMethod.EQUAL) {
+            currentStep += 2
+        }else if (currentStep < totalSteps) {
             currentStep++
             return
         }else if (currentStep == totalSteps) {
@@ -66,15 +79,20 @@ fun AddBillScreen(
     }
 
     fun goToPrevStep() {
-        if (currentStep > 1) {
+        if (currentStep == 4 && !uiState.isGroupSplit) {
+            currentStep -= 2
+        } else if (currentStep == 7 && uiState.splitMethod == AddBillSplitMethod.EQUAL) {
+            currentStep -= 2
+        }else if (currentStep > 1) {
             currentStep--
         } else {
             goBack()
+            // TODO: clear add bill state
         }
     }
 
     Scaffold(
-        bottomBar = {AddBillFooter(goToNextStep = {goToNextStep()})},
+        bottomBar = {AddBillFooter(goToNextStep = {goToNextStep()}, enabled = uiState.isCurrentStepValid, isLastStep = currentStep == totalSteps )},
         modifier = modifier
             .fillMaxSize()
     ) {innerPadding ->
@@ -84,15 +102,52 @@ fun AddBillScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
         ) {
-            AddBillHeader(currentStep, totalSteps, goToPrevStep = {goToPrevStep()})
+            AddBillHeader(splitMethod = uiState.splitMethod, currentStep = currentStep, totalSteps = totalSteps, goToPrevStep = {goToPrevStep()})
             when (currentStep) {
-                1 -> StepOne()
-                2 -> StepTwo()
-                3 -> StepThree()
-                4 -> StepFour()
-                5 -> StepFive()
-                6 -> StepSix()
-                7 -> StepSeven()
+                1 -> StepOne(
+                    uiState,
+                    onAmountChange = { addBillViewModel.onBillAmountChange(it) },
+                    onDescriptionChange = {addBillViewModel.onDescriptionChange(it)},
+                    onDateSelected = {
+                        if (it == null) return@StepOne
+                        val selectedDate = Date(it)
+                        addBillViewModel.onDateChange(selectedDate)
+                    },
+                    onCategorySelected = {addBillViewModel.onCategoryChange(it)},
+                )
+                2 -> StepTwo(
+                    uiState,
+                    onSelectGroup = {addBillViewModel.onGroupSelected(it)},
+                    onSelectFriend = {addBillViewModel.onFriendSelected(it)},
+                    onTabChanged = {addBillViewModel.clearParticipants()}
+                )
+                3 -> StepThree(
+                    selectedParticipants = uiState.participants,
+                    onMemberSelected = {addBillViewModel.onGroupMemberSelected(it)}
+                )
+                4 -> StepFour(
+                    billAmount = uiState.billAmountAsDouble,
+                    payerId = uiState.paidByUserId,
+                    onPayerSelected = {addBillViewModel.onPayerSelected(it)},
+                    participants = uiState.participants
+                )
+                5 -> StepFive(
+                    billAmount = uiState.billAmountAsDouble,
+                    numberOfPersons = uiState.participants.size,
+                    splitMethod = uiState.splitMethod,
+                    payerName = uiState.participants.find { it.id == uiState.paidByUserId }?.name ?: "",
+                    selectSplitMethod = {addBillViewModel.onSplitMethodChanged(it)}
+                )
+                6 -> StepSix(
+                    uiState = uiState,
+                    onPercentageChange = {userId, newPercentage -> addBillViewModel.onPercentageChanged(userId, newPercentage)},
+                    onExactAmountChange = {userId, newAmount -> addBillViewModel.onExactAmountChanged(userId, newAmount)},
+                    onDistributePercentageEvenly = {addBillViewModel.distributeEvenly()},
+                    onDistributeAmountEvenly = {addBillViewModel.distributeEvenly()}
+                )
+                7 -> StepSeven(
+                    uiState
+                )
             }
         }
     }
@@ -100,6 +155,7 @@ fun AddBillScreen(
 
 @Composable
 fun AddBillHeader(
+    splitMethod: AddBillSplitMethod,
     currentStep: Int,
     totalSteps: Int,
     goToPrevStep: () -> Unit,
@@ -113,7 +169,7 @@ fun AddBillHeader(
         3 -> R.string.select_members
         4 -> R.string.who_paid
         5 -> R.string.split_method
-        6 -> R.string.adjust_perc //& exact amounts
+        6 -> if (splitMethod == AddBillSplitMethod.PERCENTAGE) R.string.adjust_perc else R.string.exact_amounts
         7 -> R.string.review
         else -> R.string.add_bill}
 
@@ -164,6 +220,8 @@ fun AddBillHeader(
 
 @Composable
 fun AddBillFooter(
+    enabled: Boolean,
+    isLastStep: Boolean,
     goToNextStep: () -> Unit,
     modifier: Modifier = Modifier
         .systemBarsPadding()
@@ -176,8 +234,9 @@ fun AddBillFooter(
 
     ) {
         AppTextButton(
-            title = stringResource(R.string.Continue),
-            onClick = {goToNextStep()}
+            title = stringResource(if (!isLastStep) R.string.Continue else R.string.add_bill),
+            onClick = {goToNextStep()},
+            enabled = enabled
         )
 //        Spacer(Modifier.height(Spacing.extraLarge))
     }
@@ -195,7 +254,8 @@ fun AddBillFooter(
 )
 @Composable
 fun AddBillScreenPreview() {
+    val vm = AddBillViewModel()
     SplitWiseTheme {
-        AddBillScreen(goBack = {}, goToAddBillSuccess = {})
+        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm)
     }
 }

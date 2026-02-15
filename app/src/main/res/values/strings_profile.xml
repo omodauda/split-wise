@@ -12,4 +12,68 @@
         © %s All rights reserved
     </string>
     <string name="app_version">SplitWise v%s</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="change_profile_photo">Change Profile Photo</string>
+    <string name="upload_desc">Upload a new photo or take one with your camera</string>
+    <string name="personal_info">personal information</string>
+    <string name="security">security</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_password_subtitle">Update your account password</string>
+    <string name="danger_zone">danger zone</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_subtitle">Permanently delete your account</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="change_password_desc">
+        Create a strong password to keep your account secure. Your password must meet all requirements below.
+    </string>
+    <string name="current_password">Current Password</string>
+    <string name="current_password_placeholder">Enter current password</string>
+    <string name="new_password">New Password</string>
+    <string name="new_password_placeholder">Enter new password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="confirm_new_password_placeholder">Re-enter new password</string>
+    <string name="cancel">Cancel</string>
+    <string-array name="change_password_guide_items">
+        <item>At least 8 characters</item>
+        <item>One uppercase letter (A-Z)</item>
+        <item>One lowercase letter (a-z)</item>
+        <item>One number (0-9)</item>
+        <item>One special character (!@#$%^&amp;*)</item>
+    </string-array>
+    <string name="password_match">Passwords match</string>
+    <string name="password_match_error">Passwords do not match</string>
+    <string name="password_changed">Password Changed!</string>
+    <string name="password_changed_desc">Your password has been updated successfully</string>
+    <string name="delete_alert_title">This action cannot be undone</string>
+    <string name="delete_alert_desc">Once you delete your account, there is no going back. All your data will be permanently removed.</string>
+    <string name="delete_instr">What will be deleted:</string>
+    <string-array name="delete_instr_items">
+        <item>All your groups and bills - You will be removed from all groups and your bills will be deleted</item>
+        <item>Outstanding balances - All unsettled balances will be lost and cannot be recovered</item>
+        <item>Personal information - Your profile, email, and all personal data will be permanently deleted</item>
+        <item>Transaction history - All payment records and activity logs will be erased</item>
+    </string-array>
+    <string-array name="delete_alt">Consider these alternatives:</string-array>
+    <string-array name="delete_alt_items">
+        <item>Settle all outstanding balances before leaving</item>
+        <item>Export your transaction history for your records</item>
+        <item>Simply log out if you need a temporary break</item>
+    </string-array>
+    <string name="keep_account">Keep Account</string>
+    <string name="continue_delete">Continue to Delete</string>
+    <string name="confirm_deletion">Confirm Deletion</string>
+    <string name="type_delete">Type "DELETE" to confirm</string>
+    <string name="type_delete_placeholder">Type DELETE here</string>
+    <string name="type_delete_error">x Please type "DELETE" exactly</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="enter_your_password_error">x Please enter your password</string>
+    <string name="last_warning">Last Warning</string>
+    <string name="last_warning_desc">This will immediately and permanently delete your account. This action is irreversible.</string>
+    <string name="go_back">Go Back</string>
+    <string name="delete_my_account">Delete My Account</string>
+    <string name="text_confirmed">Text confirmed</string>
+    <string name="deleting_account">Deleting Account...</string>
+    <string name="deleting_account_desc">Please wait while we process your request</string>
+    <string name="account_deleted">Account Deleted</string>
+    <string name="account_deleted_desc">Your account has been permanently deleted</string>
 </resources>

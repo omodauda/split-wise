@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.addBillSuccess
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,17 +35,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.crystalPeak
 import com.example.splitwise.ui.theme.emerald_50
+import com.example.splitwise.utils.formatAsCurrency
 
 @Composable
 fun AddBillSuccessScreen(
     goHome: () -> Unit,
+    addBillViewModel: AddBillViewModel,
     modifier: Modifier = Modifier
 ) {
+    val uiState by addBillViewModel.uiState.collectAsState()
+
+    BackHandler(enabled = true) { }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -64,13 +73,13 @@ fun AddBillSuccessScreen(
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         Text(
-            text = stringResource(R.string.bill_success_desc, "100.00"),
+            text = stringResource(R.string.bill_success_desc, formatAsCurrency(uiState.billAmountAsDouble)),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         Text(
-            text = stringResource(R.string.notify_people, "3"),
+            text = stringResource(R.string.notify_people, uiState.participants.size),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -166,7 +175,8 @@ fun SuccessItem(
 )
 @Composable
 fun AddBillSuccessPreview() {
+    val vm = AddBillViewModel()
     SplitWiseTheme {
-        AddBillSuccessScreen(goHome = {})
+        AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
     }
 }

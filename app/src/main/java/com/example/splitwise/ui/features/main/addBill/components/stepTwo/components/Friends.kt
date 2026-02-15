@@ -38,6 +38,8 @@ import com.example.splitwise.ui.theme.emerald_50
 
 @Composable
 fun Friends(
+    selectedFriends: List<String>,
+    onSelectFriend: (user: User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val friends = listOf(
@@ -57,7 +59,6 @@ fun Friends(
             email = "emma@example.com"
         )
     )
-    val selectedFriends = remember { mutableStateListOf<String>() }
     Column(
         modifier
     ) {
@@ -78,11 +79,7 @@ fun Friends(
                     isSelected,
                     modifier = Modifier
                         .clickable {
-                            if (isSelected) {
-                                selectedFriends.remove(user.id)
-                            } else {
-                                selectedFriends.add(user.id)
-                            }
+                            onSelectFriend(user)
                         }
                 )
             }
@@ -163,6 +160,6 @@ fun Friend(
 @Composable
 fun FriendsPreview() {
     SplitWiseTheme {
-        Friends()
+        Friends(onSelectFriend = {}, selectedFriends = emptyList())
     }
 }

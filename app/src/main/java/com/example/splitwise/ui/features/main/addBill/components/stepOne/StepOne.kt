@@ -21,10 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.BillCategory
 import com.example.splitwise.ui.components.AppDatePicker
 import com.example.splitwise.ui.components.AppTextField
@@ -41,17 +38,17 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.emerald_50
+import com.example.splitwise.utils.CurrencyAmountInputVisualTransformation
 
 @Composable
 fun StepOne(
+    uiState: AddBillUiState,
+    onAmountChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onDateSelected: (Long?) -> Unit,
+    onCategorySelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var billAmount by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var billDate by remember { mutableStateOf<Long?>(null) }
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -76,10 +73,8 @@ fun StepOne(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             TextField(
-                value = billAmount,
-                onValueChange = {
-                    billAmount = it
-                },
+                value = if (uiState.billAmountAsDouble == 0.0) "" else uiState.billAmount,
+                onValueChange = onAmountChange,
                 placeholder = {Text(text = "0.00", style = OnboardingTitle)},
                 textStyle = OnboardingTitle,
                 colors = TextFieldDefaults.colors(
@@ -95,30 +90,29 @@ fun StepOne(
                 ),
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number
-                )
+                    keyboardType = KeyboardType.NumberPassword
+                ),
+                visualTransformation = CurrencyAmountInputVisualTransformation()
             )
         }
         Spacer(Modifier.height(Spacing.large))
         AppTextField(
             label = stringResource(R.string.add_bill_desc),
-            value = description,
-            onValueChange = {description = it},
+            value = uiState.description,
+            onValueChange = onDescriptionChange,
             leadingIcon = R.drawable.bill_icon,
             placeholder = stringResource(R.string.desc_placeholder)
         )
         Spacer(Modifier.height(Spacing.large))
         Categories(
-            selectedCategory = category,
-            onSelect = { category = it}
+            selectedCategory = uiState.category,
+            onSelect = onCategorySelected
         )
         Spacer(Modifier.height(Spacing.large))
         AppDatePicker(
             label = stringResource(R.string.date),
-            selectedDate = billDate,
-            onDateSelected = { newDate ->
-                billDate = newDate
-            }
+            selectedDate = uiState.date?.time,
+            onDateSelected = onDateSelected
         )
         Spacer(Modifier.height(Spacing.large))
     }
@@ -126,8 +120,8 @@ fun StepOne(
 
 @Composable
 fun Categories(
-    selectedCategory: String? = null,
-    onSelect: (String) -> Unit,
+    selectedCategory: Int? = null,
+    onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val categories = listOf(
@@ -175,7 +169,7 @@ fun Categories(
                     category = category,
                     selectedCategory = selectedCategory,
                     modifier = Modifier
-                        .clickable(enabled = true, onClick = {onSelect(category.name.toString())})
+                        .clickable(enabled = true, onClick = {onSelect(category.name)})
                 )
             }
         }
@@ -184,11 +178,11 @@ fun Categories(
 
 @Composable
 fun Category(
-    selectedCategory: String? = null,
+    selectedCategory: Int? = null,
     category: BillCategory,
     modifier: Modifier = Modifier
 ) {
-    val isSelected = selectedCategory == category.name.toString()
+    val isSelected = selectedCategory == category.name
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -201,7 +195,7 @@ fun Category(
                 shape = MaterialTheme.shapes.large
             )
             .background(
-                color = if (isSelected) emerald_50 else MaterialTheme.colorScheme.background,
+                color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.large
             )
     ) {
@@ -231,6 +225,12 @@ fun Category(
 @Composable
 fun StepOnePreview() {
     SplitWiseTheme {
-        StepOne()
+        StepOne(
+            uiState = AddBillUiState(),
+            onAmountChange = {},
+            onDescriptionChange = {},
+            onDateSelected = {},
+            onCategorySelected = {}
+        )
     }
 }

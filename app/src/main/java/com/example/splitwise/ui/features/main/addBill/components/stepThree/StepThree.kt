@@ -13,8 +13,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +25,8 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 
 @Composable
 fun StepThree(
+    selectedParticipants: List<User>,
+    onMemberSelected: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val friends = listOf(
@@ -46,7 +46,7 @@ fun StepThree(
             email = "emma@example.com"
         )
     )
-    val selectedFriends = remember { mutableStateListOf<String>() }
+
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -63,17 +63,13 @@ fun StepThree(
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
             items(friends) {user ->
-                val isSelected = user.id in selectedFriends
+                val isSelected = selectedParticipants.any {it.id == user.id}
                 Friend(
                     user,
                     isSelected,
                     modifier = Modifier
                         .clickable {
-                            if (isSelected) {
-                                selectedFriends.remove(user.id)
-                            } else {
-                                selectedFriends.add(user.id)
-                            }
+                            onMemberSelected(user)
                         }
                 )
             }
@@ -85,6 +81,6 @@ fun StepThree(
 @Composable
 fun StepThreePreview() {
     SplitWiseTheme {
-        StepThree()
+        StepThree(selectedParticipants = emptyList(), onMemberSelected = {})
     }
 }

@@ -56,7 +56,7 @@
     </string-array>
     <string-array name="enter_each_amount_desc">Enter exact amount for each person</string-array>
     <string name="bill_added">Bill Added Successfully!</string>
-    <string name="bill_success_desc">Your $%s bill has been split</string>
+    <string name="bill_success_desc">Your %s bill has been split</string>
     <string name="notify_people">%s people will be notified</string>
     <string name="balances_update">Balances Updated</string>
     <string name="account_synced">All accounts synced</string>

@@ -14,10 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,29 +24,16 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
+import com.example.splitwise.utils.formatAsCurrency
 
 @Composable
 fun StepFour(
-    modifier: Modifier = Modifier
+    billAmount: Double,
+    onPayerSelected: (String) -> Unit,
+    participants: List<User>,
+    modifier: Modifier = Modifier,
+    payerId: String? = null,
 ) {
-    val friends = listOf(
-        User(
-            id = "1",
-            name = "Sarah Johnson",
-            email = "sarah@example.com"
-        ),
-        User(
-            id = "2",
-            name = "Mike Chen",
-            email = "mike@example.com"
-        ),
-        User(
-            id = "3",
-            name = "Emma Wilson",
-            email = "emma@example.com"
-        )
-    )
-    var selectedFriend by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -69,7 +52,7 @@ fun StepFour(
             )
             Spacer(Modifier.height(Spacing.extraSmall))
             Text(
-                text = "$600",
+                text = formatAsCurrency(billAmount),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onPrimary
             )
@@ -85,14 +68,14 @@ fun StepFour(
             verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
-            items(friends) {user ->
-                val isSelected = user.id == selectedFriend
+            items(participants) {user ->
+                val isSelected = user.id == payerId
                 Friend(
                     user,
                     isSelected,
                     modifier = Modifier
                         .clickable {
-                            selectedFriend = user.id
+                            onPayerSelected(user.id)
                         }
                 )
             }
@@ -104,6 +87,11 @@ fun StepFour(
 @Composable
 fun StepFourPreview() {
     SplitWiseTheme {
-        StepFour()
+        StepFour(
+            billAmount = 0.00,
+            payerId = null,
+            onPayerSelected = {},
+            participants = emptyList()
+        )
     }
 }

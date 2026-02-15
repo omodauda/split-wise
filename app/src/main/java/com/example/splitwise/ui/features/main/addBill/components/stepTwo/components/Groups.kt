@@ -19,10 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -35,13 +31,14 @@ import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.emerald_50
 
 @Composable
 fun Groups(
+    selectedGroupId: String? = null,
+    onSelectGroup: (groupId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedGroup by rememberSaveable { mutableStateOf<String?>(null) }
+
     val groups = listOf(
         Group(
             id = "1",
@@ -73,14 +70,14 @@ fun Groups(
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
             items(groups) { group ->
-                val isSelected = group.id == selectedGroup
+                val isSelected = group.id == selectedGroupId
                 Group(
                     group,
                     isSelected,
                     modifier = Modifier
                         .clickable(
                             enabled = true,
-                            onClick = {selectedGroup = group.id}
+                            onClick = {onSelectGroup(group.id)}
                         )
                 )
             }
@@ -138,6 +135,6 @@ fun Group(
 @Composable
 fun GroupsPreview() {
     SplitWiseTheme {
-        Groups()
+        Groups(selectedGroupId = null, onSelectGroup = {})
     }
 }
