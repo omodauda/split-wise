@@ -43,7 +43,8 @@ import java.time.Year
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    goToAccountSettings: () -> Unit
 ) {
     Scaffold(
         modifier = modifier
@@ -56,7 +57,8 @@ fun ProfileScreen(
         ) {
             ProfileHeader(paddingTop = innerPadding.calculateTopPadding())
             ProfileContent(
-                onLogout = {authViewModel.logout()}
+                onLogout = {authViewModel.logout()},
+                goToAccountSettings = goToAccountSettings
             )
         }
     }
@@ -118,6 +120,7 @@ fun ProfileHeader(
 
 @Composable
 fun ProfileContent(
+    goToAccountSettings: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -140,15 +143,16 @@ fun ProfileContent(
             title = R.string.account_settings,
             subTitle = R.string.account_settings_desc,
             icon = R.drawable.settings_icon,
-
+            modifier = Modifier
+                .clickable(enabled = true, onClick = {goToAccountSettings()})
         )
         Spacer(Modifier.height(Spacing.medium))
-        ProfileItem(
-            title = R.string.notifications,
-            subTitle = R.string.notifications_desc,
-            icon = R.drawable.notification_icon,
-
-        )
+//        ProfileItem(
+//            title = R.string.notifications,
+//            subTitle = R.string.notifications_desc,
+//            icon = R.drawable.notification_icon,
+//
+//        )
         Spacer(Modifier.height(Spacing.medium))
         ProfileItem(
             title = R.string.help_support,
@@ -192,10 +196,10 @@ fun ProfileContent(
 @Composable
 fun ProfileItem(
     title: Int,
-    subTitle: Int? = null,
     icon: Int,
+    modifier: Modifier = Modifier,
+    subTitle: Int? = null,
     color: Color? = null,
-    modifier: Modifier = Modifier
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -255,6 +259,6 @@ fun ProfileScreenPreview() {
     val container = FakeAppContainer()
     val vm = AuthViewModel(container.authRepository)
     SplitWiseTheme {
-        ProfileScreen(authViewModel = vm)
+        ProfileScreen(authViewModel = vm, goToAccountSettings = {})
     }
 }

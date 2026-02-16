@@ -57,7 +57,10 @@ fun HomeBottomTab(
                 FriendScreen()
             }
             composable(route = Screen.Profile.route) {
-                ProfileScreen(authViewModel = authViewModel)
+                ProfileScreen(
+                    authViewModel = authViewModel,
+                    goToAccountSettings = {navController.navigate(Screen.AccountSettings.route)}
+                )
             }
         }
     }
