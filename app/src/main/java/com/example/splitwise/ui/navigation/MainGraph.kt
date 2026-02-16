@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.splitwise.ui.features.auth.AuthViewModel
+import com.example.splitwise.ui.features.main.accountSettings.AccountSettingScreen
 import com.example.splitwise.ui.features.main.addBill.AddBillScreen
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
@@ -48,6 +49,11 @@ fun NavGraphBuilder.mainNavGraph(
                     addBillViewModel.resetState()
                 },
                 addBillViewModel
+            )
+        }
+        composable (route = Screen.AccountSettings.route){
+            AccountSettingScreen(
+                goBack = {navController.popBackStack()}
             )
         }
     }
