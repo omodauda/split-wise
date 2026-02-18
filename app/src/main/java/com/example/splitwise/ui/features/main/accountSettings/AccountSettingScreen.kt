@@ -39,12 +39,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
-import com.example.splitwise.ui.features.main.profile.ChangePasswordViewModel
-import com.example.splitwise.ui.features.main.profile.components.ChangePasswordModal
-import com.example.splitwise.ui.features.main.profile.components.SuccessCard
+import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordModal
+import com.example.splitwise.ui.features.main.accountSettings.components.DeleteAccountDialog
+import com.example.splitwise.ui.features.main.accountSettings.components.DeleteAccountModal
+import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
+import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -56,12 +59,19 @@ import com.example.splitwise.ui.theme.error_light
 @Composable
 fun AccountSettingScreen(
     goBack: () -> Unit,
-    viewModel: ChangePasswordViewModel,
+    changePasswordViewModel: ChangePasswordViewModel,
+    deleteAccountViewModel: DeleteAccountViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val changePasswordModalState = rememberModalBottomSheetState()
+    val uiState by changePasswordViewModel.uiState.collectAsState()
+    val deleteAccountUiState by deleteAccountViewModel.uiState.collectAsState()
+
+    // change password
+    val changePasswordModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showChangePasswordModal by remember { mutableStateOf(false) }
+    // delete account
+    val deleteAccountModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showDeleteAccountModal by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier
@@ -83,7 +93,7 @@ fun AccountSettingScreen(
                 HorizontalDivider(thickness = 7.dp)
                 SecuritySection(openChangePasswordModal = {showChangePasswordModal = true})
                 HorizontalDivider(thickness = 7.dp)
-                DangerZone()
+                DangerZone(onDeleteAccount = {showDeleteAccountModal = true})
             }
             Column(
                 modifier = modifier
@@ -102,14 +112,26 @@ fun AccountSettingScreen(
                     sheetState = changePasswordModalState,
                     onDismissRequest = { showChangePasswordModal = false },
                     uiState = uiState,
-                    onCurrentPasswordChange = { viewModel.onCurrentPasswordChange(it) },
-                    onNewPasswordChange = {viewModel.onNewPasswordChanged(it)},
-                    onConfirmNewPasswordChange = {viewModel.onConfirmNewPasswordChange(it)},
-                    onChangePassword = {viewModel.changePassword()}
+                    onCurrentPasswordChange = { changePasswordViewModel.onCurrentPasswordChange(it) },
+                    onNewPasswordChange = {changePasswordViewModel.onNewPasswordChanged(it)},
+                    onConfirmNewPasswordChange = {changePasswordViewModel.onConfirmNewPasswordChange(it)},
+                    onChangePassword = {changePasswordViewModel.changePassword()}
                 )
             }
-            if (uiState.submissionState == SubmissionState.Success) {
-                SuccessCard(onDismiss = {viewModel.resetSubmissionState()})
+            if (showDeleteAccountModal) {
+                DeleteAccountModal(
+                    sheetState = deleteAccountModalState,
+                    onDismissRequest = { showDeleteAccountModal = false },
+                    viewModel = deleteAccountViewModel
+                )
+            }
+            if (uiState.submissionState != SubmissionState.Idle) {
+                ChangePasswordDialog(
+                    uiState = uiState
+                )
+            }
+            if (deleteAccountUiState.submissionState != SubmissionState.Idle) {
+                DeleteAccountDialog(uiState = deleteAccountUiState)
             }
         }
     }
@@ -211,6 +233,7 @@ fun SecuritySection(
 
 @Composable
 fun DangerZone(
+    onDeleteAccount: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -229,7 +252,9 @@ fun DangerZone(
             title = R.string.delete_account,
             subTitle = R.string.delete_account_subtitle,
             icon = R.drawable.bin_icon,
-            color = error_light
+            color = error_light,
+            modifier = Modifier
+                .clickable(enabled = true, onClick = {onDeleteAccount()})
         )
     }
 }
@@ -294,7 +319,9 @@ fun SettingsItem(
 @Composable
 fun AccountSettingScreenPreview() {
     val vm = ChangePasswordViewModel()
+    val container = FakeAppContainer()
+    val deleteVm = DeleteAccountViewModel(container.authRepository)
     SplitWiseTheme {
-        AccountSettingScreen(goBack = {}, viewModel = vm)
+        AccountSettingScreen(goBack = {}, changePasswordViewModel = vm, deleteAccountViewModel = deleteVm)
     }
 }
