@@ -33,6 +33,7 @@
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="confirm_new_password_placeholder">Re-enter new password</string>
     <string name="cancel">Cancel</string>
+    <string name="password_requirements">Password Requirements:</string>
     <string-array name="change_password_guide_items">
         <item>At least 8 characters</item>
         <item>One uppercase letter (A-Z)</item>
