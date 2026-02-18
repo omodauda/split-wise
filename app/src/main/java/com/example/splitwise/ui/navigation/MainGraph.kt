@@ -9,11 +9,13 @@ import com.example.splitwise.ui.features.main.accountSettings.AccountSettingScre
 import com.example.splitwise.ui.features.main.addBill.AddBillScreen
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
+import com.example.splitwise.ui.features.main.profile.ChangePasswordViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel,
-    addBillViewModel: AddBillViewModel
+    addBillViewModel: AddBillViewModel,
+    changePasswordViewModel: ChangePasswordViewModel
 ) {
     navigation(
         startDestination = Screen.Home.route,
@@ -53,7 +55,8 @@ fun NavGraphBuilder.mainNavGraph(
         }
         composable (route = Screen.AccountSettings.route){
             AccountSettingScreen(
-                goBack = {navController.popBackStack()}
+                goBack = {navController.popBackStack()},
+                changePasswordViewModel
             )
         }
     }

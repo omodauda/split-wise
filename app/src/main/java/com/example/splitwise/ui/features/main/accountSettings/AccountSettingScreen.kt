@@ -1,6 +1,7 @@
 package com.example.splitwise.ui.features.main.accountSettings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,13 +15,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -31,8 +39,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.features.main.profile.ChangePasswordViewModel
+import com.example.splitwise.ui.features.main.profile.components.ChangePasswordModal
+import com.example.splitwise.ui.features.main.profile.components.SuccessCard
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -40,11 +52,17 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.error_light
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountSettingScreen(
     goBack: () -> Unit,
+    viewModel: ChangePasswordViewModel,
     modifier: Modifier = Modifier
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val changePasswordModalState = rememberModalBottomSheetState()
+    var showChangePasswordModal by remember { mutableStateOf(false) }
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -63,7 +81,7 @@ fun AccountSettingScreen(
                 HorizontalDivider(thickness = 7.dp)
                 PersonalInfoSection()
                 HorizontalDivider(thickness = 7.dp)
-                SecuritySection()
+                SecuritySection(openChangePasswordModal = {showChangePasswordModal = true})
                 HorizontalDivider(thickness = 7.dp)
                 DangerZone()
             }
@@ -79,9 +97,25 @@ fun AccountSettingScreen(
                     onClick = {},
                 )
             }
+            if (showChangePasswordModal) {
+                ChangePasswordModal(
+                    sheetState = changePasswordModalState,
+                    onDismissRequest = { showChangePasswordModal = false },
+                    uiState = uiState,
+                    onCurrentPasswordChange = { viewModel.onCurrentPasswordChange(it) },
+                    onNewPasswordChange = {viewModel.onNewPasswordChanged(it)},
+                    onConfirmNewPasswordChange = {viewModel.onConfirmNewPasswordChange(it)},
+                    onChangePassword = {viewModel.changePassword()}
+                )
+            }
+            if (uiState.submissionState == SubmissionState.Success) {
+                SuccessCard(onDismiss = {viewModel.resetSubmissionState()})
+            }
         }
     }
 }
+
+
 
 @Composable
 fun AccountSettingHeader(
@@ -146,6 +180,7 @@ fun PersonalInfoSection(
 
 @Composable
 fun SecuritySection(
+    openChangePasswordModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -164,7 +199,12 @@ fun SecuritySection(
         SettingsItem(
             title = R.string.change_password,
             subTitle = R.string.change_password_subtitle,
-            icon = R.drawable.password_icon
+            icon = R.drawable.password_icon,
+            modifier = Modifier
+                .clickable(
+                    enabled = true,
+                    onClick = {openChangePasswordModal()}
+                )
         )
     }
 }
@@ -253,7 +293,8 @@ fun SettingsItem(
 )
 @Composable
 fun AccountSettingScreenPreview() {
+    val vm = ChangePasswordViewModel()
     SplitWiseTheme {
-        AccountSettingScreen(goBack = {})
+        AccountSettingScreen(goBack = {}, viewModel = vm)
     }
 }
