@@ -1,12 +1,15 @@
-package com.example.splitwise.ui.features.main.profile
+package com.example.splitwise.ui.features.main.accountSettings
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.splitwise.model.ChangePasswordUiState
 import com.example.splitwise.model.SubmissionState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ChangePasswordViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(ChangePasswordUiState())
@@ -40,10 +43,14 @@ class ChangePasswordViewModel: ViewModel() {
 
     fun changePassword() {
         if (!isFormValid()) return
-        _uiState.update { it.copy(submissionState = SubmissionState.Success) }
-        // delay for some minutes
-        // update submission state to success
-        // reset all state
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(submissionState = SubmissionState.Loading) }
+            delay(5_000L)
+            _uiState.update { it.copy(submissionState = SubmissionState.Success) }
+            delay(3_000L)
+            resetState()
+        }
     }
 
     private fun validateForm() {
@@ -61,7 +68,7 @@ class ChangePasswordViewModel: ViewModel() {
                 state.newPasswordMatch
     }
 
-    fun resetSubmissionState() {
-        _uiState.update { it.copy(submissionState = SubmissionState.Idle) }
+    fun resetState() {
+        _uiState.update { ChangePasswordUiState() }
     }
 }

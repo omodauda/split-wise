@@ -1,4 +1,4 @@
-package com.example.splitwise.ui.features.main.profile.components
+package com.example.splitwise.ui.features.main.accountSettings.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

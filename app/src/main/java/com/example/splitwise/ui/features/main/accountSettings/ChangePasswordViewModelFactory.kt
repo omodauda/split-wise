@@ -1,4 +1,4 @@
-package com.example.splitwise.ui.features.main.profile
+package com.example.splitwise.ui.features.main.accountSettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
