@@ -43,6 +43,7 @@
     </string-array>
     <string name="password_match">Passwords match</string>
     <string name="password_match_error">Passwords do not match</string>
+    <string name="change_password_loading">Changing Password...</string>
     <string name="password_changed">Password Changed!</string>
     <string name="password_changed_desc">Your password has been updated successfully</string>
     <string name="delete_alert_title">This action cannot be undone</string>
@@ -54,7 +55,7 @@
         <item>Personal information - Your profile, email, and all personal data will be permanently deleted</item>
         <item>Transaction history - All payment records and activity logs will be erased</item>
     </string-array>
-    <string-array name="delete_alt">Consider these alternatives:</string-array>
+    <string name="delete_alt">Consider these alternatives:</string>
     <string-array name="delete_alt_items">
         <item>Settle all outstanding balances before leaving</item>
         <item>Export your transaction history for your records</item>
@@ -63,9 +64,10 @@
     <string name="keep_account">Keep Account</string>
     <string name="continue_delete">Continue to Delete</string>
     <string name="confirm_deletion">Confirm Deletion</string>
-    <string name="type_delete">Type "DELETE" to confirm</string>
+    <string name="confirm_deletion_subtitle">To confirm account deletion, please type DELETE in the box below and enter your password.</string>
+    <string name="type_delete">Type \"DELETE\" to confirm</string>
     <string name="type_delete_placeholder">Type DELETE here</string>
-    <string name="type_delete_error">x Please type "DELETE" exactly</string>
+    <string name="type_delete_error">x Please type \"DELETE\" exactly</string>
     <string name="enter_your_password">Enter your password</string>
     <string name="enter_your_password_error">x Please enter your password</string>
     <string name="last_warning">Last Warning</string>
