@@ -6,16 +6,18 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.accountSettings.AccountSettingScreen
+import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
 import com.example.splitwise.ui.features.main.addBill.AddBillScreen
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
-import com.example.splitwise.ui.features.main.profile.ChangePasswordViewModel
+import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel,
     addBillViewModel: AddBillViewModel,
-    changePasswordViewModel: ChangePasswordViewModel
+    changePasswordViewModel: ChangePasswordViewModel,
+    deleteAccountViewModel: DeleteAccountViewModel
 ) {
     navigation(
         startDestination = Screen.Home.route,
@@ -56,7 +58,8 @@ fun NavGraphBuilder.mainNavGraph(
         composable (route = Screen.AccountSettings.route){
             AccountSettingScreen(
                 goBack = {navController.popBackStack()},
-                changePasswordViewModel
+                changePasswordViewModel,
+                deleteAccountViewModel
             )
         }
     }
