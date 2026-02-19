@@ -60,7 +60,7 @@ fun ChangePasswordDialog(
 
 @Composable
 fun ChangePasswordContentCard(uiState: ChangePasswordUiState, modifier: Modifier = Modifier) {
-    val title = if (uiState.submissionState == SubmissionState.Loading) R.string.deleting_account else R.string.password_changed
+    val title = if (uiState.submissionState == SubmissionState.Loading) R.string.change_password_loading else R.string.password_changed
     val subTitle = if (uiState.submissionState == SubmissionState.Loading) R.string.deleting_account_desc else R.string.password_changed_desc
 
     Column(
