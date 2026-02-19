@@ -21,10 +21,10 @@ import com.example.splitwise.ui.theme.extendedColorScheme
 fun AppTextButton(
     title: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     containerColor: Color? = null,
     contentColor: Color? = null,
-    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = {onClick()},
@@ -43,7 +43,7 @@ fun AppTextButton(
         Text(
             text = title,
             style = ButtonLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground
         )
     }
 }
@@ -60,7 +60,7 @@ fun AppTextButton(
 )
 @Composable
 fun AppTextButtonPreview() {
-    SplitWiseTheme() {
+    SplitWiseTheme {
         AppTextButton(
             modifier = Modifier.fillMaxWidth(),
             onClick = {},
