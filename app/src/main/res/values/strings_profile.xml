@@ -38,12 +38,12 @@
         <item>At least 8 characters</item>
         <item>One uppercase letter (A-Z)</item>
         <item>One lowercase letter (a-z)</item>
-        <item>One number (0-9)</item>
+        <item>One number (0–9)</item>
         <item>One special character (!@#$%^&amp;*)</item>
     </string-array>
     <string name="password_match">Passwords match</string>
     <string name="password_match_error">Passwords do not match</string>
-    <string name="change_password_loading">Changing Password...</string>
+    <string name="change_password_loading">Changing Password…</string>
     <string name="password_changed">Password Changed!</string>
     <string name="password_changed_desc">Your password has been updated successfully</string>
     <string name="delete_alert_title">This action cannot be undone</string>
@@ -75,7 +75,7 @@
     <string name="go_back">Go Back</string>
     <string name="delete_my_account">Delete My Account</string>
     <string name="text_confirmed">Text confirmed</string>
-    <string name="deleting_account">Deleting Account...</string>
+    <string name="deleting_account">Deleting Account…</string>
     <string name="deleting_account_desc">Please wait while we process your request</string>
     <string name="account_deleted">Account Deleted</string>
     <string name="account_deleted_desc">Your account has been permanently deleted</string>
