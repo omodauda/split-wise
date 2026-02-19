@@ -33,15 +33,17 @@
     <string name="confirm_new_password">Confirm New Password</string>
     <string name="confirm_new_password_placeholder">Re-enter new password</string>
     <string name="cancel">Cancel</string>
+    <string name="password_requirements">Password Requirements:</string>
     <string-array name="change_password_guide_items">
         <item>At least 8 characters</item>
         <item>One uppercase letter (A-Z)</item>
         <item>One lowercase letter (a-z)</item>
-        <item>One number (0-9)</item>
+        <item>One number (0–9)</item>
         <item>One special character (!@#$%^&amp;*)</item>
     </string-array>
     <string name="password_match">Passwords match</string>
     <string name="password_match_error">Passwords do not match</string>
+    <string name="change_password_loading">Changing Password…</string>
     <string name="password_changed">Password Changed!</string>
     <string name="password_changed_desc">Your password has been updated successfully</string>
     <string name="delete_alert_title">This action cannot be undone</string>
@@ -53,7 +55,7 @@
         <item>Personal information - Your profile, email, and all personal data will be permanently deleted</item>
         <item>Transaction history - All payment records and activity logs will be erased</item>
     </string-array>
-    <string-array name="delete_alt">Consider these alternatives:</string-array>
+    <string name="delete_alt">Consider these alternatives:</string>
     <string-array name="delete_alt_items">
         <item>Settle all outstanding balances before leaving</item>
         <item>Export your transaction history for your records</item>
@@ -62,9 +64,10 @@
     <string name="keep_account">Keep Account</string>
     <string name="continue_delete">Continue to Delete</string>
     <string name="confirm_deletion">Confirm Deletion</string>
-    <string name="type_delete">Type "DELETE" to confirm</string>
+    <string name="confirm_deletion_subtitle">To confirm account deletion, please type DELETE in the box below and enter your password.</string>
+    <string name="type_delete">Type \"DELETE\" to confirm</string>
     <string name="type_delete_placeholder">Type DELETE here</string>
-    <string name="type_delete_error">x Please type "DELETE" exactly</string>
+    <string name="type_delete_error">x Please type \"DELETE\" exactly</string>
     <string name="enter_your_password">Enter your password</string>
     <string name="enter_your_password_error">x Please enter your password</string>
     <string name="last_warning">Last Warning</string>
@@ -72,7 +75,7 @@
     <string name="go_back">Go Back</string>
     <string name="delete_my_account">Delete My Account</string>
     <string name="text_confirmed">Text confirmed</string>
-    <string name="deleting_account">Deleting Account...</string>
+    <string name="deleting_account">Deleting Account…</string>
     <string name="deleting_account_desc">Please wait while we process your request</string>
     <string name="account_deleted">Account Deleted</string>
     <string name="account_deleted_desc">Your account has been permanently deleted</string>

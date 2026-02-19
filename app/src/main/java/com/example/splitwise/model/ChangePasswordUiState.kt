@@ -1,0 +1,27 @@
+package com.example.splitwise.model
+
+data class ChangePasswordUiState(
+    val currentPassword: String = "",
+    val newPassword: String = "",
+    val confirmNewPassword: String = "",
+
+    val hasMinChars: Boolean = false,
+    val hasUppercase: Boolean = false,
+    val hasLowercase: Boolean = false,
+    val hasNumber: Boolean = false,
+    val hasSpecialChar: Boolean = false,
+
+    val isFormValid: Boolean = false,
+
+    val submissionState: SubmissionState = SubmissionState.Idle
+) {
+    val newPasswordMatch: Boolean
+        get() = newPassword == confirmNewPassword
+}
+
+enum class SubmissionState {
+    Idle,
+    Loading,
+    Success,
+    Error
+}

@@ -8,22 +8,20 @@ import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
-class CurrencyAmountInputVisualTransformation(
-    private val fixedCursorAtTheEnd: Boolean = true
-) : VisualTransformation {
+class CurrencyAmountInputVisualTransformation() : VisualTransformation {
 
-    private val numberOfDecimals = 2
+//    private val numberOfDecimals = 2
     private val dollarFormat = DecimalFormat("$#,##0.00", DecimalFormatSymbols(Locale.US))
 
     override fun filter(text: AnnotatedString): TransformedText {
-        val symbols = DecimalFormatSymbols.getInstance()
+//        val symbols = DecimalFormatSymbols.getInstance()
         val inputString = text.text.filter { it.isDigit() }
 
         val intValue = inputString.toLongOrNull() ?: 0L
-        val lendedString = intValue.toString().padStart(numberOfDecimals + 1, '0')
+//        val lendedString = intValue.toString().padStart(numberOfDecimals + 1, '0')
 
-        val integerPart = lendedString.dropLast(numberOfDecimals)
-        val decimalPart = lendedString.takeLast(numberOfDecimals)
+//        val integerPart = lendedString.dropLast(numberOfDecimals)
+//        val decimalPart = lendedString.takeLast(numberOfDecimals)
 
         // Format with commas and currency symbol
         val formattedNumber = dollarFormat.format(
