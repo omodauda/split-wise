@@ -9,7 +9,7 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2024.09.00"
 lifecycleViewModel = "2.8.0"
-navigationCompose = "2.9.5"
+navigationCompose = "2.9.7"
 dataStore = "1.2.0"
 coreSplashScreen = "1.2.0"
 
