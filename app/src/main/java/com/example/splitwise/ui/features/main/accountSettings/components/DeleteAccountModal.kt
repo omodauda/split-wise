@@ -49,6 +49,7 @@ import com.example.splitwise.ui.theme.black
 import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.emerald_700
 import com.example.splitwise.ui.theme.emerald_800
+import com.example.splitwise.ui.theme.white
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -291,19 +292,19 @@ fun DeleteStepTwo(
         Icon(
             painter = painterResource(R.drawable.caution_icon),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onTertiary
+            tint = white
         )
         Column {
             Text(
                 text = stringResource(R.string.last_warning),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = white
             )
             Spacer(Modifier.height(Spacing.small))
             Text(
                 text = stringResource(R.string.last_warning_desc),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onTertiary
+                color = white
             )
         }
     }
@@ -312,8 +313,8 @@ fun DeleteStepTwo(
 @Composable
 fun InstructionItem(
     text: String,
-    color: Color? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color? = null
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
