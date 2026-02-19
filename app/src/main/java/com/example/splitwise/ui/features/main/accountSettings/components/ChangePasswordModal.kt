@@ -111,7 +111,8 @@ fun ChangePasswordModalHeader(
             ) {
                 Icon(
                     painter = painterResource(R.drawable.password_icon),
-                    contentDescription = null
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
             Text(
