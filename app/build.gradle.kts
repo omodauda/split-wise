@@ -60,4 +60,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore)
+    implementation(libs.androidx.core.splashscreen)
 }
