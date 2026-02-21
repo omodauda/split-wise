@@ -23,6 +23,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,17 +46,23 @@ import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.GoogleButton
 import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
 import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = viewModel(),
     authViewModel: AuthViewModel,
+    toastHostState: ToastHostState,
     goToSignup: () -> Unit,
     goToForgotPassword: () -> Unit,
     modifier: Modifier = Modifier
@@ -63,6 +70,7 @@ fun LoginScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val authState by authViewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     fun handleLogin() {
         if (viewModel.validateForm()){
@@ -78,16 +86,14 @@ fun LoginScreen(
 
     if (authState.submissionState is AuthSubmissionState.Error) {
         val errorMessage = (authState.submissionState as AuthSubmissionState.Error).message
-        Text(
-            text = errorMessage,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.large)
-        )
-
+        scope.launch {
+            toastHostState.showToast(
+                toast = ToastState(
+                    message = errorMessage,
+                    type = ToastType.ERROR
+                )
+            )
+        }
         // Automatically reset the state after showing the error so it doesn't linger
         LaunchedEffect(authState.submissionState) {
             authViewModel.resetLoginSubmissionState()
@@ -289,7 +295,8 @@ uiMode = Configuration.UI_MODE_NIGHT_NO
 fun LoginScreenPreview() {
     val container = FakeAppContainer()
     val vm = AuthViewModel(container.authRepository)
+    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        LoginScreen(goToSignup = {}, goToForgotPassword = {}, authViewModel = vm)
+        LoginScreen(goToSignup = {}, goToForgotPassword = {}, authViewModel = vm, toastHostState = toastHostState)
     }
 }
