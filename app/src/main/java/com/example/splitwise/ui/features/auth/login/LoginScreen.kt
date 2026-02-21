@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,10 +39,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.GoogleButton
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -57,11 +61,36 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val authState by authViewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     fun handleLogin() {
         if (viewModel.validateForm()){
-            authViewModel.authenticate()
+            authViewModel.login(
+                data = LoginRequest(email = state.email, password = state.password)
+            )
+        }
+    }
+
+    if (authState.submissionState is AuthSubmissionState.Loading) {
+        LoadingView()
+    }
+
+    if (authState.submissionState is AuthSubmissionState.Error) {
+        val errorMessage = (authState.submissionState as AuthSubmissionState.Error).message
+        Text(
+            text = errorMessage,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.large)
+        )
+
+        // Automatically reset the state after showing the error so it doesn't linger
+        LaunchedEffect(authState.submissionState) {
+            authViewModel.resetLoginSubmissionState()
         }
     }
 
@@ -114,7 +143,12 @@ fun LoginScreen(
                         color = MaterialTheme.colorScheme.background,
                         shape = SplitWiseShapes.bottomSheet
                     )
-                    .padding(top = Spacing.extraLarge, start = Spacing.large, end = Spacing.large, bottom = innerPadding.calculateBottomPadding())
+                    .padding(
+                        top = Spacing.extraLarge,
+                        start = Spacing.large,
+                        end = Spacing.large,
+                        bottom = innerPadding.calculateBottomPadding()
+                    )
                     .verticalScroll(state = scrollState)
             ) {
                 AppTextField(
