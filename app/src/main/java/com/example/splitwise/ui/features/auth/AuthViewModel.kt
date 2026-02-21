@@ -1,12 +1,27 @@
 package com.example.splitwise.ui.features.auth
 
+import androidx.compose.animation.core.copy
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+sealed interface AuthSubmissionState {
+    data object Idle: AuthSubmissionState
+    data object Loading: AuthSubmissionState
+    data class Error(val message: String): AuthSubmissionState
+    data object Success: AuthSubmissionState
+}
+
+data class AuthUiState(
+    val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
+)
 class AuthViewModel(private val repo: AuthRepository): ViewModel() {
     val isAuthenticated = repo.isAuthenticated
         .stateIn(
@@ -15,10 +30,25 @@ class AuthViewModel(private val repo: AuthRepository): ViewModel() {
             initialValue = null
         )
 
-    fun authenticate() {
+    private val _uiState = MutableStateFlow(AuthUiState())
+    val uiState = _uiState.asStateFlow()
+
+    fun login(data: LoginRequest) {
         viewModelScope.launch {
-            repo.authenticate()
+            _uiState.update { it.copy(submissionState = AuthSubmissionState.Loading) }
+
+            val result = repo.login(data)
+
+            result.onSuccess {
+                _uiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(submissionState = AuthSubmissionState.Error(exception.message ?: "An error occurred")) }
+            }
         }
+    }
+
+    fun resetLoginSubmissionState() {
+        _uiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
     }
 
     fun logout() {
