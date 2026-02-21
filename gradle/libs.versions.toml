@@ -12,6 +12,9 @@ lifecycleViewModel = "2.10.0"
 navigationCompose = "2.9.7"
 dataStore = "1.2.0"
 coreSplashScreen = "1.2.0"
+retrofit = "3.0.0"
+gsonConverter = "latest.version"
+okHttp = "5.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +35,10 @@ androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose"}
 androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore"}
 androidx-core-splashscreen = {group = "androidx.core", name = "core-splashscreen", version.ref= "coreSplashScreen"}
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+gsonConverter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gsonConverter"}
+okHttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp"}
+okHttpLogging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okHttp"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
