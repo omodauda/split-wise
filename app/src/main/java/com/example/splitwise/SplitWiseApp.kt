@@ -10,6 +10,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.splitwise.ui.components.toast.ToastHost
+import com.example.splitwise.ui.components.toast.rememberToastHostState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.auth.AuthViewModelFactory
 import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
@@ -43,6 +45,8 @@ fun SplitWiseApp() {
 
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
     val navController = rememberNavController()
+    val toastHostState = rememberToastHostState()
+
 
     Scaffold(
         modifier = Modifier
@@ -55,9 +59,12 @@ fun SplitWiseApp() {
                 navController,
                 startDestination = startDestination
             ) {
-                authNavGraph(navController, authViewModel)
+                authNavGraph(navController, authViewModel, toastHostState)
                 mainNavGraph(navController, authViewModel, addBillViewModel, changePasswordViewModel, deleteAccountViewModel)
             }
+            ToastHost(
+                hostState = toastHostState
+            )
         }
     }
 }
