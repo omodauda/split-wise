@@ -6,9 +6,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import com.example.splitwise.data.CryptoManager
 import com.example.splitwise.data.network.model.AuthUserData
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -47,26 +49,12 @@ class AuthPreference(context: Context): IAuthPreference {
 
     private object PreferencesKeys {
         val IS_AUTHENTICATED = booleanPreferencesKey("is_authenticated")
-//        val ACCESS_TOKEN = stringPreferencesKey("access_token")
-//        val USER_DATA = stringPreferencesKey("user_data")
+        val ENCRYPTED_USER = stringPreferencesKey("encrypted_user")
     }
-
-//    override suspend fun saveAccessToken(token: String) {
-//        dataStore.edit { preferences ->
-//            preferences[PreferencesKeys.ACCESS_TOKEN] = token
-//        }
-//    }
 
     override suspend fun saveAccessToken(token: String) = withContext(Dispatchers.IO) {
         encryptedPrefs.edit().putString("access_token", token).apply()
     }
-
-//    override fun getAccessToken(): Flow<String?> {
-//        return dataStore.data.map { preferences ->
-//            preferences[PreferencesKeys.ACCESS_TOKEN]
-//
-//        }
-//    }
     override fun getAccessTokenSync(): String? {
         return encryptedPrefs.getString("access_token", null)
     }
@@ -76,43 +64,27 @@ class AuthPreference(context: Context): IAuthPreference {
         return flowOf(getAccessTokenSync())
     }
 
-//    override suspend fun saveUser(user: AuthUserData) {
-//        val userJson = Gson().toJson(user)
-//        dataStore.edit { preferences ->
-//            preferences[PreferencesKeys.USER_DATA] = userJson
-//        }
-//    }
+    override suspend fun saveUser(user: AuthUserData) {
+        val json = Gson().toJson(user)
+        val encrypted = CryptoManager.encrypt(json)
 
-    override suspend fun saveUser(user: AuthUserData) = withContext(Dispatchers.IO) {
-        val userJson = Gson().toJson(user)
-        encryptedPrefs.edit().putString("user_data_json", userJson).apply()
+        dataStore.edit { prefs ->
+            prefs[PreferencesKeys.ENCRYPTED_USER] = encrypted
+        }
     }
-
-//    override fun getUser(): Flow<AuthUserData?> {
-//        return dataStore.data.map { preferences ->
-//            val userJson = preferences[PreferencesKeys.USER_DATA]
-//            if (userJson !== null) {
-//                Gson().fromJson(userJson, AuthUserData::class.java)
-//            } else {
-//                null
-//            }
-//        }
-//    }
 
     override fun getUser(): Flow<AuthUserData?> {
-        val userJson = encryptedPrefs.getString("user_data_json", null)
-        val user = if (userJson != null) {
-            try {
-                Gson().fromJson(userJson, AuthUserData::class.java)
-            } catch (e: Exception) {
-                null // Handle potential JSON parsing errors
+        return dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.ENCRYPTED_USER]?.let { encrypted ->
+                try {
+                    val decrypted = CryptoManager.decrypt(encrypted)
+                    Gson().fromJson(decrypted, AuthUserData::class.java)
+                } catch (e: Exception) {
+                    null
+                }
             }
-        } else {
-            null
         }
-        return flowOf(user)
     }
-
 
     override val isAuthenticated: Flow<Boolean> = dataStore.data.map { preferences ->
         preferences[PreferencesKeys.IS_AUTHENTICATED] ?: false
