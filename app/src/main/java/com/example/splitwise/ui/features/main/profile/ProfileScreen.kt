@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.profile
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.features.auth.AuthViewModel
@@ -46,6 +49,10 @@ fun ProfileScreen(
     authViewModel: AuthViewModel,
     goToAccountSettings: () -> Unit
 ) {
+    val user by authViewModel.user.collectAsStateWithLifecycle()
+
+    Log.d("Profile", "$user")
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -55,7 +62,11 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
         ) {
-            ProfileHeader(paddingTop = innerPadding.calculateTopPadding())
+            ProfileHeader(
+                paddingTop = innerPadding.calculateTopPadding(),
+                fullName = user?.fullName,
+                email = user?.email
+            )
             ProfileContent(
                 onLogout = {authViewModel.logout()},
                 goToAccountSettings = goToAccountSettings
@@ -67,6 +78,8 @@ fun ProfileScreen(
 @Composable
 fun ProfileHeader(
     paddingTop: Dp,
+    fullName: String?,
+    email: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -103,13 +116,13 @@ fun ProfileHeader(
             }
             Column {
                 Text(
-                    text = "Lawal Dauda",
+                    text = fullName ?: "",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
                 Spacer(Modifier.height(Spacing.extraSmall))
                 Text(
-                    text = "omodauda.dl@gmail.com",
+                    text = email ?: "",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimary
                 )
