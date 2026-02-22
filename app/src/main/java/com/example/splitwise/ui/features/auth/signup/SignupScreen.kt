@@ -24,7 +24,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,22 +47,36 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.SignupRequest
+import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.GoogleButton
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignupScreen(
     viewModel: SignupViewModel = viewModel(),
+    authViewModel: AuthViewModel,
+    toastHostState: ToastHostState,
     goBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val authUiState by authViewModel.signupUiState.collectAsStateWithLifecycle()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
     val annotatedText = buildAnnotatedString {
@@ -84,7 +100,35 @@ fun SignupScreen(
     }
 
     fun handleSignup() {
-        viewModel.validateForm()
+        if (viewModel.validateForm()) {
+            authViewModel.signup(
+                data = SignupRequest(
+                    fullName = state.fullName,
+                    email = state.email,
+                    password = state.password
+                )
+            )
+        }
+    }
+
+    if (authUiState.submissionState is AuthSubmissionState.Loading) {
+        LoadingView()
+    }
+
+    if (authUiState.submissionState is AuthSubmissionState.Error) {
+        val errorMessage = (authUiState.submissionState as AuthSubmissionState.Error).message
+        scope.launch {
+            toastHostState.showToast(
+                toast = ToastState(
+                    message = errorMessage,
+                    type = ToastType.ERROR
+                )
+            )
+        }
+        // Automatically reset the state after showing the error so it doesn't linger
+        LaunchedEffect(authUiState.submissionState) {
+            authViewModel.resetSignupState()
+        }
     }
 
     Scaffold(
@@ -356,7 +400,10 @@ fun AlternativeSignupView(goToLogin: () -> Unit) {
 )
 @Composable
 fun SignupScreenPreview() {
+    val container = FakeAppContainer()
+    val vm = AuthViewModel(container.authRepository)
+    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        SignupScreen(goBack = {})
+        SignupScreen(goBack = {}, authViewModel = vm, toastHostState = toastHostState)
     }
 }
