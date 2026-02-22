@@ -1,4 +1,4 @@
-package com.example.splitwise.data
+package com.example.splitwise.data.local
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties

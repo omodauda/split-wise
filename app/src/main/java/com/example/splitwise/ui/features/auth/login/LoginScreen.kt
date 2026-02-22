@@ -68,7 +68,7 @@ fun LoginScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val authState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val authState by authViewModel.loginUiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 

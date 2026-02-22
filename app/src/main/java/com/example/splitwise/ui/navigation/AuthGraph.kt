@@ -35,7 +35,9 @@ fun NavGraphBuilder.authNavGraph(
         }
         composable(route = Screen.Signup.route) {
             SignupScreen(
-               goBack = {navController.popBackStack()}
+               goBack = {navController.popBackStack()},
+                authViewModel = authViewModel,
+                toastHostState = toastHostState
             )
         }
         composable(route = Screen.ForgotPassword.route) {
