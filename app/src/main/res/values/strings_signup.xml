@@ -12,6 +12,7 @@
         <item>• At least 8 characters</item>
         <item>• One uppercase and one lowercase letter</item>
         <item>• One number</item>
+        <item>• One special character</item>
     </string-array>
     <string name="alt_signup">Or sign up with</string>
     <string name="existing_account">Already have an account?</string>
