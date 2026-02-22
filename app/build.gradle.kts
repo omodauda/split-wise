@@ -65,4 +65,5 @@ dependencies {
     implementation(libs.gsonConverter)
     implementation(libs.okHttp)
     implementation(libs.okHttpLogging)
+    implementation(libs.androidx.security.crypto)
 }

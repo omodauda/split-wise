@@ -15,6 +15,7 @@ coreSplashScreen = "1.2.0"
 retrofit = "2.9.0"
 gsonConverter = "2.9.0"
 okHttp = "4.12.0"
+securityCrypto = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,7 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 gsonConverter = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gsonConverter"}
 okHttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHttp"}
 okHttpLogging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okHttp"}
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
