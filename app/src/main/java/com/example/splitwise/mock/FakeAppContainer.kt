@@ -19,6 +19,30 @@ class FakeAuthPreferences : IAuthPreference {
     override suspend fun setAuthenticated(value: Boolean) {
         // Do nothing — fake storage
     }
+
+    override suspend fun saveAccessToken(token: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAccessToken(): Flow<String?> {
+        TODO("Not yet implemented")
+    }
+
+    override fun getAccessTokenSync(): String? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun saveUser(user: AuthUserData) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getUser(): Flow<AuthUserData?> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun clearAll() {
+        TODO("Not yet implemented")
+    }
 }
 
 class FakeAuthApi : AuthApi {
