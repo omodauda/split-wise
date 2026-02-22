@@ -52,6 +52,7 @@ class SignupViewModel: ViewModel() {
             !password.any { it.isUpperCase() } -> "Password must contain at least one uppercase letter"
             !password.any { it.isLowerCase() } -> "Password must contain at least one lowercase letter"
             !password.any { it.isDigit() } -> "Password must contain at least one digit"
+            !password.any {char -> !char.isLetterOrDigit() } -> "Password must contain at least one special character"
             else -> null
         }
 
