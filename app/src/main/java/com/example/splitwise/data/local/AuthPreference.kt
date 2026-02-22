@@ -10,7 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
-import com.example.splitwise.data.CryptoManager
+import com.example.splitwise.data.local.CryptoManager
 import com.example.splitwise.data.network.model.AuthUserData
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
