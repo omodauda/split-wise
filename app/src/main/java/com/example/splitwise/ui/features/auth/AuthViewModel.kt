@@ -3,6 +3,7 @@ package com.example.splitwise.ui.features.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.splitwise.data.network.model.LoginRequest
+import com.example.splitwise.data.network.model.SignupRequest
 import com.example.splitwise.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +19,11 @@ sealed interface AuthSubmissionState {
     data object Success: AuthSubmissionState
 }
 
-data class AuthUiState(
+data class LoginUiState(
+    val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
+)
+
+data class SignupUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 class AuthViewModel(private val repo: AuthRepository): ViewModel() {
@@ -36,25 +41,42 @@ class AuthViewModel(private val repo: AuthRepository): ViewModel() {
             initialValue = null
         )
 
-    private val _uiState = MutableStateFlow(AuthUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _signupUiState = MutableStateFlow(SignupUiState())
+    val signupUiState = _signupUiState.asStateFlow()
 
-    fun login(data: LoginRequest) {
+    private val _loginUiState = MutableStateFlow(LoginUiState())
+    val loginUiState = _loginUiState.asStateFlow()
+
+    fun signup(data: SignupRequest) {
         viewModelScope.launch {
-            _uiState.update { it.copy(submissionState = AuthSubmissionState.Loading) }
-
-            val result = repo.login(data)
-
+            _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Loading) }
+            val result = repo.signup(data)
             result.onSuccess {
-                _uiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
+                _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
             }.onFailure { exception ->
-                _uiState.update { it.copy(submissionState = AuthSubmissionState.Error(exception.message ?: "An error occurred")) }
+                _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Error(exception.message ?: "An error occurred")) }
             }
         }
     }
 
+    fun login(data: LoginRequest) {
+        viewModelScope.launch {
+            _loginUiState.update { it.copy(submissionState = AuthSubmissionState.Loading) }
+            val result = repo.login(data)
+            result.onSuccess {
+                _loginUiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
+            }.onFailure { exception ->
+                _loginUiState.update { it.copy(submissionState = AuthSubmissionState.Error(exception.message ?: "An error occurred")) }
+            }
+        }
+    }
+
+    fun resetSignupState() {
+        _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
+    }
+
     fun resetLoginSubmissionState() {
-        _uiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
+        _loginUiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
     }
 
     fun logout() {
