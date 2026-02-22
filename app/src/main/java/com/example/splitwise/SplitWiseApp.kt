@@ -14,12 +14,6 @@ import com.example.splitwise.ui.components.toast.ToastHost
 import com.example.splitwise.ui.components.toast.rememberToastHostState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.auth.AuthViewModelFactory
-import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
-import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModelFactory
-import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
-import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModelFactory
-import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
-import com.example.splitwise.ui.features.main.addBill.AddBillViewModelFactory
 import com.example.splitwise.ui.navigation.authNavGraph
 import com.example.splitwise.ui.navigation.mainNavGraph
 
@@ -29,18 +23,6 @@ fun SplitWiseApp() {
     val authRepository = application.appContainer.authRepository
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(authRepository)
-    )
-
-    val addBillViewModel: AddBillViewModel = viewModel(
-        factory = AddBillViewModelFactory()
-    )
-
-    val changePasswordViewModel: ChangePasswordViewModel = viewModel(
-        factory = ChangePasswordViewModelFactory()
-    )
-
-    val deleteAccountViewModel: DeleteAccountViewModel = viewModel(
-        factory = DeleteAccountViewModelFactory(authRepository)
     )
 
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
@@ -60,7 +42,7 @@ fun SplitWiseApp() {
                 startDestination = startDestination
             ) {
                 authNavGraph(navController, authViewModel, toastHostState)
-                mainNavGraph(navController, authViewModel, addBillViewModel, changePasswordViewModel, deleteAccountViewModel)
+                mainNavGraph(navController, authViewModel)
             }
             ToastHost(
                 hostState = toastHostState
