@@ -18,3 +18,9 @@ data class AuthUserData(
     val fullName: String,
     val avatar: String?
 )
+
+data class SignupRequest(
+    val fullName: String,
+    val email: String,
+    val password: String
+)
