@@ -12,7 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -20,7 +22,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
+import com.example.splitwise.SplitWiseApplication
 import com.example.splitwise.ui.features.auth.AuthViewModel
+import com.example.splitwise.ui.features.auth.AuthViewModelFactory
 import com.example.splitwise.ui.features.main.activity.ActivityScreen
 import com.example.splitwise.ui.features.main.friends.FriendScreen
 //import com.example.splitwise.ui.features.main.groups.GroupScreen

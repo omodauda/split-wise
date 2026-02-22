@@ -60,4 +60,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.datastore)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.retrofit)
+    implementation(libs.gsonConverter)
+    implementation(libs.okHttp)
+    implementation(libs.okHttpLogging)
+    implementation(libs.androidx.security.crypto)
 }
