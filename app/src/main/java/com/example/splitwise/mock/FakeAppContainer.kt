@@ -6,6 +6,7 @@ import com.example.splitwise.data.network.model.AuthData
 import com.example.splitwise.data.network.model.AuthUserData
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
+import com.example.splitwise.data.network.model.SignupRequest
 import com.example.splitwise.data.repository.AuthRepository
 import com.example.splitwise.di.IAppContainer
 import kotlinx.coroutines.flow.Flow
@@ -63,8 +64,22 @@ class FakeAuthApi : AuthApi {
             )
         )
         return Response.success(fakeResponse)
-        // Wrap the fake data in a successful Retrofit Response object.
-//        return androidx.tracing.perfetto.handshake.protocol.Response.success(fakeResponse)
+    }
+
+    override suspend fun signup(request: SignupRequest): Response<LoginResponse> {
+        val fakeResponse = LoginResponse(
+            message = "Login successful",
+            data = AuthData(
+                token = "",
+                user = AuthUserData(
+                    id = "",
+                    email = "",
+                    fullName = "",
+                    avatar = ""
+                )
+            )
+        )
+        return Response.success(fakeResponse)
     }
 }
 
