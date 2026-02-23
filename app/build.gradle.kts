@@ -66,4 +66,6 @@ dependencies {
     implementation(libs.okHttp)
     implementation(libs.okHttpLogging)
     implementation(libs.androidx.security.crypto)
+    implementation(libs.compose.shimmer)
+    implementation(libs.androidx.paging)
 }
