@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -50,6 +51,7 @@ import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
+import com.valentinilk.shimmer.shimmer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,7 +94,7 @@ fun FriendScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.inverseOnSurface)
-                .padding(innerPadding)
+                .padding(top = innerPadding.calculateTopPadding())
         ) {
             FriendsList(
                 friends = friends, sendInvite = { sendInvite() }, searchQuery = searchQuery,
@@ -119,11 +121,7 @@ fun FriendsList(
     ) {
         if (loadState.refresh is LoadState.Loading) {
             // handle refresh loading
-            if (friends.itemCount == 0) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
+            FriendListPlaceholder()
         } else if (!searchQuery.isNullOrBlank() && friends.itemCount == 0) {
             EmptySearchView()
         } else if (friends.itemCount == 0) {
@@ -169,6 +167,7 @@ fun FriendsList(
                             )
                         } else {
                             // TODO: show skeleton placeholder
+                            FriendPlaceholder()
                         }
                     }
 
@@ -287,6 +286,70 @@ fun FriendHeader(
             placeholder = stringResource(R.string.search_friends),
             leadingIcon = R.drawable.search_icon
         )
+    }
+}
+
+@Composable
+fun FriendListPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .shimmer(),
+        contentPadding = PaddingValues(
+            start = Spacing.large,
+            end = Spacing.large,
+            bottom = Spacing.large,
+            top = Spacing.large
+        ),
+    ) {
+        items(12) {
+            FriendPlaceholder()
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.surfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+fun FriendPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(Spacing.medium)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(ComponentDimensions.iconSizeExtraLarge)
+                .background(color = Color.LightGray, shape = CircleShape)
+        )
+        Column{
+            Box(
+                modifier = Modifier
+                    .height(20.dp)
+                    .fillMaxWidth(0.7f)
+                    .background(
+                        color = Color.LightGray,
+                        shape = MaterialTheme.shapes.small
+                    )
+            )
+            Spacer(Modifier.height(2.dp))
+            Box(
+                modifier = Modifier
+                    .height(16.dp)
+                    .fillMaxWidth(0.4f)
+                    .background(
+                        color = Color.LightGray,
+                        shape = MaterialTheme.shapes.small
+                    )
+            )
+        }
     }
 }
 
