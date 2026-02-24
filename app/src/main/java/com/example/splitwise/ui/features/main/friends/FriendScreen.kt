@@ -24,8 +24,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -47,6 +51,7 @@ import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.features.main.friends.components.EmptyFriendView
 import com.example.splitwise.ui.features.main.friends.components.EmptySearchView
+import com.example.splitwise.ui.features.main.friends.components.InviteFriendModal
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -59,11 +64,14 @@ fun FriendScreen(
     viewModel: FriendViewModel,
     modifier: Modifier = Modifier
 ) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showInviteModal by remember { mutableStateOf(false) }
+
     val friends = viewModel.friendsPagingData.collectAsLazyPagingItems()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    fun sendInvite () {
+    fun shareInvite () {
         val inviteLink = "https://splitwise-app.example.com/invite/234509"
         val shareMessage = "Join me on SplitWise to easily split our bills! Click the link to join: $inviteLink"
         val shareTitle = "Join me on SplitWise!"
@@ -79,10 +87,14 @@ fun FriendScreen(
         context.startActivity(shareIntent)
     }
 
+    fun openInviteModal() {
+        showInviteModal = true
+    }
+
     Scaffold(
         topBar = {
             FriendHeader(
-                onSendInvite = {sendInvite()},
+                onSendInvite = {openInviteModal()},
                 searchQuery = searchQuery,
                 onSearchChanged = {
                     viewModel.onSearchQueryChanged(it)}
@@ -97,9 +109,17 @@ fun FriendScreen(
                 .padding(top = innerPadding.calculateTopPadding())
         ) {
             FriendsList(
-                friends = friends, sendInvite = { sendInvite() }, searchQuery = searchQuery,
+                friends = friends, sendInvite = { openInviteModal() }, searchQuery = searchQuery,
                 onRefresh = { friends.refresh() },
             )
+
+            if (showInviteModal) {
+                InviteFriendModal(
+                    sheetState = sheetState,
+                    onDismissRequest = { showInviteModal = false},
+                    shareInvite = {shareInvite()}
+                )
+            }
         }
     }
 }
