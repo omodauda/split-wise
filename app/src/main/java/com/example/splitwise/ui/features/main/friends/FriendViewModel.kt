@@ -7,12 +7,14 @@ import androidx.paging.cachedIn
 import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.data.repository.FriendRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class FriendViewModel(private val friendRepository: FriendRepository): ViewModel() {
     private val _searchQuery = MutableStateFlow<String?>(null)
     val searchQuery = _searchQuery.asStateFlow()
@@ -22,6 +24,7 @@ class FriendViewModel(private val friendRepository: FriendRepository): ViewModel
     // pager and creates a new one with the new query.
     // `cachedIn` ensures the data survives configuration changes (like screen rotation).
     val friendsPagingData: Flow<PagingData<Friend>> = _searchQuery
+        .debounce(500L)
         .flatMapLatest { query ->
             friendRepository.getFriendsStream(query)
         }

@@ -119,6 +119,11 @@ fun FriendsList(
     ) {
         if (loadState.refresh is LoadState.Loading) {
             // handle refresh loading
+            if (friends.itemCount == 0) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
         } else if (!searchQuery.isNullOrBlank() && friends.itemCount == 0) {
             EmptySearchView()
         } else if (friends.itemCount == 0) {
