@@ -23,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
 import com.example.splitwise.SplitWiseApplication
+import com.example.splitwise.ui.components.toast.ToastHostState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.auth.AuthViewModelFactory
 import com.example.splitwise.ui.features.main.activity.ActivityScreen
@@ -31,6 +32,7 @@ import com.example.splitwise.ui.features.main.friends.FriendViewModel
 import com.example.splitwise.ui.features.main.friends.FriendViewModelFactory
 //import com.example.splitwise.ui.features.main.groups.GroupScreen
 import com.example.splitwise.ui.features.main.home.HomeScreen
+import com.example.splitwise.ui.features.main.invites.InviteViewModel
 import com.example.splitwise.ui.features.main.profile.ProfileScreen
 import com.example.splitwise.ui.theme.Elevation
 
@@ -38,6 +40,8 @@ import com.example.splitwise.ui.theme.Elevation
 fun HomeBottomTab(
     navController: NavController,
     authViewModel: AuthViewModel,
+    inviteViewModel: InviteViewModel,
+    toastHostState: ToastHostState,
     startDestination: String = Screen.Home.route
 ) {
     val bottomNavController = rememberNavController()
@@ -66,7 +70,7 @@ fun HomeBottomTab(
                 ActivityScreen()
             }
             composable(route = Screen.Friends.route) {
-                FriendScreen(viewModel = friendViewModel)
+                FriendScreen(viewModel = friendViewModel, inviteViewModel)
             }
             composable(route = Screen.Profile.route) {
                 ProfileScreen(

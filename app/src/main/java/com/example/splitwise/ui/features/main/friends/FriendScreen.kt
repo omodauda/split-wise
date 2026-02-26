@@ -48,10 +48,12 @@ import androidx.paging.compose.itemKey
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.mock.FakeAppContainer
+import com.example.splitwise.model.InviteSubmissionState
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.features.main.friends.components.EmptyFriendView
 import com.example.splitwise.ui.features.main.friends.components.EmptySearchView
 import com.example.splitwise.ui.features.main.friends.components.InviteFriendModal
+import com.example.splitwise.ui.features.main.invites.InviteViewModel
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -62,8 +64,11 @@ import com.valentinilk.shimmer.shimmer
 @Composable
 fun FriendScreen(
     viewModel: FriendViewModel,
+    inviteViewModel: InviteViewModel,
     modifier: Modifier = Modifier
 ) {
+    val inviteUiState by inviteViewModel.uiState.collectAsStateWithLifecycle()
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showInviteModal by remember { mutableStateOf(false) }
 
@@ -116,8 +121,16 @@ fun FriendScreen(
             if (showInviteModal) {
                 InviteFriendModal(
                     sheetState = sheetState,
-                    onDismissRequest = { showInviteModal = false},
-                    shareInvite = {shareInvite()}
+                    onDismissRequest = { showInviteModal = false },
+                    shareInvite = { shareInvite() },
+                    validateForm = { inviteViewModel.validateEmail() },
+                    email = inviteUiState.email,
+                    onEmailChanged = { inviteViewModel.onEmailChanged(it) },
+                    isLoading = inviteUiState.sendInviteState is InviteSubmissionState.Loading,
+                    emailError = inviteUiState.emailError,
+                    sendEmailInvite = {inviteViewModel.sendInvite(it)},
+                    sendInviteState = inviteUiState.sendInviteState,
+                    resetSendInviteState = {inviteViewModel.resetSendInviteState()}
                 )
             }
         }
@@ -343,6 +356,7 @@ fun FriendPlaceholder(
         modifier = modifier
             .fillMaxWidth()
             .padding(Spacing.medium)
+            .shimmer()
     ) {
         Box(
             modifier = Modifier
@@ -381,7 +395,9 @@ fun FriendPlaceholder(
 fun FriendScreenPreview() {
     val container = FakeAppContainer()
     val vm = FriendViewModel(container.friendRepository)
+    val inviteVm = InviteViewModel(container.inviteRepository)
+//    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        FriendScreen(viewModel = vm)
+        FriendScreen(viewModel = vm, inviteViewModel = inviteVm)
     }
 }
