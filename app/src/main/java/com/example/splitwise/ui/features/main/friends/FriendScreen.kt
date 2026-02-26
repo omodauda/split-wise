@@ -50,6 +50,7 @@ import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.model.InviteSubmissionState
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.components.UserAvatar
 import com.example.splitwise.ui.features.main.friends.components.EmptyFriendView
 import com.example.splitwise.ui.features.main.friends.components.EmptySearchView
 import com.example.splitwise.ui.features.main.friends.components.InviteFriendModal
@@ -241,18 +242,10 @@ fun FriendView(
             .fillMaxWidth()
             .padding(Spacing.medium)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(ComponentDimensions.iconSizeExtraLarge)
-                .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-        ) {
-            Text(
-                text = "M",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
+        UserAvatar(
+            fullName = user.fullName,
+            avatarUrl = user.avatar,
+        )
         Column{
             Text(
                 text = user.fullName,
