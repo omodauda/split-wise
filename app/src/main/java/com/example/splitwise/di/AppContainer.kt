@@ -7,6 +7,7 @@ import com.example.splitwise.data.network.api.FriendApi
 import com.example.splitwise.data.network.interceptor.AuthInterceptor
 import com.example.splitwise.data.repository.AuthRepository
 import com.example.splitwise.data.repository.FriendRepository
+import com.example.splitwise.data.repository.InviteRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -19,6 +20,8 @@ interface IAppContainer {
  val authApi: AuthApi
  val friendApi: FriendApi
  val friendRepository: FriendRepository
+
+ val inviteRepository: InviteRepository
 }
 class AppContainerImpl(private val context: Context): IAppContainer {
 
@@ -53,4 +56,5 @@ class AppContainerImpl(private val context: Context): IAppContainer {
 
     override val authRepository = AuthRepository(authPreference, authApi)
     override val friendRepository = FriendRepository(friendApi)
+    override val inviteRepository = InviteRepository(friendApi)
 }

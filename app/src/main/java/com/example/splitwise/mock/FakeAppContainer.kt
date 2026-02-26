@@ -15,6 +15,7 @@ import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.network.model.SignupRequest
 import com.example.splitwise.data.repository.AuthRepository
 import com.example.splitwise.data.repository.FriendRepository
+import com.example.splitwise.data.repository.InviteRepository
 import com.example.splitwise.di.IAppContainer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -138,5 +139,8 @@ class FakeAppContainer : IAppContainer {
     )
 
     override val friendRepository: FriendRepository
+        get() = TODO("Not yet implemented")
+
+    override val inviteRepository: InviteRepository
         get() = TODO("Not yet implemented")
 }
