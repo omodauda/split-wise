@@ -13,6 +13,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
@@ -29,13 +30,15 @@ fun AppIconTextButton(
     title: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerColor: Color? = null,
+    contentColor: Color? = null,
 ) {
     Button(
         onClick = {onClick()},
         colors = ButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
+            containerColor = containerColor ?: MaterialTheme.colorScheme.primary,
+            contentColor = contentColor ?: MaterialTheme.colorScheme.onPrimary,
             disabledContainerColor = MaterialTheme.extendedColorScheme.disabledContainer,
             disabledContentColor = MaterialTheme.extendedColorScheme.onDisabledContainer
         ),
@@ -52,8 +55,7 @@ fun AppIconTextButton(
         Spacer(Modifier.width(Spacing.small))
         Text(
             text = title,
-            style = ButtonLarge,
-            color = MaterialTheme.colorScheme.onPrimary
+            style = ButtonLarge
         )
     }
 }
