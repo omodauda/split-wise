@@ -46,6 +46,7 @@ import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.emerald_500
 import com.example.splitwise.utils.formatDate
+import com.example.splitwise.utils.formatRelativeTime
 import kotlinx.coroutines.flow.flowOf
 
 @Composable
@@ -177,7 +178,7 @@ fun PendingInviteCard(
                 )
                 Spacer(Modifier.height(Spacing.extraSmall))
                 Text(
-                    text = formatDate(invite.createdAt),
+                    text = formatRelativeTime(invite.createdAt),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
