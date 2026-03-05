@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,15 +22,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.components.AppIconTextButton
+import com.example.splitwise.ui.features.main.home.components.PendingInvites
 import com.example.splitwise.ui.features.main.home.components.DashBoard
-import com.example.splitwise.ui.features.main.home.components.EmptyBillView
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
 import com.example.splitwise.ui.features.main.home.components.RecordPaymentModal
 import com.example.splitwise.ui.features.main.home.components.ReminderModal
 import com.example.splitwise.ui.features.main.home.components.SettleUpModal
+import com.example.splitwise.ui.features.main.invites.InviteViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
@@ -38,8 +43,17 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 @Composable
 fun HomeScreen(
     goToAddBill: () -> Unit,
+    inviteViewModel: InviteViewModel,
     modifier: Modifier = Modifier
 ) {
+    val invites = inviteViewModel.inviteFlow.collectAsLazyPagingItems()
+
+    val showInviteDialog by inviteViewModel.showDialog.collectAsStateWithLifecycle()
+
+    LaunchedEffect(invites) {
+        inviteViewModel.monitorLoadState(invites)
+    }
+
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -84,6 +98,10 @@ fun HomeScreen(
                     sheetState = settleUpModalState,
                     onDismissRequest = {showSettleUpModal = false}
                 )
+            }
+
+            if (showInviteDialog) {
+                PendingInvites(dismiss = {inviteViewModel.onDialogDismissed()}, invites = invites)
             }
         }
     }
@@ -132,7 +150,9 @@ fun ContentView(
 )
 @Composable
 fun HomeScreenPreview() {
+    val container = FakeAppContainer()
+    val inviteVm = InviteViewModel(container.inviteRepository)
     SplitWiseTheme {
-        HomeScreen(goToAddBill = {})
+        HomeScreen(goToAddBill = {}, inviteVm )
     }
 }

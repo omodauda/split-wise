@@ -61,7 +61,11 @@ fun HomeBottomTab(
             modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(route = Screen.Home.route) {
-                HomeScreen(goToAddBill = {navController.navigate(Screen.AddBill.route)})
+                HomeScreen(
+                    goToAddBill = {navController.navigate(Screen.AddBill.route)},
+                    inviteViewModel
+                )
+
             }
 //            composable(route = Screen.Groups.route) {
 //                GroupScreen()

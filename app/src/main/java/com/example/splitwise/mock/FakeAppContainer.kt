@@ -121,8 +121,12 @@ class FakeFriendApi : FriendApi {
         return Response.success(fakeResponse)
     }
 
-    override suspend fun getPendingInvites(): Response<GetPendingInvitesResponse> {
-        TODO("Not yet implemented")
+    override suspend fun getPendingInvites(cursorId: String?): Response<GetPendingInvitesResponse> {
+        val fakeResponse = GetPendingInvitesResponse(
+            data = emptyList(),
+            meta = PaginationMetaData(nextCursor = null, hasNextPage = false)
+        )
+        return Response.success(fakeResponse)
     }
 }
 
