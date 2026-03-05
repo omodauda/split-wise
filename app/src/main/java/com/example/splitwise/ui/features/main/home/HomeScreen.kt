@@ -20,18 +20,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.splitwise.R
 import com.example.splitwise.mock.FakeAppContainer
-import com.example.splitwise.ui.components.AppIconTextButton
 import com.example.splitwise.ui.features.main.friends.FriendViewModel
-import com.example.splitwise.ui.features.main.home.components.PendingInvites
 import com.example.splitwise.ui.features.main.home.components.DashBoard
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
+import com.example.splitwise.ui.features.main.home.components.PendingInvites
 import com.example.splitwise.ui.features.main.home.components.RecordPaymentModal
 import com.example.splitwise.ui.features.main.home.components.ReminderModal
 import com.example.splitwise.ui.features.main.home.components.SettleUpModal
@@ -58,13 +55,13 @@ fun HomeScreen(
         inviteViewModel.monitorLoadState(invites)
     }
 
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    val recordPaymentModalState = rememberModalBottomSheetState()
+    val recordPaymentModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showRecordPaymentModal by remember { mutableStateOf(false) }
 
-    val settleUpModalState = rememberModalBottomSheetState()
+    val settleUpModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSettleUpModal by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -76,9 +73,11 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            DashBoard(paddingTop = innerPadding.calculateTopPadding())
-            ContentView(
+            DashBoard(
+                paddingTop = innerPadding.calculateTopPadding(),
                 onAddBill = {goToAddBill()},
+            )
+            ContentView(
                 openRecordPaymentModal = {showRecordPaymentModal = true},
                 openReminderModal = {showBottomSheet = true},
                 openSettleUpModal = {showSettleUpModal = true},
@@ -125,7 +124,6 @@ fun HomeScreen(
 
 @Composable
 fun ContentView(
-    onAddBill: () -> Unit,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
     openSettleUpModal: () -> Unit,
@@ -136,11 +134,6 @@ fun ContentView(
             .verticalScroll(rememberScrollState())
             .padding(start = ScreenDimensions.sectionSpacing, end = ScreenDimensions.sectionSpacing, top = ScreenDimensions.verticalPadding)
     ) {
-        AppIconTextButton(
-            leadingIcon = R.drawable.plus_icon,
-            title = stringResource(R.string.add_bill),
-            onClick = {onAddBill()}
-        )
         Spacer(Modifier.height(Spacing.medium))
 //        EmptyBillView(
 //            onAddBill,
