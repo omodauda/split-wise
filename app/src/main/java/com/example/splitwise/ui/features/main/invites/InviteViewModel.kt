@@ -1,13 +1,18 @@
 package com.example.splitwise.ui.features.main.invites
 
 import android.util.Patterns
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LoadState
+import androidx.paging.cachedIn
+import androidx.paging.compose.LazyPagingItems
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.repository.InviteRepository
 import com.example.splitwise.model.InviteSubmissionState
 import com.example.splitwise.model.InviteUiState
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -52,4 +57,32 @@ class InviteViewModel (private val repo: InviteRepository): ViewModel() {
     fun resetSendInviteState() {
         _uiState.update { it.copy(sendInviteState = InviteSubmissionState.Idle) }
     }
+
+    // Pending invites
+    val inviteFlow = repo.getPendingInviteStream().cachedIn(viewModelScope)
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
+    private var hasHandledInitialLoad = false
+    fun monitorLoadState(pagingItems: LazyPagingItems<*>) {
+        if (hasHandledInitialLoad) return
+        viewModelScope.launch {
+            // snapshotFlow converts Compose State (loadState) into a Kotlin Flow
+            snapshotFlow { pagingItems.loadState.refresh }
+                .collect { loadState ->
+                    if (loadState is LoadState.NotLoading && !hasHandledInitialLoad) {
+                        if (pagingItems.itemCount > 0) {
+                            _showDialog.value = true
+                        }
+                        // Even if count is 0, we mark as handled so it doesn't
+                        // flash later if the list updates
+                        hasHandledInitialLoad = true
+                    }
+                }
+        }
+    }
+
+    fun onDialogDismissed() {
+        _showDialog.value = false
+    }
+
 }
