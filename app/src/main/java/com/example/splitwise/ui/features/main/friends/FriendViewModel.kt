@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.splitwise.data.network.model.Friend
+import com.example.splitwise.data.network.model.FriendInvite
 import com.example.splitwise.data.repository.FriendRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

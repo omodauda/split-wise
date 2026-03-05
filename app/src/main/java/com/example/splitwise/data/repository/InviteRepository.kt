@@ -1,10 +1,16 @@
 package com.example.splitwise.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.example.splitwise.data.network.PendingInvitesPagingSource
 import com.example.splitwise.data.network.api.FriendApi
 import com.example.splitwise.data.network.model.ApiError
+import com.example.splitwise.data.network.model.FriendInvite
 import com.example.splitwise.data.network.model.FriendInviteResponse
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
 
 class InviteRepository(private val friendApi: FriendApi) {
 
@@ -22,5 +28,17 @@ class InviteRepository(private val friendApi: FriendApi) {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    fun getPendingInviteStream(): Flow<PagingData<FriendInvite>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                PendingInvitesPagingSource(friendApi)
+            }
+        ).flow
     }
 }
