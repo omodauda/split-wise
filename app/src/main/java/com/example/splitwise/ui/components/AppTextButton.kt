@@ -42,8 +42,7 @@ fun AppTextButton(
     ) {
         Text(
             text = title,
-            style = ButtonLarge,
-            color = if (enabled) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground
+            style = ButtonLarge
         )
     }
 }

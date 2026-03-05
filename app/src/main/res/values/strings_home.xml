@@ -23,4 +23,12 @@
     <string name="record_payment_received">Record Payment Received</string>
     <string name="settle_up">Settle Up</string>
     <string name="confirm_payment">Confirm Payment</string>
+    <string name="pending_invites">Pending Invitations</string>
+    <plurals name="invite_count">
+        <item quantity="one">You have %d invitation waiting</item>
+        <item quantity="other">You have %d invitations waiting</item>
+    </plurals>
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+    <string name="decide_later">I\'ll Decide Later</string>
 </resources>

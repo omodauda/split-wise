@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.splitwise.SplitWiseApplication
+import com.example.splitwise.ui.components.toast.ToastHostState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.accountSettings.AccountSettingScreen
 import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
@@ -18,19 +19,28 @@ import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordView
 import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModelFactory
 import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModelFactory
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModelFactory
+import com.example.splitwise.ui.features.main.invites.InviteViewModel
+import com.example.splitwise.ui.features.main.invites.InviteViewModelFactory
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    toastHostState: ToastHostState
 ) {
     navigation(
         startDestination = Screen.Home.route,
         route = "main_graph"
     ) {
         composable(route = Screen.Home.route) {
+            val application = LocalContext.current.applicationContext as SplitWiseApplication
+            val inviteViewModel: InviteViewModel = viewModel(
+                factory = InviteViewModelFactory(inviteRepository = application.appContainer.inviteRepository)
+            )
             HomeBottomTab(
                 navController,
-                authViewModel
+                authViewModel,
+                inviteViewModel,
+                toastHostState
             )
         }
         composable(route = Screen.AddBill.route){

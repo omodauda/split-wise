@@ -23,12 +23,16 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
 import com.example.splitwise.SplitWiseApplication
+import com.example.splitwise.ui.components.toast.ToastHostState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.auth.AuthViewModelFactory
 import com.example.splitwise.ui.features.main.activity.ActivityScreen
 import com.example.splitwise.ui.features.main.friends.FriendScreen
+import com.example.splitwise.ui.features.main.friends.FriendViewModel
+import com.example.splitwise.ui.features.main.friends.FriendViewModelFactory
 //import com.example.splitwise.ui.features.main.groups.GroupScreen
 import com.example.splitwise.ui.features.main.home.HomeScreen
+import com.example.splitwise.ui.features.main.invites.InviteViewModel
 import com.example.splitwise.ui.features.main.profile.ProfileScreen
 import com.example.splitwise.ui.theme.Elevation
 
@@ -36,9 +40,17 @@ import com.example.splitwise.ui.theme.Elevation
 fun HomeBottomTab(
     navController: NavController,
     authViewModel: AuthViewModel,
+    inviteViewModel: InviteViewModel,
+    toastHostState: ToastHostState,
     startDestination: String = Screen.Home.route
 ) {
     val bottomNavController = rememberNavController()
+
+    val application = LocalContext.current.applicationContext as SplitWiseApplication
+    val friendRepository = application.appContainer.friendRepository
+    val friendViewModel: FriendViewModel = viewModel(
+        factory = FriendViewModelFactory(friendRepository)
+    )
 
     Scaffold(
         bottomBar = {BottomNavigationBar(bottomNavController)}
@@ -49,7 +61,12 @@ fun HomeBottomTab(
             modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding())
         ) {
             composable(route = Screen.Home.route) {
-                HomeScreen(goToAddBill = {navController.navigate(Screen.AddBill.route)})
+                HomeScreen(
+                    goToAddBill = {navController.navigate(Screen.AddBill.route)},
+                    inviteViewModel,
+                    friendViewModel
+                )
+
             }
 //            composable(route = Screen.Groups.route) {
 //                GroupScreen()
@@ -58,7 +75,7 @@ fun HomeBottomTab(
                 ActivityScreen()
             }
             composable(route = Screen.Friends.route) {
-                FriendScreen()
+                FriendScreen(viewModel = friendViewModel, inviteViewModel)
             }
             composable(route = Screen.Profile.route) {
                 ProfileScreen(

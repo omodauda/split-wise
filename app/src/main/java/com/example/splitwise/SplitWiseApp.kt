@@ -42,7 +42,7 @@ fun SplitWiseApp() {
                 startDestination = startDestination
             ) {
                 authNavGraph(navController, authViewModel, toastHostState)
-                mainNavGraph(navController, authViewModel)
+                mainNavGraph(navController, authViewModel, toastHostState)
             }
             ToastHost(
                 hostState = toastHostState
