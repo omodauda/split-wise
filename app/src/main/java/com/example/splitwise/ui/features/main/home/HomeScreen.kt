@@ -27,6 +27,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.splitwise.R
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.components.AppIconTextButton
+import com.example.splitwise.ui.features.main.friends.FriendViewModel
 import com.example.splitwise.ui.features.main.home.components.PendingInvites
 import com.example.splitwise.ui.features.main.home.components.DashBoard
 import com.example.splitwise.ui.features.main.home.components.OwedView
@@ -44,9 +45,12 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 fun HomeScreen(
     goToAddBill: () -> Unit,
     inviteViewModel: InviteViewModel,
+    friendViewModel: FriendViewModel,
     modifier: Modifier = Modifier
 ) {
     val invites = inviteViewModel.inviteFlow.collectAsLazyPagingItems()
+
+    val friends = friendViewModel.friendsPagingData.collectAsLazyPagingItems()
 
     val showInviteDialog by inviteViewModel.showDialog.collectAsStateWithLifecycle()
 
@@ -101,7 +105,19 @@ fun HomeScreen(
             }
 
             if (showInviteDialog) {
-                PendingInvites(dismiss = {inviteViewModel.onDialogDismissed()}, invites = invites)
+                PendingInvites(
+                    dismiss = { inviteViewModel.onDialogDismissed() },
+                    invites = invites,
+                    onAccept = { id ->
+                        inviteViewModel.acceptInvite(id) {
+                            invites.refresh()
+                            friends.refresh()
+                        }
+                     },
+                    onDecline = {inviteViewModel.declineInvite(it) {
+                        invites.refresh()
+                    } },
+                )
             }
         }
     }
@@ -152,7 +168,9 @@ fun ContentView(
 fun HomeScreenPreview() {
     val container = FakeAppContainer()
     val inviteVm = InviteViewModel(container.inviteRepository)
+    val friendVm = FriendViewModel(container.friendRepository)
+
     SplitWiseTheme {
-        HomeScreen(goToAddBill = {}, inviteVm )
+        HomeScreen(goToAddBill = {}, inviteVm, friendViewModel = friendVm )
     }
 }

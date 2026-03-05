@@ -30,6 +30,38 @@ class InviteRepository(private val friendApi: FriendApi) {
         }
     }
 
+    suspend fun declineInvite(inviteId: String): Result<FriendInviteResponse> {
+        return try {
+            val response = friendApi.declineInvite(inviteId)
+            if (response.isSuccessful && response.body() !== null) {
+                val responseBody = response.body()!!
+                Result.success(responseBody)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun acceptInvite(inviteId: String): Result<FriendInviteResponse> {
+        return try {
+            val response = friendApi.acceptInvite(inviteId)
+            if (response.isSuccessful && response.body() !== null) {
+                val responseBody = response.body()!!
+                Result.success(responseBody)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun getPendingInviteStream(): Flow<PagingData<FriendInvite>> {
         return Pager(
             config = PagingConfig(

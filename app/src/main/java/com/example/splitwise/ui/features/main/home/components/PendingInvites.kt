@@ -45,7 +45,6 @@ import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
 import com.example.splitwise.ui.theme.emerald_500
-import com.example.splitwise.utils.formatDate
 import com.example.splitwise.utils.formatRelativeTime
 import kotlinx.coroutines.flow.flowOf
 
@@ -53,6 +52,8 @@ import kotlinx.coroutines.flow.flowOf
 fun PendingInvites(
     dismiss: () -> Unit,
     invites: LazyPagingItems<FriendInvite>,
+    onAccept: (String) -> Unit,
+    onDecline: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Dialog(
@@ -91,7 +92,11 @@ fun PendingInvites(
                     ) { index ->
                         val invite = invites[index]
                         if (invite != null) {
-                            PendingInviteCard(invite = invite)
+                            PendingInviteCard(
+                                invite = invite,
+                                onAccept = onAccept,
+                                onDecline = onDecline
+                            )
                         }
                     }
                 }
@@ -146,6 +151,8 @@ fun PendingInvitesHeader(
 @Composable
 fun PendingInviteCard(
     invite: FriendInvite,
+    onAccept: (id: String) -> Unit,
+    onDecline: (id: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -193,14 +200,14 @@ fun PendingInviteCard(
             AppIconTextButton(
                 leadingIcon = R.drawable.check_icon,
                 title = stringResource(R.string.accept),
-                onClick = {},
+                onClick = {onAccept(invite.id)},
                 modifier = Modifier
                     .weight(1f),
             )
             AppIconTextButton(
                 leadingIcon = R.drawable.close_icon,
                 title = stringResource(R.string.decline),
-                onClick = {},
+                onClick = {onDecline(invite.id)},
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 contentColor = Color.Black,
                 modifier = Modifier
@@ -239,6 +246,10 @@ fun PendingInviteFooter(
 fun PendingInvitesPreview() {
     val emptyInvites = flowOf(PagingData.empty<FriendInvite>()).collectAsLazyPagingItems()
     SplitWiseTheme {
-        PendingInvites(dismiss = {}, invites = emptyInvites)
+        PendingInvites(
+            dismiss = {}, invites = emptyInvites,
+            onAccept = {},
+            onDecline = {}
+        )
     }
 }

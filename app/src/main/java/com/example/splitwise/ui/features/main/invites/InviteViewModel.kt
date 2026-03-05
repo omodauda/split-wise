@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LoadState
 import androidx.paging.cachedIn
 import androidx.paging.compose.LazyPagingItems
+import com.example.splitwise.data.network.model.FriendInvite
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.repository.InviteRepository
 import com.example.splitwise.model.InviteSubmissionState
@@ -53,9 +54,38 @@ class InviteViewModel (private val repo: InviteRepository): ViewModel() {
             }
         }
     }
-
     fun resetSendInviteState() {
         _uiState.update { it.copy(sendInviteState = InviteSubmissionState.Idle) }
+    }
+
+    fun declineInvite(inviteId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Loading) }
+            val result = repo.declineInvite(inviteId)
+            result.onSuccess { response ->
+                onSuccess()
+                _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Success(response.message)) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Error(exception.message ?: "An error occurred")) }
+            }
+        }
+    }
+
+    fun acceptInvite(inviteId: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Loading) }
+            val result = repo.acceptInvite(inviteId)
+            result.onSuccess { response ->
+                onSuccess()
+                _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Success(response.message)) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Error(exception.message ?: "An error occurred")) }
+            }
+        }
+    }
+
+    fun resetActionInviteState() {
+        _uiState.update { it.copy(actionInviteState = InviteSubmissionState.Idle) }
     }
 
     // Pending invites
@@ -63,23 +93,30 @@ class InviteViewModel (private val repo: InviteRepository): ViewModel() {
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
     private var hasHandledInitialLoad = false
-    fun monitorLoadState(pagingItems: LazyPagingItems<*>) {
-        if (hasHandledInitialLoad) return
+
+    fun monitorLoadState(pagingItems: LazyPagingItems<FriendInvite>) {
         viewModelScope.launch {
-            // snapshotFlow converts Compose State (loadState) into a Kotlin Flow
+            // Observe the load state of the paging items
             snapshotFlow { pagingItems.loadState.refresh }
                 .collect { loadState ->
-                    if (loadState is LoadState.NotLoading && !hasHandledInitialLoad) {
-                        if (pagingItems.itemCount > 0) {
-                            _showDialog.value = true
+                    // When the "refresh" (initial load or manual refresh()) finishes successfully
+                    if (loadState is LoadState.NotLoading) {
+
+                        // Logic: If the list is empty AND we are currently showing the dialog, close it.
+                        if (pagingItems.itemCount == 0 && _showDialog.value) {
+                            _showDialog.value = false
                         }
-                        // Even if count is 0, we mark as handled so it doesn't
-                        // flash later if the list updates
-                        hasHandledInitialLoad = true
+
+                        // Logic: If the list is NOT empty, ensure dialog shows (existing logic)
+                        else if (pagingItems.itemCount > 0 && !hasHandledInitialLoad) {
+                            _showDialog.value = true
+                            hasHandledInitialLoad = true
+                        }
                     }
                 }
         }
     }
+
 
     fun onDialogDismissed() {
         _showDialog.value = false

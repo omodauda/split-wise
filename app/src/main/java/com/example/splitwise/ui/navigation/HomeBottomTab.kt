@@ -63,7 +63,8 @@ fun HomeBottomTab(
             composable(route = Screen.Home.route) {
                 HomeScreen(
                     goToAddBill = {navController.navigate(Screen.AddBill.route)},
-                    inviteViewModel
+                    inviteViewModel,
+                    friendViewModel
                 )
 
             }
