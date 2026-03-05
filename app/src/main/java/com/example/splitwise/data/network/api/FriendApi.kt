@@ -26,7 +26,9 @@ interface FriendApi {
     ): Response<FriendInviteResponse>
 
     @GET("friendship/pending")
-    suspend fun getPendingInvites(): Response<GetPendingInvitesResponse>
+    suspend fun getPendingInvites(
+        @Query("cursorId") cursorId: String?
+    ): Response<GetPendingInvitesResponse>
 
     @PATCH("friendship/{inviteId}/accept")
     suspend fun acceptInvite(@Path("inviteId") inviteId: String): Response<FriendInviteResponse>
