@@ -167,7 +167,6 @@ fun FriendsList(
                 modifier = modifier.fillMaxSize()
             ) {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(Spacing.large),
                     contentPadding = PaddingValues(
                         start = Spacing.large,
                         end = Spacing.large,
