@@ -41,6 +41,7 @@ fun HomeBottomTab(
     navController: NavController,
     authViewModel: AuthViewModel,
     inviteViewModel: InviteViewModel,
+    friendViewModel: FriendViewModel,
     toastHostState: ToastHostState,
     startDestination: String = Screen.Home.route
 ) {
@@ -48,9 +49,9 @@ fun HomeBottomTab(
 
     val application = LocalContext.current.applicationContext as SplitWiseApplication
     val friendRepository = application.appContainer.friendRepository
-    val friendViewModel: FriendViewModel = viewModel(
-        factory = FriendViewModelFactory(friendRepository)
-    )
+//    val friendViewModel: FriendViewModel = viewModel(
+//        factory = FriendViewModelFactory(friendRepository)
+//    )
 
     Scaffold(
         bottomBar = {BottomNavigationBar(bottomNavController)}
