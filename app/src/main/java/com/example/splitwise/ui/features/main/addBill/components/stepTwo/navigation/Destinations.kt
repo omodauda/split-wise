@@ -4,6 +4,6 @@ enum class StepTwoDestination(
     val route: String,
     val label: String,
 ) {
-    GROUPS("groups", "Groups"),
+//    GROUPS("groups", "Groups"),
     FRIENDS("friends", "Friends")
 }
