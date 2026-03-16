@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -175,7 +176,8 @@ fun SuccessItem(
 )
 @Composable
 fun AddBillSuccessPreview() {
-    val vm = AddBillViewModel()
+    val container = FakeAppContainer()
+    val vm = AddBillViewModel(container.billRepository)
     SplitWiseTheme {
         AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
     }

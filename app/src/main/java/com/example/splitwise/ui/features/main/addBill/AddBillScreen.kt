@@ -20,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,8 +32,16 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
+import com.example.splitwise.model.AddBillSubmissionState
 import com.example.splitwise.ui.components.AppTextButton
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
 import com.example.splitwise.ui.features.main.addBill.components.stepFive.StepFive
 import com.example.splitwise.ui.features.main.addBill.components.stepFour.StepFour
 import com.example.splitwise.ui.features.main.addBill.components.stepOne.StepOne
@@ -53,16 +60,48 @@ fun AddBillScreen(
     goBack: () -> Unit,
     goToAddBillSuccess: () -> Unit,
     addBillViewModel: AddBillViewModel,
+    toastHostState: ToastHostState,
     modifier: Modifier = Modifier
 ) {
 
-    val uiState by addBillViewModel.uiState.collectAsState()
+    val uiState by addBillViewModel.uiState.collectAsStateWithLifecycle()
 
     val totalSteps = 7
     var currentStep by rememberSaveable { mutableIntStateOf(1) }
 
     LaunchedEffect(currentStep) {
         addBillViewModel.validateStep(currentStep)
+    }
+
+    LaunchedEffect(uiState.submissionState) {
+        when (val state = uiState.submissionState) {
+            is AddBillSubmissionState.Loading -> {
+                // LoadingView is handled in the UI body below
+            }        is AddBillSubmissionState.Success -> {
+            toastHostState.showToast(
+                ToastState(message = state.message, type = ToastType.SUCCESS)
+            )
+            goToAddBillSuccess()
+            // resetState clears the form and sets state back to Idle
+            addBillViewModel.resetState()
+        }
+            is AddBillSubmissionState.Error -> {
+                toastHostState.showToast(
+                    ToastState(message = state.message, type = ToastType.ERROR)
+                )
+                // resetSubmissionState sets state back to Idle but keeps form data
+                addBillViewModel.resetSubmissionState()
+            }
+            else -> {}
+        }
+    }
+
+    if (uiState.submissionState is AddBillSubmissionState.Loading) {
+        LoadingView()
+    }
+
+    fun submitBill() {
+        addBillViewModel.addBill()
     }
 
     fun goToNextStep() {
@@ -74,7 +113,7 @@ fun AddBillScreen(
             currentStep++
             return
         }else if (currentStep == totalSteps) {
-            goToAddBillSuccess()
+            submitBill()
         }
     }
 
@@ -87,7 +126,7 @@ fun AddBillScreen(
             currentStep--
         } else {
             goBack()
-            // TODO: clear add bill state
+            addBillViewModel.resetState()
         }
     }
 
@@ -254,8 +293,10 @@ fun AddBillFooter(
 )
 @Composable
 fun AddBillScreenPreview() {
-    val vm = AddBillViewModel()
+    val container = FakeAppContainer()
+    val vm = AddBillViewModel(container.billRepository)
+    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm)
+        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm, toastHostState = toastHostState)
     }
 }

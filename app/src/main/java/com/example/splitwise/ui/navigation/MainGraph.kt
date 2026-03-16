@@ -44,8 +44,9 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
         composable(route = Screen.AddBill.route){
+            val application = LocalContext.current.applicationContext as SplitWiseApplication
             val addBillViewModel: AddBillViewModel = viewModel(
-                factory = AddBillViewModelFactory()
+                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository)
             )
             AddBillScreen(
                 goBack = {
@@ -55,16 +56,18 @@ fun NavGraphBuilder.mainNavGraph(
                 goToAddBillSuccess = {
                     navController.navigate(Screen.AddBillSuccess.route)
                 },
-                addBillViewModel
+                addBillViewModel,
+                toastHostState
             )
         }
         composable( route = Screen.AddBillSuccess.route){
             val parentEntry = remember(it) {
                 navController.getBackStackEntry("main_graph")
             }
+            val application = LocalContext.current.applicationContext as SplitWiseApplication
             val addBillViewModel: AddBillViewModel = viewModel(
                 viewModelStoreOwner = parentEntry,
-                factory = AddBillViewModelFactory()
+                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository)
             )
 
             AddBillSuccessScreen(
