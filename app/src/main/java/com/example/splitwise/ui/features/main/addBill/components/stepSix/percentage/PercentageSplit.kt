@@ -32,9 +32,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.model.SplitEntryState
 import com.example.splitwise.model.User
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.components.UserAvatar
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -53,6 +55,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun PercentageSplit(
+    currentUserId: String?,
     splitEntries: List<SplitEntryState>,
     onPercentageChange: (userId: String, newPercentage: String) -> Unit,
     onDistributePercEvenly: () -> Unit,
@@ -95,6 +98,7 @@ fun PercentageSplit(
         items(splitEntries) { entryState ->
             PercentageEntry(
                 state = entryState,
+                isMe = currentUserId === entryState.user.userId,
                 onPercentageChange = {userId, newPercentage -> onPercentageChange(userId, newPercentage)}
             )
         }
@@ -130,6 +134,7 @@ fun BillSplitNote(
 @Composable
 fun PercentageEntry(
     state: SplitEntryState,
+    isMe: Boolean,
     onPercentageChange: (userId: String, newPercentage: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -140,7 +145,7 @@ fun PercentageEntry(
             .border(width = ComponentDimensions.borderWidthMedium, color = MaterialTheme.colorScheme.outlineVariant, shape = MaterialTheme.shapes.large)
             .padding(ScreenDimensions.contentPadding)
     ) {
-        PersonDetail(user = state.user)
+        PersonDetail(user = state.user, isMe)
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         Row(
             horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
@@ -152,7 +157,7 @@ fun PercentageEntry(
                 value = String.format(Locale.US, "%.2f", state.percentage),
                 onValueChange = { newValue ->
                     if((newValue.toDoubleOrNull() !== null && newValue.toDoubleOrNull()!! <= 100.0) || newValue.isEmpty()) {
-                        onPercentageChange(state.user.id, newValue)
+                        onPercentageChange(state.user.userId, newValue)
                     }
                 },
                 placeholder = "0.0",
@@ -183,7 +188,8 @@ fun PercentageEntry(
 
 @Composable
 fun PersonDetail(
-    user: User,
+    user: Friend,
+    isMe: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -192,24 +198,25 @@ fun PersonDetail(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(ComponentDimensions.avatarSizeMedium)
-                .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = CircleShape)
-        ) {
-            Text(
-                text = user.name[0].toString().uppercase(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
+//        Box(
+//            contentAlignment = Alignment.Center,
+//            modifier = Modifier
+//                .size(ComponentDimensions.avatarSizeMedium)
+//                .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = CircleShape)
+//        ) {
+//            Text(
+//                text = user.fullName[0].toString().uppercase(),
+//                style = MaterialTheme.typography.bodyMedium,
+//                color = MaterialTheme.colorScheme.onBackground
+//            )
+//        }
+        UserAvatar(fullName = user.fullName, avatarUrl = user.avatar)
         Text(
-            text = user.name,
+            text = if (isMe) "Me" else user.fullName,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
-        if (user.name == "You") {
+        if (isMe) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -237,7 +244,8 @@ fun PercentageSplitPreview() {
             splitEntries = emptyList(),
             onPercentageChange = {_, _ ->},
             onDistributePercEvenly = {},
-            sumOfSplitPercentages = 60.0
+            sumOfSplitPercentages = 60.0,
+            currentUserId = ""
         )
     }
 }

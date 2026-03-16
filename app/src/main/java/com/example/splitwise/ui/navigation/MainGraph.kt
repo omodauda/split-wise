@@ -1,7 +1,9 @@
 package com.example.splitwise.ui.navigation
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -11,14 +13,16 @@ import com.example.splitwise.SplitWiseApplication
 import com.example.splitwise.ui.components.toast.ToastHostState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.accountSettings.AccountSettingScreen
-import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
-import com.example.splitwise.ui.features.main.addBill.AddBillScreen
-import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
-import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
 import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
 import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModelFactory
+import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
 import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModelFactory
+import com.example.splitwise.ui.features.main.addBill.AddBillScreen
+import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModelFactory
+import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
+import com.example.splitwise.ui.features.main.friends.FriendViewModel
+import com.example.splitwise.ui.features.main.friends.FriendViewModelFactory
 import com.example.splitwise.ui.features.main.invites.InviteViewModel
 import com.example.splitwise.ui.features.main.invites.InviteViewModelFactory
 
@@ -33,6 +37,16 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         composable(route = Screen.Home.route) {
             val application = LocalContext.current.applicationContext as SplitWiseApplication
+
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry("main_graph")
+            }
+
+            val friendViewModel: FriendViewModel = viewModel(
+                viewModelStoreOwner = parentEntry,
+                factory = FriendViewModelFactory(application.appContainer.friendRepository)
+            )
+
             val inviteViewModel: InviteViewModel = viewModel(
                 factory = InviteViewModelFactory(inviteRepository = application.appContainer.inviteRepository)
             )
@@ -40,15 +54,22 @@ fun NavGraphBuilder.mainNavGraph(
                 navController,
                 authViewModel,
                 inviteViewModel,
+                friendViewModel,
                 toastHostState
             )
         }
         composable(route = Screen.AddBill.route){
             val application = LocalContext.current.applicationContext as SplitWiseApplication
+            val currentUser by authViewModel.user.collectAsStateWithLifecycle()
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry("main_graph")
+            }
             val addBillViewModel: AddBillViewModel = viewModel(
-                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository)
+                viewModelStoreOwner = parentEntry,
+                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository, authViewModel.user)
             )
             AddBillScreen(
+                rootNavController = navController,
                 goBack = {
                     navController.popBackStack()
                     addBillViewModel.resetState()
@@ -57,7 +78,9 @@ fun NavGraphBuilder.mainNavGraph(
                     navController.navigate(Screen.AddBillSuccess.route)
                 },
                 addBillViewModel,
-                toastHostState
+                currentUserId = currentUser?.id,
+                toastHostState,
+
             )
         }
         composable( route = Screen.AddBillSuccess.route){
@@ -67,7 +90,7 @@ fun NavGraphBuilder.mainNavGraph(
             val application = LocalContext.current.applicationContext as SplitWiseApplication
             val addBillViewModel: AddBillViewModel = viewModel(
                 viewModelStoreOwner = parentEntry,
-                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository)
+                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository, authViewModel.user)
             )
 
             AddBillSuccessScreen(
