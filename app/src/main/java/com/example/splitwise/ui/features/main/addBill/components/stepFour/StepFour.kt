@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.addBill.components.stepFour
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
-import com.example.splitwise.model.User
+import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.components.Friend
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -30,7 +31,8 @@ import com.example.splitwise.utils.formatAsCurrency
 fun StepFour(
     billAmount: Double,
     onPayerSelected: (String) -> Unit,
-    participants: List<User>,
+    participants: List<Friend>,
+    currentUserId: String?,
     modifier: Modifier = Modifier,
     payerId: String? = null,
 ) {
@@ -69,13 +71,15 @@ fun StepFour(
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
             items(participants) {user ->
-                val isSelected = user.id == payerId
+                val isSelected = user.userId == payerId
+                val isMe = currentUserId == user.userId
                 Friend(
                     user,
                     isSelected,
+                    isMe,
                     modifier = Modifier
                         .clickable {
-                            onPayerSelected(user.id)
+                            onPayerSelected(user.userId)
                         }
                 )
             }
@@ -91,7 +95,8 @@ fun StepFourPreview() {
             billAmount = 0.00,
             payerId = null,
             onPayerSelected = {},
-            participants = emptyList()
+            participants = emptyList(),
+            currentUserId = ""
         )
     }
 }
