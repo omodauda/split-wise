@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +33,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
 import com.example.splitwise.mock.FakeAppContainer
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -50,7 +51,7 @@ fun AddBillSuccessScreen(
     addBillViewModel: AddBillViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by addBillViewModel.uiState.collectAsState()
+    val uiState by addBillViewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler(enabled = true) { }
     Column(
@@ -80,7 +81,7 @@ fun AddBillSuccessScreen(
             textAlign = TextAlign.Center
         )
         Text(
-            text = stringResource(R.string.notify_people, uiState.participants.size),
+            text = stringResource(R.string.notify_people, uiState.participants.size - 1),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -177,7 +178,8 @@ fun SuccessItem(
 @Composable
 fun AddBillSuccessPreview() {
     val container = FakeAppContainer()
-    val vm = AddBillViewModel(container.billRepository)
+    val authVm = AuthViewModel(repo = container.authRepository)
+    val vm = AddBillViewModel(container.billRepository, authVm.user)
     SplitWiseTheme {
         AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
     }
