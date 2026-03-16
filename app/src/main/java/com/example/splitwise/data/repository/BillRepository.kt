@@ -11,7 +11,6 @@ class BillRepository(private val billApi: BillApi) {
 
     suspend fun addBill(data: CreateBillRequest): Result<CreateBillResponse> {
         return try {
-            Log.d("Add Bill", data.toString())
             val response = billApi.addBill(data)
             if (response.isSuccessful && response.body() !== null) {
                 val responseBody = response.body()!!
@@ -19,7 +18,6 @@ class BillRepository(private val billApi: BillApi) {
             } else {
                 val errorBody = response.errorBody()?.string()
                 val apiError = Gson().fromJson(errorBody, ApiError::class.java)
-                Log.d("Add Bill", apiError.message)
                 Result.failure(Exception(apiError.message))
             }
         } catch (e: Exception) {
