@@ -3,7 +3,14 @@ package com.example.splitwise.model
 import com.example.splitwise.ui.features.main.addBill.AddBillSplitMethod
 import java.util.Date
 
+sealed interface AddBillSubmissionState {
+    data object Idle: AddBillSubmissionState
+    data object Loading: AddBillSubmissionState
+    data class Success(val message: String): AddBillSubmissionState
+    data class Error(val message: String): AddBillSubmissionState
+}
 data class AddBillUiState(
+    val submissionState: AddBillSubmissionState = AddBillSubmissionState.Idle,
     val isCurrentStepValid: Boolean = false,
 
     val billAmount: String = "",
