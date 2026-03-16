@@ -3,6 +3,10 @@ package com.example.splitwise.ui.features.main.addBill
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.splitwise.data.network.model.BillSplit
+import com.example.splitwise.data.network.model.CreateBillRequest
+import com.example.splitwise.data.repository.BillRepository
+import com.example.splitwise.model.AddBillSubmissionState
 import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.SplitEntryState
 import com.example.splitwise.model.User
@@ -14,12 +18,16 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import kotlin.math.absoluteValue
 
-class AddBillViewModel: ViewModel() {
+class AddBillViewModel(private val repo: BillRepository): ViewModel() {
     private val _uiState = MutableStateFlow(AddBillUiState())
     val uiState: StateFlow<AddBillUiState> = _uiState.asStateFlow()
 
     fun resetState() {
         _uiState.update { AddBillUiState() }
+    }
+    
+    fun resetSubmissionState() {
+        _uiState.update { it.copy(submissionState = AddBillSubmissionState.Idle) }
     }
     fun onBillAmountChange(amount: String) {
         val filteredAmount = amount.filter { it.isDigit() }
@@ -300,6 +308,42 @@ class AddBillViewModel: ViewModel() {
             }
             // FOR EQUAL, we skip step six.
             AddBillSplitMethod.EQUAL -> true
+        }
+    }
+    
+    fun addBill() {
+        viewModelScope.launch { 
+            _uiState.update { it.copy(submissionState = AddBillSubmissionState.Loading) }
+            val state = _uiState.value
+            val data = CreateBillRequest(
+                description = state.description,
+                category = state.category.toString(),
+                date = state.date!!,
+                payerId = state.paidByUserId!!,
+                totalAmount = state.billAmount.toInt(),
+                splitMethod = state.splitMethod.toString(),
+                splits = state.splitEntries.map { entry ->
+                    BillSplit(
+                        userId = entry.user.id,
+                        amount = entry.amount.toInt(),
+                        percentage = entry.percentage
+                    )
+                }
+            )
+            Log.d("Add Bill payload", data.toString())
+            val result = repo.addBill(data)
+            result.onSuccess { response ->
+                _uiState.update { it.copy(submissionState = AddBillSubmissionState.Success(response.message)) }
+
+            }.onFailure { exception ->
+                _uiState.update {
+                    it.copy(
+                        submissionState = AddBillSubmissionState.Error(
+                            exception.message ?: "An error occurred"
+                        )
+                    )
+                }
+            }
         }
     }
 }
