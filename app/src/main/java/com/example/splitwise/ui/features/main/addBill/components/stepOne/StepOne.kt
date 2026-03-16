@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,7 +47,7 @@ fun StepOne(
     onAmountChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onDateSelected: (Long?) -> Unit,
-    onCategorySelected: (Int) -> Unit,
+    onCategorySelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -120,8 +121,8 @@ fun StepOne(
 
 @Composable
 fun Categories(
-    selectedCategory: Int? = null,
-    onSelect: (Int) -> Unit,
+    selectedCategory: String? = null,
+    onSelect: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val categories = listOf(
@@ -150,6 +151,7 @@ fun Categories(
             name = R.string.other
         ),
     )
+    val context = LocalContext.current
     Column(modifier) {
         Text(
             text = stringResource(R.string.category),
@@ -165,11 +167,12 @@ fun Categories(
 
         ) {
             categories.forEach { category ->
+                val categoryName = context.getString(category.name)
                 Category(
                     category = category,
                     selectedCategory = selectedCategory,
                     modifier = Modifier
-                        .clickable(enabled = true, onClick = {onSelect(category.name)})
+                        .clickable(enabled = true, onClick = {onSelect(categoryName)})
                 )
             }
         }
@@ -178,11 +181,13 @@ fun Categories(
 
 @Composable
 fun Category(
-    selectedCategory: Int? = null,
+    selectedCategory: String? = null,
     category: BillCategory,
     modifier: Modifier = Modifier
 ) {
-    val isSelected = selectedCategory == category.name
+    val context = LocalContext.current
+    val categoryName = context.getString(category.name)
+    val isSelected = selectedCategory == categoryName
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
