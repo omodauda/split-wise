@@ -1,15 +1,15 @@
 package com.example.splitwise.ui.features.main.addBill
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.splitwise.data.network.model.AuthUserData
 import com.example.splitwise.data.network.model.BillSplit
 import com.example.splitwise.data.network.model.CreateBillRequest
+import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.data.repository.BillRepository
 import com.example.splitwise.model.AddBillSubmissionState
 import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.SplitEntryState
-import com.example.splitwise.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,12 +18,47 @@ import kotlinx.coroutines.launch
 import java.util.Date
 import kotlin.math.absoluteValue
 
-class AddBillViewModel(private val repo: BillRepository): ViewModel() {
+class AddBillViewModel(
+    private val repo: BillRepository,
+    private val userFlow: StateFlow<AuthUserData?>,
+): ViewModel() {
     private val _uiState = MutableStateFlow(AddBillUiState())
     val uiState: StateFlow<AddBillUiState> = _uiState.asStateFlow()
 
+    private var currentUser: Friend? = null
+
+    init {
+        viewModelScope.launch {
+            userFlow.collect { user ->
+                if (user !== null) {
+                    val me = Friend (
+                        friendshipId = user.id,
+                        userId = user.id,
+                        fullName = user.fullName,
+                        email = user.email,
+                        avatar = user.avatar
+                    )
+                    if (uiState.value.participants.isEmpty()) {
+                        currentUser = me
+                        _uiState.update {
+                            it.copy(
+                                participants = listOf(me)
+                            )
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
     fun resetState() {
-        _uiState.update { AddBillUiState() }
+        _uiState.update {
+            AddBillUiState(
+                participants = currentUser?.let { listOf(it) } ?: emptyList(),
+                splitEntries = currentUser?.let { listOf(SplitEntryState(it)) } ?: emptyList()
+            )
+        }
     }
     
     fun resetSubmissionState() {
@@ -41,7 +76,7 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
         _uiState.update { it.copy(description = description) }
         validateStep((1))
     }
-    fun onCategoryChange(category: Int) {
+    fun onCategoryChange(category: String) {
         _uiState.update { it.copy(category = category) }
         validateStep((1))
     }
@@ -63,19 +98,19 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
         validateStep((2))
         // TODO: set group members as participants
     }
-    fun onGroupMemberSelected(member: User) {
+    fun onGroupMemberSelected(member: Friend) {
         _uiState.update { currentState ->
             val updatedParticipants = currentState.participants.toMutableList()
-            val isAlreadySelected = updatedParticipants.any { it.id == member.id }
+            val isAlreadySelected = updatedParticipants.any { it.userId == member.userId }
 
             if (isAlreadySelected) {
-                updatedParticipants.removeAll { it.id == member.id }
+                updatedParticipants.removeAll { it.userId == member.userId }
             } else {
                 updatedParticipants.add(member)
             }
             // Also update the split entries to match the new participant list
             val newEntries = updatedParticipants.map { user ->
-                currentState.splitEntries.find { it.user.id == user.id } ?: SplitEntryState(user)
+                currentState.splitEntries.find { it.user.userId == user.userId } ?: SplitEntryState(user)
             }
 
             currentState.copy(
@@ -86,22 +121,29 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
         recalculateSplits()
          validateStep(3)
     }
-    fun onFriendSelected(friend: User) {
+    fun onFriendSelected(friend: Friend) {
         _uiState.update { currentState ->
+            // TODO: current user should be auto included as first participants
             val updatedFriends = currentState.selectedFriends.toMutableList()
             val updatedParticipants = currentState.participants.toMutableList()
 
-            val isAlreadySelected = updatedFriends.contains(friend.id)
+            currentUser?.let { me ->
+                if (updatedParticipants.none {it.userId == me.userId}) {
+                    updatedParticipants.add(0, me)
+                }
+             }
+
+            val isAlreadySelected = updatedFriends.contains(friend.userId)
             if (isAlreadySelected) {
-                updatedFriends.remove(friend.id)
-                updatedParticipants.removeAll { it.id == friend.id }
+                updatedFriends.remove(friend.userId)
+                updatedParticipants.removeAll { it.userId == friend.userId }
             } else {
-                updatedFriends.add(friend.id)
+                updatedFriends.add(friend.userId)
                 updatedParticipants.add(friend)
             }
 
             val newEntries = updatedParticipants.map { user ->
-                currentState.splitEntries.find { it.user.id == user.id } ?: SplitEntryState(user)
+                currentState.splitEntries.find { it.user.userId == user.userId } ?: SplitEntryState(user)
             }
 
             currentState.copy(
@@ -117,12 +159,12 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
     }
 
     fun clearParticipants() {
-        _uiState.update {
+        _uiState.update { it ->
             it.copy(
                 isGroupSplit = false,
                 selectedGroupId = null,
                 selectedFriends = emptyList(),
-                participants = emptyList(),
+                participants = currentUser?.let { listOf(it) } ?: emptyList(),
                 paidByUserId = null,
                 splitEntries = emptyList()
             )
@@ -197,7 +239,7 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
         _uiState.update { currentState ->
             currentState.copy(
                 splitEntries = currentState.splitEntries.map { entry ->
-                    if (entry.user.id == userId) {
+                    if (entry.user.userId == userId) {
                         entry.copy(amount = newAmount, percentage = newPercentage)
                     } else {
                         entry
@@ -277,7 +319,7 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
     private fun isStepTwoValid(): Boolean{
         val state = _uiState.value
         return (state.isGroupSplit && state.selectedGroupId !== null) ||
-                (!state.isGroupSplit && state.selectedFriends.size > 1)
+                (!state.isGroupSplit && state.selectedFriends.isNotEmpty())
     }
     private fun isStepThreeValid(): Boolean {
         val state = _uiState.value
@@ -317,20 +359,20 @@ class AddBillViewModel(private val repo: BillRepository): ViewModel() {
             val state = _uiState.value
             val data = CreateBillRequest(
                 description = state.description,
-                category = state.category.toString(),
+                category = state.category!!,
                 date = state.date!!,
                 payerId = state.paidByUserId!!,
                 totalAmount = state.billAmount.toInt(),
                 splitMethod = state.splitMethod.toString(),
                 splits = state.splitEntries.map { entry ->
                     BillSplit(
-                        userId = entry.user.id,
+                        userId = entry.user.userId,
                         amount = entry.amount.toInt(),
                         percentage = entry.percentage
                     )
                 }
             )
-            Log.d("Add Bill payload", data.toString())
+//            Log.d("Add Bill payload", data.toString())
             val result = repo.addBill(data)
             result.onSuccess { response ->
                 _uiState.update { it.copy(submissionState = AddBillSubmissionState.Success(response.message)) }
