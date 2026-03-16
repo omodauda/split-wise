@@ -14,7 +14,8 @@
     <string name="other">Other</string>
     <string name="date">Date</string>
     <string name="Continue">Continue</string>
-    <string name="select_group_or_friends">Select Group or Friends</string>
+<!--    <string name="select_group_or_friends">Select Group or Friends</string>-->
+    <string name="select_group_or_friends">Select Friends</string>
     <string name="groups">Groups</string>
     <string name="select_a_group">Select a group</string>
     <string name="select_friends">Select friends(multiple)</string>
