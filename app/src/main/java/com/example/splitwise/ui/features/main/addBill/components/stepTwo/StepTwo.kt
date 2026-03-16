@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.User
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.navigation.StepTwoDestination
@@ -29,19 +30,22 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 
 @Composable
 fun StepTwo(
+    rootNavController: NavHostController,
     uiState: AddBillUiState,
     onSelectGroup: (groupId: String) -> Unit,
-    onSelectFriend: (user: User) -> Unit,
+    onSelectFriend: (user: Friend) -> Unit,
+    currentUserId: String?,
     onTabChanged: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStack?.destination
-    val currentTab = StepTwoDestination.entries.find { it.route == currentDestination?.route } ?: StepTwoDestination.GROUPS
+    val currentTab = StepTwoDestination.entries.find { it.route == currentDestination?.route } ?: StepTwoDestination.FRIENDS
 
     StepTwoContent(
         navController = navController,
+        rootNavController,
         currentTab = currentTab,
         onTabSelected = { newTab ->
             if (newTab.ordinal != currentTab.ordinal) {
@@ -65,6 +69,7 @@ fun StepTwo(
         uiState,
         onSelectGroup,
         onSelectFriend,
+        currentUserId = currentUserId,
         modifier = modifier
     )
 }
@@ -73,11 +78,13 @@ fun StepTwo(
 @Composable
 fun StepTwoContent(
     navController: NavHostController,
+    rootNavController: NavHostController,
     currentTab: StepTwoDestination,
     onTabSelected: (StepTwoDestination) -> Unit,
    uiState: AddBillUiState,
     onSelectGroup: (groupId: String) -> Unit,
-   onSelectFriend: (user: User) -> Unit,
+   onSelectFriend: (user: Friend) -> Unit,
+    currentUserId: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -125,10 +132,12 @@ fun StepTwoContent(
         }
         StepTwoNavHost(
             navController = navController,
+            rootNavController,
             modifier = Modifier.padding(top = Spacing.medium),
             uiState = uiState,
             onSelectGroup = onSelectGroup,
-            onSelectFriend = onSelectFriend
+            onSelectFriend = onSelectFriend,
+            currentUserId = currentUserId
         )
     }
 }
@@ -146,7 +155,8 @@ fun StepTwoContent(
 )
 @Composable
 fun StepTwoPreview() {
+    val navController = rememberNavController()
     SplitWiseTheme {
-        StepTwo(uiState = AddBillUiState(), onSelectGroup = {}, onSelectFriend = {}, onTabChanged = {})
+        StepTwo(uiState = AddBillUiState(), onSelectGroup = {}, onSelectFriend = {}, onTabChanged = {}, rootNavController = navController, currentUserId = "")
     }
 }
