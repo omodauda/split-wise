@@ -30,6 +30,7 @@ import com.example.splitwise.ui.features.main.activity.ActivityScreen
 import com.example.splitwise.ui.features.main.friends.FriendScreen
 import com.example.splitwise.ui.features.main.friends.FriendViewModel
 import com.example.splitwise.ui.features.main.friends.FriendViewModelFactory
+import com.example.splitwise.ui.features.main.home.BillsViewModel
 //import com.example.splitwise.ui.features.main.groups.GroupScreen
 import com.example.splitwise.ui.features.main.home.HomeScreen
 import com.example.splitwise.ui.features.main.invites.InviteViewModel
@@ -41,6 +42,8 @@ fun HomeBottomTab(
     navController: NavController,
     authViewModel: AuthViewModel,
     inviteViewModel: InviteViewModel,
+    friendViewModel: FriendViewModel,
+    billsViewModel: BillsViewModel,
     toastHostState: ToastHostState,
     startDestination: String = Screen.Home.route
 ) {
@@ -48,9 +51,9 @@ fun HomeBottomTab(
 
     val application = LocalContext.current.applicationContext as SplitWiseApplication
     val friendRepository = application.appContainer.friendRepository
-    val friendViewModel: FriendViewModel = viewModel(
-        factory = FriendViewModelFactory(friendRepository)
-    )
+//    val friendViewModel: FriendViewModel = viewModel(
+//        factory = FriendViewModelFactory(friendRepository)
+//    )
 
     Scaffold(
         bottomBar = {BottomNavigationBar(bottomNavController)}
@@ -64,7 +67,8 @@ fun HomeBottomTab(
                 HomeScreen(
                     goToAddBill = {navController.navigate(Screen.AddBill.route)},
                     inviteViewModel,
-                    friendViewModel
+                    friendViewModel,
+                    billsViewModel
                 )
 
             }

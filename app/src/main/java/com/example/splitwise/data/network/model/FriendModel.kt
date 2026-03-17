@@ -8,7 +8,7 @@ data class GetFriendsResponse(
 )
 data class Friend(
     val friendshipId: String,
-    val createdAt: Date,
+//    val createdAt: Date,
     val userId: String,
     val fullName: String,
     val email: String,

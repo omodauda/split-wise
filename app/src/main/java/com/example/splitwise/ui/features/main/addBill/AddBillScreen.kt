@@ -20,7 +20,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,8 +32,19 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.R
+import com.example.splitwise.mock.FakeAppContainer
+import com.example.splitwise.model.AddBillSubmissionState
 import com.example.splitwise.ui.components.AppTextButton
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
+import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.addBill.components.stepFive.StepFive
 import com.example.splitwise.ui.features.main.addBill.components.stepFour.StepFour
 import com.example.splitwise.ui.features.main.addBill.components.stepOne.StepOne
@@ -42,6 +52,7 @@ import com.example.splitwise.ui.features.main.addBill.components.stepSeven.StepS
 import com.example.splitwise.ui.features.main.addBill.components.stepSix.StepSix
 import com.example.splitwise.ui.features.main.addBill.components.stepThree.StepThree
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.StepTwo
+import com.example.splitwise.ui.features.main.home.BillsViewModel
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -50,19 +61,51 @@ import java.util.Date
 
 @Composable
 fun AddBillScreen(
+    rootNavController: NavHostController,
     goBack: () -> Unit,
     goToAddBillSuccess: () -> Unit,
     addBillViewModel: AddBillViewModel,
+    billsViewModel: BillsViewModel,
+    currentUserId: String?,
+    toastHostState: ToastHostState,
     modifier: Modifier = Modifier
 ) {
 
-    val uiState by addBillViewModel.uiState.collectAsState()
+    val uiState by addBillViewModel.uiState.collectAsStateWithLifecycle()
 
     val totalSteps = 7
     var currentStep by rememberSaveable { mutableIntStateOf(1) }
 
     LaunchedEffect(currentStep) {
         addBillViewModel.validateStep(currentStep)
+    }
+
+    LaunchedEffect(uiState.submissionState) {
+        when (val state = uiState.submissionState) {
+            is AddBillSubmissionState.Loading -> {
+                // LoadingView is handled in the UI body below
+            }
+            is AddBillSubmissionState.Success -> {
+                billsViewModel.refresh()
+                goToAddBillSuccess()
+            }
+            is AddBillSubmissionState.Error -> {
+                toastHostState.showToast(
+                    ToastState(message = state.message, type = ToastType.ERROR)
+                )
+                // resetSubmissionState sets state back to Idle but keeps form data
+                addBillViewModel.resetSubmissionState()
+            }
+            else -> {}
+        }
+    }
+
+    if (uiState.submissionState is AddBillSubmissionState.Loading) {
+        LoadingView()
+    }
+
+    fun submitBill() {
+        addBillViewModel.addBill()
     }
 
     fun goToNextStep() {
@@ -74,7 +117,7 @@ fun AddBillScreen(
             currentStep++
             return
         }else if (currentStep == totalSteps) {
-            goToAddBillSuccess()
+            submitBill()
         }
     }
 
@@ -87,7 +130,7 @@ fun AddBillScreen(
             currentStep--
         } else {
             goBack()
-            // TODO: clear add bill state
+            addBillViewModel.resetState()
         }
     }
 
@@ -116,26 +159,32 @@ fun AddBillScreen(
                     onCategorySelected = {addBillViewModel.onCategoryChange(it)},
                 )
                 2 -> StepTwo(
+                    rootNavController,
                     uiState,
                     onSelectGroup = {addBillViewModel.onGroupSelected(it)},
                     onSelectFriend = {addBillViewModel.onFriendSelected(it)},
-                    onTabChanged = {addBillViewModel.clearParticipants()}
+                    onTabChanged = {addBillViewModel.clearParticipants()},
+                    currentUserId = currentUserId
                 )
                 3 -> StepThree(
                     selectedParticipants = uiState.participants,
-                    onMemberSelected = {addBillViewModel.onGroupMemberSelected(it)}
+                    onMemberSelected = {addBillViewModel.onGroupMemberSelected(it)},
+                    currentUserId
                 )
                 4 -> StepFour(
                     billAmount = uiState.billAmountAsDouble,
                     payerId = uiState.paidByUserId,
                     onPayerSelected = {addBillViewModel.onPayerSelected(it)},
-                    participants = uiState.participants
+                    participants = uiState.participants,
+                    currentUserId = currentUserId
                 )
                 5 -> StepFive(
                     billAmount = uiState.billAmountAsDouble,
                     numberOfPersons = uiState.participants.size,
                     splitMethod = uiState.splitMethod,
-                    payerName = uiState.participants.find { it.id == uiState.paidByUserId }?.name ?: "",
+                    payerName = uiState.participants.find { it.userId == uiState.paidByUserId }?.let {
+                        if (it.userId == currentUserId) "You" else it.fullName
+                    } ?: "",
                     selectSplitMethod = {addBillViewModel.onSplitMethodChanged(it)}
                 )
                 6 -> StepSix(
@@ -143,10 +192,12 @@ fun AddBillScreen(
                     onPercentageChange = {userId, newPercentage -> addBillViewModel.onPercentageChanged(userId, newPercentage)},
                     onExactAmountChange = {userId, newAmount -> addBillViewModel.onExactAmountChanged(userId, newAmount)},
                     onDistributePercentageEvenly = {addBillViewModel.distributeEvenly()},
-                    onDistributeAmountEvenly = {addBillViewModel.distributeEvenly()}
+                    onDistributeAmountEvenly = {addBillViewModel.distributeEvenly()},
+                    currentUserId=currentUserId
                 )
                 7 -> StepSeven(
-                    uiState
+                    uiState,
+                    currentUserId
                 )
             }
         }
@@ -210,7 +261,9 @@ fun AddBillHeader(
         Spacer(Modifier.height(Spacing.medium))
         LinearProgressIndicator(
             progress = {currentProgress},
-            modifier = Modifier.fillMaxWidth().clip(shape = CircleShape),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = CircleShape),
             color = MaterialTheme.colorScheme.primary,
             trackColor = MaterialTheme.colorScheme.surfaceContainer,
             strokeCap = StrokeCap.Round,
@@ -254,8 +307,13 @@ fun AddBillFooter(
 )
 @Composable
 fun AddBillScreenPreview() {
-    val vm = AddBillViewModel()
+    val container = FakeAppContainer()
+    val authVm = AuthViewModel(repo = container.authRepository)
+    val vm = AddBillViewModel(container.billsRepository, userFlow = authVm.user)
+    val billsVm = BillsViewModel(container.billsRepository)
+    val toastHostState = rememberToastHostState()
+    val navController = rememberNavController()
     SplitWiseTheme {
-        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm)
+        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm, toastHostState = toastHostState, rootNavController = navController, currentUserId = "", billsViewModel = billsVm)
     }
 }

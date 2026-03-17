@@ -2,11 +2,17 @@ package com.example.splitwise.mock
 
 import com.example.splitwise.data.local.IAuthPreference
 import com.example.splitwise.data.network.api.AuthApi
+import com.example.splitwise.data.network.api.BillApi
 import com.example.splitwise.data.network.api.FriendApi
 import com.example.splitwise.data.network.model.AuthData
 import com.example.splitwise.data.network.model.AuthUserData
+import com.example.splitwise.data.network.model.CreateBillRequest
+import com.example.splitwise.data.network.model.CreateBillResponse
 import com.example.splitwise.data.network.model.FriendInviteResponse
+import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.GetFriendsResponse
+import com.example.splitwise.data.network.model.GetOwedBillsResponse
+import com.example.splitwise.data.network.model.GetOwingBillsResponse
 import com.example.splitwise.data.network.model.GetPendingInvitesResponse
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
@@ -14,6 +20,7 @@ import com.example.splitwise.data.network.model.PaginationMetaData
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.network.model.SignupRequest
 import com.example.splitwise.data.repository.AuthRepository
+import com.example.splitwise.data.repository.BillsRepository
 import com.example.splitwise.data.repository.FriendRepository
 import com.example.splitwise.data.repository.InviteRepository
 import com.example.splitwise.di.IAppContainer
@@ -130,6 +137,31 @@ class FakeFriendApi : FriendApi {
     }
 }
 
+class FakeBillApi: BillApi {
+    override suspend fun addBill(request: CreateBillRequest): Response<CreateBillResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getOwedBills(
+        cursorId: String?,
+        limit: Int?
+    ): Response<GetOwedBillsResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getOwingBills(
+        cursorId: String?,
+        limit: Int?
+    ): Response<GetOwingBillsResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getBillsDashboard(): Response<GetBillsDashboardResponse> {
+        TODO("Not yet implemented")
+    }
+
+}
+
 class FakeAppContainer : IAppContainer {
 
     // First, implement the missing 'authApi' member.
@@ -146,5 +178,10 @@ class FakeAppContainer : IAppContainer {
         get() = TODO("Not yet implemented")
 
     override val inviteRepository: InviteRepository
+        get() = TODO("Not yet implemented")
+
+    override val billApi: BillApi = FakeBillApi()
+
+    override val billsRepository: BillsRepository
         get() = TODO("Not yet implemented")
 }

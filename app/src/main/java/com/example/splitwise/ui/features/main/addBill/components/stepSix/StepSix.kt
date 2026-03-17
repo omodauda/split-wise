@@ -34,6 +34,7 @@ fun StepSix(
     onExactAmountChange: (userId: String, newAmount: String) -> Unit,
     onDistributePercentageEvenly: () -> Unit,
     onDistributeAmountEvenly: () -> Unit,
+    currentUserId: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -54,14 +55,16 @@ fun StepSix(
                 billAmount = uiState.billAmountAsDouble,
                 onExactAmountChange = {userId, newAmount -> onExactAmountChange(userId, newAmount)},
                 onDistributeAmountEvenly = {onDistributeAmountEvenly()},
-                sumOfSplitAmounts = uiState.sumOfSplitAmount
+                sumOfSplitAmounts = uiState.sumOfSplitAmount,
+                currentUserId = currentUserId
             )
         } else if (uiState.splitMethod == AddBillSplitMethod.PERCENTAGE) {
             PercentageSplit(
                 splitEntries = uiState.splitEntries,
                 onPercentageChange = {userId, newPercentage -> onPercentageChange(userId, newPercentage)},
                 onDistributePercEvenly = {onDistributePercentageEvenly()},
-                sumOfSplitPercentages = uiState.sumOfSplitPercentage
+                sumOfSplitPercentages = uiState.sumOfSplitPercentage,
+                currentUserId = currentUserId
             )
         }
     }
@@ -120,7 +123,8 @@ fun StepSixPreview() {
             onPercentageChange = { _, _ -> },
             onDistributePercentageEvenly = {},
             onExactAmountChange = {_, _ ->},
-            onDistributeAmountEvenly = {}
+            onDistributeAmountEvenly = {},
+            currentUserId = ""
         )
     }
 }

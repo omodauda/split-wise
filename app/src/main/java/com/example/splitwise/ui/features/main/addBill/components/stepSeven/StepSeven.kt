@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.SplitEntryState
+import com.example.splitwise.ui.components.UserAvatar
 import com.example.splitwise.ui.features.main.addBill.AddBillSplitMethod
 import com.example.splitwise.ui.theme.BalanceNegative
 import com.example.splitwise.ui.theme.ComponentDimensions
@@ -48,6 +47,7 @@ import java.util.Locale
 @Composable
 fun StepSeven(
     uiState: AddBillUiState,
+    currentUserId: String?,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -61,13 +61,15 @@ fun StepSeven(
         ReviewDetail(
             billAmount = uiState.billAmountAsDouble,
             description = uiState.description,
-            category = uiState.category ?: 0,
+            category = uiState.category!!,
             date = uiState.date,
-            paidBy = (uiState.participants.find { it.id == uiState.paidByUserId }?.name ?: ""),
+            paidBy = uiState.participants.find { it.userId == uiState.paidByUserId }?.let {
+                if (it.userId == currentUserId) "You" else it.fullName
+            } ?: "",
             splitMethod = uiState.splitMethod
         )
         Spacer(Modifier.height(Spacing.medium))
-        ReviewBreakDown(breakDowns = uiState.splitEntries)
+        ReviewBreakDown(breakDowns = uiState.splitEntries, currentUserId = currentUserId)
         Spacer(Modifier.height(Spacing.medium))
         NextStepView()
     }
@@ -104,7 +106,7 @@ fun ReviewHeader(
 fun ReviewDetail(
     billAmount: Double,
     description: String,
-    category: Int,
+    category: String,
     date: Date?,
     paidBy: String,
     splitMethod: AddBillSplitMethod,
@@ -147,7 +149,7 @@ fun ReviewDetail(
                 modifier = Modifier
                 .fillMaxWidth()
             ) {
-                ReviewDetailItem(label = R.string.category, value = stringResource(category))
+                ReviewDetailItem(label = R.string.category, value = category)
                 ReviewDetailItem(label = R.string.date, value = formatDate(date))
             }
             ReviewDetailItem(label = R.string.paid_by, value = paidBy)
@@ -181,6 +183,7 @@ fun ReviewDetailItem(
 
 @Composable
 fun ReviewBreakDown(
+    currentUserId: String?,
     breakDowns: List<SplitEntryState>,
     modifier: Modifier = Modifier
 ) {
@@ -195,7 +198,7 @@ fun ReviewBreakDown(
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
 
         breakDowns.forEach {
-            SplitBreakDownItem(state = it)
+            SplitBreakDownItem(state = it, isMe = it.user.userId === currentUserId)
             Spacer(Modifier.height(Spacing.small))
         }
     }
@@ -204,6 +207,7 @@ fun ReviewBreakDown(
 @Composable
 fun SplitBreakDownItem(
     state: SplitEntryState,
+    isMe: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -220,28 +224,17 @@ fun SplitBreakDownItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(ComponentDimensions.iconSizeExtraLarge)
-                    .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape)
-            ) {
-                Text(
-                    text = state.user.name[0].uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            UserAvatar(fullName = state.user.fullName, avatarUrl = state.user.avatar)
             Column{
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(Spacing.small)
                 ) {
                     Text(
-                        text = state.user.name,
+                        text = if (isMe) "You" else state.user.fullName,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
-                    if (state.user.name == "You") {
+                    if (isMe) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
@@ -324,6 +317,6 @@ fun NextStepView(
 @Composable
 fun StepSevenPreview() {
     SplitWiseTheme {
-        StepSeven(uiState = AddBillUiState())
+        StepSeven(uiState = AddBillUiState(), currentUserId = "")
     }
 }

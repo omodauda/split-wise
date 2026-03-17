@@ -45,6 +45,7 @@ import kotlin.math.absoluteValue
 
 @Composable
 fun ExactAmountSplit(
+    currentUserId: String?,
     splitEntries: List<SplitEntryState>,
     billAmount: Double,
     onExactAmountChange: (userId: String, newAmount: String) -> Unit,
@@ -88,6 +89,7 @@ fun ExactAmountSplit(
         items(splitEntries) { entryState ->
             AmountEntry(
                 state = entryState,
+                isMe = currentUserId === entryState.user.userId,
                 onAmountChange = {userId, newAmount ->
                     onExactAmountChange(userId, newAmount)
                 }
@@ -105,6 +107,7 @@ fun ExactAmountSplit(
 @Composable
 fun AmountEntry(
     state: SplitEntryState,
+    isMe: Boolean,
     onAmountChange: (userId: String, newAmount: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -115,7 +118,7 @@ fun AmountEntry(
             .border(width = ComponentDimensions.borderWidthMedium, color = MaterialTheme.colorScheme.outlineVariant, shape = MaterialTheme.shapes.large)
             .padding(ScreenDimensions.contentPadding)
     ) {
-        PersonDetail(user = state.user)
+        PersonDetail(user = state.user, isMe)
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         Row(
             horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
@@ -127,7 +130,7 @@ fun AmountEntry(
                 value = String.format(Locale.US,"%.2f", state.amount),
                 onValueChange = {newValue ->
                     if((newValue.toDoubleOrNull() !== null) || newValue.isEmpty()) {
-                        onAmountChange(state.user.id, newValue)
+                        onAmountChange(state.user.userId, newValue)
                     }},
                 placeholder = "200.00",
                 leadingIcon = R.drawable.dollar_icon,
@@ -170,7 +173,8 @@ fun ExactAmountSplitPreview() {
             billAmount = 600.0,
             onExactAmountChange = {_, _ ->},
             onDistributeAmountEvenly = {},
-            sumOfSplitAmounts = 400.0
+            sumOfSplitAmounts = 400.0,
+            currentUserId = ""
         )
     }
 }

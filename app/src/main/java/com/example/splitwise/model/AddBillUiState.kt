@@ -1,21 +1,29 @@
 package com.example.splitwise.model
 
+import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.ui.features.main.addBill.AddBillSplitMethod
 import java.util.Date
 
+sealed interface AddBillSubmissionState {
+    data object Idle: AddBillSubmissionState
+    data object Loading: AddBillSubmissionState
+    data class Success(val message: String): AddBillSubmissionState
+    data class Error(val message: String): AddBillSubmissionState
+}
 data class AddBillUiState(
+    val submissionState: AddBillSubmissionState = AddBillSubmissionState.Idle,
     val isCurrentStepValid: Boolean = false,
 
     val billAmount: String = "",
     val description: String = "",
-    val category: Int? = null,
+    val category: String? = null,
     val date: Date? = null,
 
     val isGroupSplit: Boolean = false,
     val selectedGroupId: String? = null,
     val selectedFriends: List<String> = emptyList(),
 
-    val participants: List<User> = emptyList(),
+    val participants: List<Friend> = emptyList(),
     val paidByUserId: String? = null,
 
     val splitMethod: AddBillSplitMethod = AddBillSplitMethod.EQUAL,

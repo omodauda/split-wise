@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.splitwise.R
-import com.example.splitwise.model.User
+import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.components.Friend
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -25,25 +25,18 @@ import com.example.splitwise.ui.theme.SplitWiseTheme
 
 @Composable
 fun StepThree(
-    selectedParticipants: List<User>,
-    onMemberSelected: (User) -> Unit,
+    selectedParticipants: List<Friend>,
+    onMemberSelected: (Friend) -> Unit,
+    currentUserId: String?,
     modifier: Modifier = Modifier
 ) {
     val friends = listOf(
-        User(
-            id = "1",
-            name = "Sarah Johnson",
-            email = "sarah@example.com"
-        ),
-        User(
-            id = "2",
-            name = "Mike Chen",
-            email = "mike@example.com"
-        ),
-        User(
-            id = "3",
-            name = "Emma Wilson",
-            email = "emma@example.com"
+        Friend(
+            userId = "1",
+            friendshipId = "2347812",
+            fullName = "Sarah Johnson",
+            email = "sarah@example.com",
+            avatar = ""
         )
     )
 
@@ -63,10 +56,12 @@ fun StepThree(
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
             items(friends) {user ->
-                val isSelected = selectedParticipants.any {it.id == user.id}
+                val isSelected = selectedParticipants.any {it.userId == user.userId}
+                val isMe = currentUserId == user.userId
                 Friend(
                     user,
                     isSelected,
+                    isMe,
                     modifier = Modifier
                         .clickable {
                             onMemberSelected(user)
@@ -81,6 +76,6 @@ fun StepThree(
 @Composable
 fun StepThreePreview() {
     SplitWiseTheme {
-        StepThree(selectedParticipants = emptyList(), onMemberSelected = {})
+        StepThree(selectedParticipants = emptyList(), onMemberSelected = {}, currentUserId = "")
     }
 }

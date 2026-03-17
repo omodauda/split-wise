@@ -14,51 +14,37 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.splitwise.R
-import com.example.splitwise.model.User
+import com.example.splitwise.data.network.model.Friend
+import com.example.splitwise.ui.components.UserAvatar
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import com.example.splitwise.ui.theme.emerald_50
+import kotlinx.coroutines.flow.flowOf
 
 @Composable
 fun Friends(
+    friends: LazyPagingItems<Friend>,
     selectedFriends: List<String>,
-    onSelectFriend: (user: User) -> Unit,
+    currentUserId: String?,
+    onSelectFriend: (user: Friend) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val friends = listOf(
-        User(
-            id = "1",
-            name = "Sarah Johnson",
-            email = "sarah@example.com"
-        ),
-        User(
-            id = "2",
-            name = "Mike Chen",
-            email = "mike@example.com"
-        ),
-        User(
-            id = "3",
-            name = "Emma Wilson",
-            email = "emma@example.com"
-        )
-    )
     Column(
         modifier
     ) {
@@ -72,16 +58,21 @@ fun Friends(
             verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
-            items(friends) {user ->
-                val isSelected = user.id in selectedFriends
-                Friend(
-                    user,
-                    isSelected,
-                    modifier = Modifier
-                        .clickable {
-                            onSelectFriend(user)
-                        }
-                )
+            items(friends.itemCount) {index ->
+                val friend = friends[index]
+                if (friend !== null) {
+                    val isSelected = friend.userId in selectedFriends
+                    val isMe = friend.userId == currentUserId
+                    Friend(
+                        user = friend,
+                        isSelected = isSelected,
+                        isMe = isMe,
+                        modifier = Modifier
+                            .clickable {
+                                onSelectFriend(friend)
+                            }
+                    )
+                }
             }
         }
     }
@@ -89,8 +80,9 @@ fun Friends(
 
 @Composable
 fun Friend(
-    user: User,
+    user: Friend,
     isSelected: Boolean,
+    isMe: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -109,21 +101,22 @@ fun Friend(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(ComponentDimensions.iconSizeExtraLarge)
-                    .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape)
-            ) {
-                Text(
-                    text = "M",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+//            Box(
+//                contentAlignment = Alignment.Center,
+//                modifier = Modifier
+//                    .size(ComponentDimensions.iconSizeExtraLarge)
+//                    .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape)
+//            ) {
+//                Text(
+//                    text = "M",
+//                    style = MaterialTheme.typography.titleMedium,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//            }
+            UserAvatar(fullName = user.fullName, avatarUrl = user.avatar)
             Column{
                 Text(
-                    text = user.name,
+                    text = if (isMe) "You" else user.fullName,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -159,7 +152,8 @@ fun Friend(
 )
 @Composable
 fun FriendsPreview() {
+    val emptyFriends = flowOf(PagingData.empty<Friend>()).collectAsLazyPagingItems()
     SplitWiseTheme {
-        Friends(onSelectFriend = {}, selectedFriends = emptyList())
+        Friends(onSelectFriend = {}, selectedFriends = emptyList(), friends = emptyFriends, currentUserId = "")
     }
 }

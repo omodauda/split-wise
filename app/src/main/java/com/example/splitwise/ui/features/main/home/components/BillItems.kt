@@ -27,14 +27,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.OwedBill
+import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.CurrencySmall
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.emerald_200
+import com.example.splitwise.utils.formatFromCents
 
 @Composable
 fun OwedItem(
+    bill: OwedBill,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
     modifier: Modifier = Modifier
@@ -42,9 +46,9 @@ fun OwedItem(
     BillItem(
         avatarBackgroundColor = emerald_200,
         avatarContentColor = MaterialTheme.colorScheme.primary,
-        personName = "Sarah John",
+        personName = bill.user.fullName,
         descriptionText = stringResource(R.string.owes_you),
-        amountText = "$138.63",
+        amountText = formatFromCents(bill.amount),
         amountColor = MaterialTheme.colorScheme.primary,
         buttonText = R.string.settle,
         buttonContainerColor = emerald_200,
@@ -57,15 +61,16 @@ fun OwedItem(
 
 @Composable
 fun OwingItem(
+    bill: OwingBill,
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillItem(
         avatarBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         avatarContentColor = MaterialTheme.colorScheme.error,
-        personName = "David Brown",
+        personName = bill.bill.paidBy.fullName,
         descriptionText = stringResource(R.string.you_owe),
-        amountText = "$36.44",
+        amountText = formatFromCents(bill.amount),
         amountColor = MaterialTheme.colorScheme.error,
         buttonText = R.string.pay,
         buttonContainerColor = MaterialTheme.colorScheme.errorContainer,

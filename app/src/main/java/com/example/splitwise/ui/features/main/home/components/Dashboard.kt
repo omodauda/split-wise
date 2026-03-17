@@ -3,13 +3,14 @@ package com.example.splitwise.ui.features.main.home.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,24 +19,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.GetBillsDashboardResponse
+import com.example.splitwise.ui.components.AppIconTextButton
 import com.example.splitwise.ui.theme.CurrencyLarge
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.emerald_500
+import com.example.splitwise.utils.formatFromCents
+import com.valentinilk.shimmer.shimmer
 
 @Composable
 fun DashBoard(
+    isLoading: Boolean,
+    data: GetBillsDashboardResponse?,
     paddingTop: Dp,
+    onAddBill: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary)
-//            .systemBarsPadding()
-            .padding(top = paddingTop + ScreenDimensions.verticalPadding, start = Spacing.large, end = Spacing.large, bottom = ScreenDimensions.verticalPadding)
+            .padding(
+                top = paddingTop + ScreenDimensions.verticalPadding,
+                start = Spacing.large,
+                end = Spacing.large,
+                bottom = ScreenDimensions.verticalPadding
+            )
     ) {
         Text(
             text = stringResource(R.string.dashboard),
@@ -44,7 +57,9 @@ fun DashBoard(
         )
         Spacer(Modifier.height(Spacing.large))
         BalanceView(
-            title = R.string.net_balance
+            title = R.string.net_balance,
+            value = data?.netBalance ?: 0,
+            isLoading = isLoading
         )
         Spacer(Modifier.height(Spacing.large))
         Row(
@@ -55,21 +70,34 @@ fun DashBoard(
             BalanceView(
                 icon = R.drawable.arrow_down,
                 title = R.string.total_owed,
+                value = data?.totalOwed ?: 0,
+                isLoading = isLoading,
                 modifier = Modifier
                     .weight(1f)
             )
             BalanceView(
                 icon = R.drawable.arrow_up,
                 title = R.string.total_owing,
+                value = data?.totalOwing ?: 0,
+                isLoading = isLoading,
                 modifier = Modifier
                     .weight(1f)
             )
         }
+        Spacer(Modifier.height(Spacing.large))
+        AppIconTextButton(
+            leadingIcon = R.drawable.plus_icon,
+            title = stringResource(R.string.add_bill),
+            onClick = {onAddBill()},
+            containerColor = emerald_500
+        )
     }
 }
 @Composable
 fun BalanceView(
+    isLoading: Boolean,
     title: Int,
+    value: Int,
     modifier: Modifier = Modifier,
     icon: Int? = null,
 ) {
@@ -97,10 +125,23 @@ fun BalanceView(
             )
         }
         Spacer(Modifier.height(Spacing.extraSmall))
-        Text(
-            text = "$0.00",
-            style = CurrencyLarge,
-            color = MaterialTheme.colorScheme.onPrimary
-        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(28.dp)
+                    .shimmer()
+                    .background(
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
+                        shape = MaterialTheme.shapes.small
+                    )
+            )
+        } else {
+            Text(
+                text = formatFromCents(value),
+                style = CurrencyLarge,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     }
 }

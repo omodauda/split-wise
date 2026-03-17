@@ -21,6 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.OwedBill
+import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -28,29 +30,37 @@ import java.util.Locale
 
 @Composable
 fun OwedView(
+    bills: List<OwedBill>,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     BillSection(
         titleRes = R.string.you_are_owed,
         iconRes = R.drawable.arrow_down,
-        itemCount = 5,
-        itemContent = { OwedItem( openReminderModal, openRecordPaymentModal) },
+        itemCount = bills.size,
+        itemContent = { index ->
+            OwedItem(
+                bill = bills[index],
+                openReminderModal,
+                openRecordPaymentModal
+            )
+        },
         modifier = modifier
     )
 }
 
 @Composable
 fun OwingView(
+    bills: List<OwingBill>,
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
         titleRes = R.string.you_owe,
         iconRes = R.drawable.arrow_up,
-        itemCount = 1,
-        itemContent = { OwingItem(openSettleUpModal) },
+        itemCount = bills.size,
+        itemContent = {index -> OwingItem(bill = bills[index], openSettleUpModal) },
         modifier = modifier
     )
 }
@@ -69,7 +79,7 @@ private fun BillSection(
     @StringRes titleRes: Int,
     @DrawableRes iconRes: Int,
     itemCount: Int,
-    itemContent: @Composable () -> Unit,
+    itemContent: @Composable (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -91,7 +101,7 @@ private fun BillSection(
         ) {
             if (itemCount > 0) {
                 repeat(itemCount) { index ->
-                    itemContent()
+                    itemContent(index)
                     if (index < itemCount - 1) {
                         Box(
                             modifier = Modifier
