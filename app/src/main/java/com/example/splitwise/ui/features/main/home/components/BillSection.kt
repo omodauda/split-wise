@@ -59,7 +59,7 @@ fun OwingView(
     BillSection(
         titleRes = R.string.you_owe,
         iconRes = R.drawable.arrow_up,
-        itemCount = 1,
+        itemCount = bills.size,
         itemContent = {index -> OwingItem(bill = bills[index], openSettleUpModal) },
         modifier = modifier
     )
