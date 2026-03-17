@@ -3,6 +3,7 @@ package com.example.splitwise.ui.features.main.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.OwedBill
 import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.data.repository.BillsRepository
@@ -20,7 +21,10 @@ data class BillsUiState(
     val isOwedBillsLoading: Boolean = false,
 
     val owingBills: List<OwingBill> = emptyList(),
-    val isOwingBillsLoading: Boolean = false
+    val isOwingBillsLoading: Boolean = false,
+
+    val dashboardLoading: Boolean = false,
+    val billDashboard: GetBillsDashboardResponse? = null
 )
 
 class BillsViewModel(private val repo: BillsRepository): ViewModel() {
@@ -56,7 +60,24 @@ class BillsViewModel(private val repo: BillsRepository): ViewModel() {
     }
     private fun loadPreview() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isOwedBillsLoading = true, isOwingBillsLoading = true) }
+            _uiState.update { it.copy(isOwedBillsLoading = true, isOwingBillsLoading = true, dashboardLoading = true) }
+            launch {
+                repo.getBillsDashboard()
+                    .onSuccess { data ->
+                        _uiState.update {
+                            it.copy(
+                                billDashboard = data,
+                                dashboardLoading = false
+                            )}
+                    }
+                    .onFailure {
+                        _uiState.update {
+                            it.copy(
+                                dashboardLoading = false
+                            )
+                        }
+                    }
+            }
             launch {
                 repo.getOwedBillsFirstPage()
                     .onSuccess { bills ->

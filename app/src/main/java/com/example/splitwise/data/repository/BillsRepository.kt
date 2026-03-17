@@ -9,6 +9,7 @@ import com.example.splitwise.data.network.api.BillApi
 import com.example.splitwise.data.network.model.ApiError
 import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
+import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.OwedBill
 import com.example.splitwise.data.network.model.OwingBill
 import com.google.gson.Gson
@@ -87,6 +88,25 @@ class BillsRepository(private val billApi: BillApi) {
             val body = response.body()
             if (response.isSuccessful && body !== null) {
                 Result.success(body.data)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getBillsDashboard(): Result<GetBillsDashboardResponse> {
+        return try {
+            val response = billApi.getBillsDashboard()
+            val body = response.body()
+//            Log.d("dashboard", body.toString())
+            if (response.isSuccessful && body !== null) {
+                Result.success(body)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val apiError = Gson().fromJson(errorBody, ApiError::class.java)
