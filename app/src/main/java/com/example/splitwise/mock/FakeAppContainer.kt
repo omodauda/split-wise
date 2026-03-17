@@ -10,6 +10,8 @@ import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
 import com.example.splitwise.data.network.model.FriendInviteResponse
 import com.example.splitwise.data.network.model.GetFriendsResponse
+import com.example.splitwise.data.network.model.GetOwedBillsResponse
+import com.example.splitwise.data.network.model.GetOwingBillsResponse
 import com.example.splitwise.data.network.model.GetPendingInvitesResponse
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
@@ -17,7 +19,7 @@ import com.example.splitwise.data.network.model.PaginationMetaData
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.network.model.SignupRequest
 import com.example.splitwise.data.repository.AuthRepository
-import com.example.splitwise.data.repository.BillRepository
+import com.example.splitwise.data.repository.BillsRepository
 import com.example.splitwise.data.repository.FriendRepository
 import com.example.splitwise.data.repository.InviteRepository
 import com.example.splitwise.di.IAppContainer
@@ -139,6 +141,20 @@ class FakeBillApi: BillApi {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getOwedBills(
+        cursorId: String?,
+        limit: Int?
+    ): Response<GetOwedBillsResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getOwingBills(
+        cursorId: String?,
+        limit: Int?
+    ): Response<GetOwingBillsResponse> {
+        TODO("Not yet implemented")
+    }
+
 }
 
 class FakeAppContainer : IAppContainer {
@@ -161,6 +177,6 @@ class FakeAppContainer : IAppContainer {
 
     override val billApi: BillApi = FakeBillApi()
 
-    override val billRepository: BillRepository
+    override val billsRepository: BillsRepository
         get() = TODO("Not yet implemented")
 }
