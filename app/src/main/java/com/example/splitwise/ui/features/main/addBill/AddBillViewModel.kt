@@ -6,7 +6,7 @@ import com.example.splitwise.data.network.model.AuthUserData
 import com.example.splitwise.data.network.model.BillSplit
 import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.Friend
-import com.example.splitwise.data.repository.BillRepository
+import com.example.splitwise.data.repository.BillsRepository
 import com.example.splitwise.model.AddBillSubmissionState
 import com.example.splitwise.model.AddBillUiState
 import com.example.splitwise.model.SplitEntryState
@@ -19,7 +19,7 @@ import java.util.Date
 import kotlin.math.absoluteValue
 
 class AddBillViewModel(
-    private val repo: BillRepository,
+    private val repo: BillsRepository,
     private val userFlow: StateFlow<AuthUserData?>,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AddBillUiState())

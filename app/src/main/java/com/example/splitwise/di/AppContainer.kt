@@ -7,7 +7,7 @@ import com.example.splitwise.data.network.api.BillApi
 import com.example.splitwise.data.network.api.FriendApi
 import com.example.splitwise.data.network.interceptor.AuthInterceptor
 import com.example.splitwise.data.repository.AuthRepository
-import com.example.splitwise.data.repository.BillRepository
+import com.example.splitwise.data.repository.BillsRepository
 import com.example.splitwise.data.repository.FriendRepository
 import com.example.splitwise.data.repository.InviteRepository
 import okhttp3.OkHttpClient
@@ -24,7 +24,7 @@ interface IAppContainer {
  val friendRepository: FriendRepository
  val inviteRepository: InviteRepository
  val billApi: BillApi
- val billRepository: BillRepository
+ val billsRepository: BillsRepository
 }
 class AppContainerImpl(private val context: Context): IAppContainer {
 
@@ -61,5 +61,5 @@ class AppContainerImpl(private val context: Context): IAppContainer {
     override val authRepository = AuthRepository(authPreference, authApi)
     override val friendRepository = FriendRepository(friendApi)
     override val inviteRepository = InviteRepository(friendApi)
-    override val billRepository = BillRepository(billApi)
+    override val billsRepository = BillsRepository(billApi)
 }

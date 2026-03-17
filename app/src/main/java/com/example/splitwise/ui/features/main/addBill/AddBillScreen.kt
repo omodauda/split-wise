@@ -306,7 +306,7 @@ fun AddBillFooter(
 fun AddBillScreenPreview() {
     val container = FakeAppContainer()
     val authVm = AuthViewModel(repo = container.authRepository)
-    val vm = AddBillViewModel(container.billRepository, userFlow = authVm.user)
+    val vm = AddBillViewModel(container.billsRepository, userFlow = authVm.user)
     val toastHostState = rememberToastHostState()
     val navController = rememberNavController()
     SplitWiseTheme {

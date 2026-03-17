@@ -179,7 +179,7 @@ fun SuccessItem(
 fun AddBillSuccessPreview() {
     val container = FakeAppContainer()
     val authVm = AuthViewModel(repo = container.authRepository)
-    val vm = AddBillViewModel(container.billRepository, authVm.user)
+    val vm = AddBillViewModel(container.billsRepository, authVm.user)
     SplitWiseTheme {
         AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
     }
