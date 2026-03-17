@@ -4,7 +4,6 @@ import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
 import com.example.splitwise.data.network.model.GetOwedBillsResponse
 import com.example.splitwise.data.network.model.GetOwingBillsResponse
-import com.example.splitwise.data.network.model.GetPendingInvitesResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

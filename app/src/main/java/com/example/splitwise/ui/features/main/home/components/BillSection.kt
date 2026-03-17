@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.OwedBill
+import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -51,6 +52,7 @@ fun OwedView(
 
 @Composable
 fun OwingView(
+    bills: List<OwingBill>,
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -58,7 +60,7 @@ fun OwingView(
         titleRes = R.string.you_owe,
         iconRes = R.drawable.arrow_up,
         itemCount = 1,
-        itemContent = { OwingItem(openSettleUpModal) },
+        itemContent = {index -> OwingItem(bill = bills[index], openSettleUpModal) },
         modifier = modifier
     )
 }

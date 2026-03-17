@@ -25,10 +25,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.OwedBill
+import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.features.main.friends.FriendViewModel
 import com.example.splitwise.ui.features.main.home.components.BillSectionShimmer
 import com.example.splitwise.ui.features.main.home.components.DashBoard
+import com.example.splitwise.ui.features.main.home.components.EmptyBillView
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
 import com.example.splitwise.ui.features.main.home.components.PendingInvites
@@ -81,33 +83,35 @@ fun HomeScreen(
         ) {
             DashBoard(
                 paddingTop = innerPadding.calculateTopPadding(),
-                onAddBill = {goToAddBill()},
+                onAddBill = { goToAddBill() },
             )
             ContentView(
                 owedLoading = billsUiState.isOwedBillsLoading,
                 owedBills = billsUiState.owedBills,
-                openRecordPaymentModal = {showRecordPaymentModal = true},
-                openReminderModal = {showBottomSheet = true},
-                openSettleUpModal = {showSettleUpModal = true},
+                owingLoading = billsUiState.isOwingBillsLoading,
+                owingBills = billsUiState.owingBills,
+                openRecordPaymentModal = { showRecordPaymentModal = true },
+                openReminderModal = { showBottomSheet = true },
+                openSettleUpModal = { showSettleUpModal = true },
                 modifier = Modifier
                     .weight(1f)
             )
             if (showBottomSheet) {
                 ReminderModal(
                     sheetState,
-                    onDismissRequest = {showBottomSheet = false}
+                    onDismissRequest = { showBottomSheet = false }
                 )
             }
             if (showRecordPaymentModal) {
                 RecordPaymentModal(
                     sheetState = recordPaymentModalState,
-                    onDismissRequest = {showRecordPaymentModal = false}
+                    onDismissRequest = { showRecordPaymentModal = false }
                 )
             }
             if (showSettleUpModal) {
                 SettleUpModal(
                     sheetState = settleUpModalState,
-                    onDismissRequest = {showSettleUpModal = false}
+                    onDismissRequest = { showSettleUpModal = false }
                 )
             }
 
@@ -120,10 +124,12 @@ fun HomeScreen(
                             invites.refresh()
                             friends.refresh()
                         }
-                     },
-                    onDecline = {inviteViewModel.declineInvite(it) {
-                        invites.refresh()
-                    } },
+                    },
+                    onDecline = {
+                        inviteViewModel.declineInvite(it) {
+                            invites.refresh()
+                        }
+                    },
                 )
             }
         }
@@ -134,11 +140,16 @@ fun HomeScreen(
 fun ContentView(
     owedLoading: Boolean,
     owedBills: List<OwedBill>,
+    owingLoading: Boolean,
+    owingBills: List<OwingBill>,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isOverAllLoading = owedLoading || owingLoading
+    val isEmpty = !isOverAllLoading && owedBills.isEmpty() && owingBills.isEmpty()
+
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -149,22 +160,40 @@ fun ContentView(
             )
     ) {
         Spacer(Modifier.height(Spacing.medium))
-//        EmptyBillView(
-//            onAddBill,
-//            modifier = Modifier
-//                .weight(1f)
-//        )
-       if (owedLoading) {
-           BillSectionShimmer(
-               titleRes = R.string.you_are_owed,
-               iconRes = R.drawable.arrow_down,
-               itemCount = 5,
-           )
-       } else {
-           OwedView(openReminderModal = {openReminderModal()}, openRecordPaymentModal = {openRecordPaymentModal()}, bills = owedBills)
-       }
-        Spacer(Modifier.height(Spacing.large))
-        OwingView(openSettleUpModal)
+        when {
+            isEmpty -> {
+                EmptyBillView(
+                    modifier = Modifier
+                        .weight(1f)
+                )
+            }
+
+            else -> {
+                if (owedLoading) {
+                    BillSectionShimmer(
+                        titleRes = R.string.you_are_owed,
+                        iconRes = R.drawable.arrow_down,
+                        itemCount = 5,
+                    )
+                } else if (owedBills.isNotEmpty()) {
+                    OwedView(
+                        openReminderModal = { openReminderModal() },
+                        openRecordPaymentModal = { openRecordPaymentModal() },
+                        bills = owedBills
+                    )
+                }
+                Spacer(Modifier.height(Spacing.large))
+                if (owingLoading) {
+                    BillSectionShimmer(
+                        titleRes = R.string.you_owe,
+                        iconRes = R.drawable.arrow_up,
+                        itemCount = 5,
+                    )
+                } else if (owingBills.isNotEmpty()) {
+                    OwingView(bills = owingBills, openSettleUpModal)
+                }
+            }
+        }
         Spacer(Modifier.height(Spacing.large))
     }
 }
@@ -187,6 +216,6 @@ fun HomeScreenPreview() {
     val billsViewModel = BillsViewModel(container.billsRepository)
 
     SplitWiseTheme {
-        HomeScreen(goToAddBill = {}, inviteVm, friendViewModel = friendVm, billsViewModel )
+        HomeScreen(goToAddBill = {}, inviteVm, friendViewModel = friendVm, billsViewModel)
     }
 }

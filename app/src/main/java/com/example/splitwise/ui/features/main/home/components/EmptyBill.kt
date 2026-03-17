@@ -28,7 +28,7 @@ import com.example.splitwise.ui.theme.Spacing
 
 @Composable
 fun EmptyBillView(
-    onAddBill: () -> Unit,
+//    onAddBill: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -63,12 +63,12 @@ fun EmptyBillView(
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(Spacing.large))
-        AppIconTextButton(
-            leadingIcon = R.drawable.plus_icon,
-            title = stringResource(R.string.add_first_bill),
-            onClick = {onAddBill()},
-            modifier = Modifier
-                .width(203.dp)
-        )
+//        AppIconTextButton(
+//            leadingIcon = R.drawable.plus_icon,
+//            title = stringResource(R.string.add_first_bill),
+//            onClick = {onAddBill()},
+//            modifier = Modifier
+//                .width(203.dp)
+//        )
     }
 }

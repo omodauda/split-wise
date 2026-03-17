@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.OwedBill
+import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.ui.theme.ComponentDimensions
 import com.example.splitwise.ui.theme.CurrencySmall
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -61,15 +62,16 @@ fun OwedItem(
 
 @Composable
 fun OwingItem(
+    bill: OwingBill,
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillItem(
         avatarBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         avatarContentColor = MaterialTheme.colorScheme.error,
-        personName = "David Brown",
+        personName = bill.bill.paidBy.fullName,
         descriptionText = stringResource(R.string.you_owe),
-        amountText = "$36.44",
+        amountText = formatFromCents(bill.amount),
         amountColor = MaterialTheme.colorScheme.error,
         buttonText = R.string.pay,
         buttonContainerColor = MaterialTheme.colorScheme.errorContainer,
