@@ -48,3 +48,9 @@ data class Bill(
     val id: String,
     val paidBy: User
 )
+
+data class GetBillsDashboardResponse(
+    val totalOwed: Int,
+    val totalOwing: Int,
+    val netBalance: Int
+)
