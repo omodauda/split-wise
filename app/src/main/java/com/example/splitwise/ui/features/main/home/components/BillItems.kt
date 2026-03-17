@@ -34,7 +34,6 @@ import com.example.splitwise.ui.theme.CurrencySmall
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.emerald_200
-import com.example.splitwise.utils.formatAsCurrency
 import com.example.splitwise.utils.formatFromCents
 
 @Composable

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 class AddBillViewModel(
     private val repo: BillsRepository,
@@ -367,7 +368,7 @@ class AddBillViewModel(
                 splits = state.splitEntries.map { entry ->
                     BillSplit(
                         userId = entry.user.userId,
-                        amount = entry.amount.toInt(),
+                        amount = (entry.amount * 100).roundToInt(),
                         percentage = entry.percentage
                     )
                 }

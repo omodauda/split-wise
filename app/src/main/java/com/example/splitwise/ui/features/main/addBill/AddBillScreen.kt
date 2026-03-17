@@ -52,6 +52,7 @@ import com.example.splitwise.ui.features.main.addBill.components.stepSeven.StepS
 import com.example.splitwise.ui.features.main.addBill.components.stepSix.StepSix
 import com.example.splitwise.ui.features.main.addBill.components.stepThree.StepThree
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.StepTwo
+import com.example.splitwise.ui.features.main.home.BillsViewModel
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -64,6 +65,7 @@ fun AddBillScreen(
     goBack: () -> Unit,
     goToAddBillSuccess: () -> Unit,
     addBillViewModel: AddBillViewModel,
+    billsViewModel: BillsViewModel,
     currentUserId: String?,
     toastHostState: ToastHostState,
     modifier: Modifier = Modifier
@@ -84,6 +86,7 @@ fun AddBillScreen(
                 // LoadingView is handled in the UI body below
             }
             is AddBillSubmissionState.Success -> {
+                billsViewModel.refresh()
                 goToAddBillSuccess()
             }
             is AddBillSubmissionState.Error -> {
@@ -307,9 +310,10 @@ fun AddBillScreenPreview() {
     val container = FakeAppContainer()
     val authVm = AuthViewModel(repo = container.authRepository)
     val vm = AddBillViewModel(container.billsRepository, userFlow = authVm.user)
+    val billsVm = BillsViewModel(container.billsRepository)
     val toastHostState = rememberToastHostState()
     val navController = rememberNavController()
     SplitWiseTheme {
-        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm, toastHostState = toastHostState, rootNavController = navController, currentUserId = "")
+        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm, toastHostState = toastHostState, rootNavController = navController, currentUserId = "", billsViewModel = billsVm)
     }
 }

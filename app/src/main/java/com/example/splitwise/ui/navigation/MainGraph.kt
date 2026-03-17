@@ -76,6 +76,10 @@ fun NavGraphBuilder.mainNavGraph(
                 viewModelStoreOwner = parentEntry,
                 factory = AddBillViewModelFactory(billsRepository = application.appContainer.billsRepository, authViewModel.user)
             )
+            val billsViewModel: BillsViewModel = viewModel(
+                viewModelStoreOwner = parentEntry,
+                factory = BillsViewModelFactory(application.appContainer.billsRepository)
+            )
             AddBillScreen(
                 rootNavController = navController,
                 goBack = {
@@ -87,8 +91,8 @@ fun NavGraphBuilder.mainNavGraph(
                 },
                 addBillViewModel,
                 currentUserId = currentUser?.id,
-                toastHostState,
-
+                billsViewModel = billsViewModel,
+                toastHostState = toastHostState,
             )
         }
         composable( route = Screen.AddBillSuccess.route){
