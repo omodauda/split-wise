@@ -2,6 +2,7 @@ package com.example.splitwise.data.network.api
 
 import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
+import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.GetOwedBillsResponse
 import com.example.splitwise.data.network.model.GetOwingBillsResponse
 import retrofit2.Response
@@ -28,4 +29,6 @@ interface BillApi {
         @Query("limit") limit: Int?
     ): Response<GetOwingBillsResponse>
 
+    @GET("bill/dashboard")
+    suspend fun getBillsDashboard(): Response<GetBillsDashboardResponse>
 }
