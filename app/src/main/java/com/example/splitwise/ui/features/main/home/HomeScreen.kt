@@ -84,6 +84,8 @@ fun HomeScreen(
             DashBoard(
                 paddingTop = innerPadding.calculateTopPadding(),
                 onAddBill = { goToAddBill() },
+                data = billsUiState.billDashboard,
+                isLoading = billsUiState.dashboardLoading
             )
             ContentView(
                 owedLoading = billsUiState.isOwedBillsLoading,
