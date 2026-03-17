@@ -23,8 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.splitwise.R
+import com.example.splitwise.data.network.model.OwedBill
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.ui.features.main.friends.FriendViewModel
+import com.example.splitwise.ui.features.main.home.components.BillSectionShimmer
 import com.example.splitwise.ui.features.main.home.components.DashBoard
 import com.example.splitwise.ui.features.main.home.components.OwedView
 import com.example.splitwise.ui.features.main.home.components.OwingView
@@ -43,11 +46,14 @@ fun HomeScreen(
     goToAddBill: () -> Unit,
     inviteViewModel: InviteViewModel,
     friendViewModel: FriendViewModel,
+    billsViewModel: BillsViewModel,
     modifier: Modifier = Modifier
 ) {
     val invites = inviteViewModel.inviteFlow.collectAsLazyPagingItems()
 
     val friends = friendViewModel.friendsPagingData.collectAsLazyPagingItems()
+
+    val billsUiState by billsViewModel.uiState.collectAsStateWithLifecycle()
 
     val showInviteDialog by inviteViewModel.showDialog.collectAsStateWithLifecycle()
 
@@ -78,6 +84,8 @@ fun HomeScreen(
                 onAddBill = {goToAddBill()},
             )
             ContentView(
+                owedLoading = billsUiState.isOwedBillsLoading,
+                owedBills = billsUiState.owedBills,
                 openRecordPaymentModal = {showRecordPaymentModal = true},
                 openReminderModal = {showBottomSheet = true},
                 openSettleUpModal = {showSettleUpModal = true},
@@ -124,6 +132,8 @@ fun HomeScreen(
 
 @Composable
 fun ContentView(
+    owedLoading: Boolean,
+    owedBills: List<OwedBill>,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
     openSettleUpModal: () -> Unit,
@@ -132,7 +142,11 @@ fun ContentView(
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
-            .padding(start = ScreenDimensions.sectionSpacing, end = ScreenDimensions.sectionSpacing, top = ScreenDimensions.verticalPadding)
+            .padding(
+                start = ScreenDimensions.sectionSpacing,
+                end = ScreenDimensions.sectionSpacing,
+                top = ScreenDimensions.verticalPadding
+            )
     ) {
         Spacer(Modifier.height(Spacing.medium))
 //        EmptyBillView(
@@ -140,7 +154,15 @@ fun ContentView(
 //            modifier = Modifier
 //                .weight(1f)
 //        )
-        OwedView(openReminderModal = {openReminderModal()}, openRecordPaymentModal = {openRecordPaymentModal()})
+       if (owedLoading) {
+           BillSectionShimmer(
+               titleRes = R.string.you_are_owed,
+               iconRes = R.drawable.arrow_down,
+               itemCount = 5,
+           )
+       } else {
+           OwedView(openReminderModal = {openReminderModal()}, openRecordPaymentModal = {openRecordPaymentModal()}, bills = owedBills)
+       }
         Spacer(Modifier.height(Spacing.large))
         OwingView(openSettleUpModal)
         Spacer(Modifier.height(Spacing.large))
@@ -162,8 +184,9 @@ fun HomeScreenPreview() {
     val container = FakeAppContainer()
     val inviteVm = InviteViewModel(container.inviteRepository)
     val friendVm = FriendViewModel(container.friendRepository)
+    val billsViewModel = BillsViewModel(container.billsRepository)
 
     SplitWiseTheme {
-        HomeScreen(goToAddBill = {}, inviteVm, friendViewModel = friendVm )
+        HomeScreen(goToAddBill = {}, inviteVm, friendViewModel = friendVm, billsViewModel )
     }
 }

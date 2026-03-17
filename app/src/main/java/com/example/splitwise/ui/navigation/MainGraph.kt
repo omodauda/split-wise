@@ -23,6 +23,8 @@ import com.example.splitwise.ui.features.main.addBill.AddBillViewModelFactory
 import com.example.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
 import com.example.splitwise.ui.features.main.friends.FriendViewModel
 import com.example.splitwise.ui.features.main.friends.FriendViewModelFactory
+import com.example.splitwise.ui.features.main.home.BillsViewModel
+import com.example.splitwise.ui.features.main.home.BillsViewModelFactory
 import com.example.splitwise.ui.features.main.invites.InviteViewModel
 import com.example.splitwise.ui.features.main.invites.InviteViewModelFactory
 
@@ -50,11 +52,17 @@ fun NavGraphBuilder.mainNavGraph(
             val inviteViewModel: InviteViewModel = viewModel(
                 factory = InviteViewModelFactory(inviteRepository = application.appContainer.inviteRepository)
             )
+
+            val billsViewModel: BillsViewModel = viewModel(
+                viewModelStoreOwner = parentEntry,
+                factory = BillsViewModelFactory(application.appContainer.billsRepository)
+            )
             HomeBottomTab(
                 navController,
                 authViewModel,
                 inviteViewModel,
                 friendViewModel,
+                billsViewModel,
                 toastHostState
             )
         }
@@ -66,7 +74,7 @@ fun NavGraphBuilder.mainNavGraph(
             }
             val addBillViewModel: AddBillViewModel = viewModel(
                 viewModelStoreOwner = parentEntry,
-                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository, authViewModel.user)
+                factory = AddBillViewModelFactory(billsRepository = application.appContainer.billsRepository, authViewModel.user)
             )
             AddBillScreen(
                 rootNavController = navController,
@@ -90,7 +98,7 @@ fun NavGraphBuilder.mainNavGraph(
             val application = LocalContext.current.applicationContext as SplitWiseApplication
             val addBillViewModel: AddBillViewModel = viewModel(
                 viewModelStoreOwner = parentEntry,
-                factory = AddBillViewModelFactory(billRepository = application.appContainer.billRepository, authViewModel.user)
+                factory = AddBillViewModelFactory(billsRepository = application.appContainer.billsRepository, authViewModel.user)
             )
 
             AddBillSuccessScreen(
