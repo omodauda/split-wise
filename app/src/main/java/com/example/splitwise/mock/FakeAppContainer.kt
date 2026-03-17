@@ -9,6 +9,7 @@ import com.example.splitwise.data.network.model.AuthUserData
 import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
 import com.example.splitwise.data.network.model.FriendInviteResponse
+import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.GetFriendsResponse
 import com.example.splitwise.data.network.model.GetOwedBillsResponse
 import com.example.splitwise.data.network.model.GetOwingBillsResponse
@@ -152,6 +153,10 @@ class FakeBillApi: BillApi {
         cursorId: String?,
         limit: Int?
     ): Response<GetOwingBillsResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getBillsDashboard(): Response<GetBillsDashboardResponse> {
         TODO("Not yet implemented")
     }
 
