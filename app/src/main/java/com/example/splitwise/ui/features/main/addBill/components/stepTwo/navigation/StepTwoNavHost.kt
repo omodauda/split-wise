@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.model.AddBillUiState
-import com.example.splitwise.model.User
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.components.Friends
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.components.Groups
 import com.example.splitwise.ui.features.main.friends.FriendViewModel

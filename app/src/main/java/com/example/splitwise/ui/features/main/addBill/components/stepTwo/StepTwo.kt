@@ -22,7 +22,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.model.AddBillUiState
-import com.example.splitwise.model.User
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.navigation.StepTwoDestination
 import com.example.splitwise.ui.features.main.addBill.components.stepTwo.navigation.StepTwoNavHost
 import com.example.splitwise.ui.theme.Spacing

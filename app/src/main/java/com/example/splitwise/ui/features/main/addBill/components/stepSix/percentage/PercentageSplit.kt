@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.Friend
 import com.example.splitwise.model.SplitEntryState
-import com.example.splitwise.model.User
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.UserAvatar
 import com.example.splitwise.ui.theme.ComponentDimensions
