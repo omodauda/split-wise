@@ -40,8 +40,9 @@ fun OwedView(
         iconRes = R.drawable.arrow_down,
         itemCount = bills.size,
         itemContent = { index ->
+            val bill = bills[index]
             OwedItem(
-                bill = bills[index],
+                bill = bill,
                 openReminderModal,
                 openRecordPaymentModal
             )
@@ -53,14 +54,19 @@ fun OwedView(
 @Composable
 fun OwingView(
     bills: List<OwingBill>,
-    openSettleUpModal: () -> Unit,
+    openSettleUpModal: (OwingBill) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
         titleRes = R.string.you_owe,
         iconRes = R.drawable.arrow_up,
         itemCount = bills.size,
-        itemContent = {index -> OwingItem(bill = bills[index], openSettleUpModal) },
+        itemContent = { index ->
+            val bill = bills[index]
+            OwingItem(
+                bill = bill,
+                openSettleUpModal = { openSettleUpModal(bill) })
+        },
         modifier = modifier
     )
 }

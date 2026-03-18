@@ -43,12 +43,13 @@ fun OwedItem(
     openRecordPaymentModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val billAmount = bill.amount - bill.paidAmount
     BillItem(
         avatarBackgroundColor = emerald_200,
         avatarContentColor = MaterialTheme.colorScheme.primary,
         personName = bill.user.fullName,
         descriptionText = stringResource(R.string.owes_you),
-        amountText = formatFromCents(bill.amount),
+        amountText = formatFromCents(billAmount),
         amountColor = MaterialTheme.colorScheme.primary,
         buttonText = R.string.settle,
         buttonContainerColor = emerald_200,
@@ -65,12 +66,13 @@ fun OwingItem(
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val billAmount = bill.amount - bill.paidAmount
     BillItem(
         avatarBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         avatarContentColor = MaterialTheme.colorScheme.error,
         personName = bill.bill.paidBy.fullName,
         descriptionText = stringResource(R.string.you_owe),
-        amountText = formatFromCents(bill.amount),
+        amountText = formatFromCents(billAmount),
         amountColor = MaterialTheme.colorScheme.error,
         buttonText = R.string.pay,
         buttonContainerColor = MaterialTheme.colorScheme.errorContainer,
@@ -92,8 +94,8 @@ private fun BillItem(
     buttonContainerColor: Color,
     buttonContentColor: Color,
     actOnBill: () -> Unit,
-    sendReminder: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    sendReminder: (() -> Unit)? = null,
 ) {
     val avatarText = personName[0].uppercase()
     Row(
