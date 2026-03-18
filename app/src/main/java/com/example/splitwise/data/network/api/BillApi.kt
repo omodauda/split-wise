@@ -5,6 +5,8 @@ import com.example.splitwise.data.network.model.CreateBillResponse
 import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.GetOwedBillsResponse
 import com.example.splitwise.data.network.model.GetOwingBillsResponse
+import com.example.splitwise.data.network.model.PayBillRequest
+import com.example.splitwise.data.network.model.PayBillResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,4 +33,10 @@ interface BillApi {
 
     @GET("bill/dashboard")
     suspend fun getBillsDashboard(): Response<GetBillsDashboardResponse>
+
+    @POST("bill/pay")
+    suspend fun payBill(
+        @Body request: PayBillRequest
+    ): Response<PayBillResponse>
+
 }
