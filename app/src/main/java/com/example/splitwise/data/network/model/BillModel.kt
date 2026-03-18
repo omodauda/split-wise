@@ -19,7 +19,6 @@ data class BillSplit(
 data class CreateBillResponse(
     val message: String
 )
-
 data class GetOwedBillsResponse(
     val data: List<OwedBill>,
     val meta: PaginationMetaData
@@ -27,6 +26,7 @@ data class GetOwedBillsResponse(
 data class OwedBill(
     val id: String,
     val amount: Int,
+    val paidAmount: Int,
     val user: User
 )
 data class User(
@@ -34,7 +34,6 @@ data class User(
     val fullName: String,
     val avatar: String?
 )
-
 data class GetOwingBillsResponse(
     val data: List<OwingBill>,
     val meta: PaginationMetaData
@@ -42,15 +41,24 @@ data class GetOwingBillsResponse(
 data class OwingBill(
     val id: String,
     val amount: Int,
+    val paidAmount: Int,
     val bill: Bill
 )
 data class Bill(
     val id: String,
     val paidBy: User
 )
-
 data class GetBillsDashboardResponse(
     val totalOwed: Int,
     val totalOwing: Int,
     val netBalance: Int
+)
+data class PayBillRequest(
+    val splitId: String,
+    val idempotencyKey: String,
+    val amount: Int,
+    val method: String
+)
+data class PayBillResponse(
+    val message: String
 )
