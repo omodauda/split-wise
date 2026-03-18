@@ -17,6 +17,8 @@ import com.example.splitwise.data.network.model.GetPendingInvitesResponse
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
 import com.example.splitwise.data.network.model.PaginationMetaData
+import com.example.splitwise.data.network.model.PayBillRequest
+import com.example.splitwise.data.network.model.PayBillResponse
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.network.model.SignupRequest
 import com.example.splitwise.data.repository.AuthRepository
@@ -157,6 +159,10 @@ class FakeBillApi: BillApi {
     }
 
     override suspend fun getBillsDashboard(): Response<GetBillsDashboardResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun payBill(request: PayBillRequest): Response<PayBillResponse> {
         TODO("Not yet implemented")
     }
 
