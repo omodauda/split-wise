@@ -32,7 +32,7 @@ import java.util.Locale
 fun OwedView(
     bills: List<OwedBill>,
     openReminderModal: () -> Unit,
-    openRecordPaymentModal: () -> Unit,
+    openRecordPaymentModal: (OwedBill) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
@@ -44,7 +44,7 @@ fun OwedView(
             OwedItem(
                 bill = bill,
                 openReminderModal,
-                openRecordPaymentModal
+                openRecordPaymentModal = {openRecordPaymentModal(bill)}
             )
         },
         modifier = modifier
