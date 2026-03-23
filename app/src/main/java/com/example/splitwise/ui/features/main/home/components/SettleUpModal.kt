@@ -1,6 +1,5 @@
 package com.example.splitwise.ui.features.main.home.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +12,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,7 +67,7 @@ fun SettleUpModalContent(
 ) {
     var settlementAmount by remember { mutableStateOf("") }
     val paymentMethods = listOf(R.string.cash, R.string.bank_transfer)
-    var selectedPaymentMethod by remember { mutableStateOf(paymentMethods[0]) }
+    var selectedPaymentMethod by remember { mutableIntStateOf(paymentMethods[0]) }
 
     val remainingAmount = if (bill !== null) {
         bill.amount - bill.paidAmount
@@ -80,7 +80,6 @@ fun SettleUpModalContent(
             amount = ((settlementAmount.toDoubleOrNull() ?: 0.0) * 100).roundToInt(),
             method = if (selectedPaymentMethod == R.string.cash) "Cash" else "BankTransfer"
         )
-        Log.d("pay", payload.toString())
         payBill(payload)
     }
 
