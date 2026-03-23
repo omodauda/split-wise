@@ -70,6 +70,7 @@ fun HomeScreen(
 
     val recordPaymentModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showRecordPaymentModal by remember { mutableStateOf(false) }
+    var selectedOwedBill by remember { mutableStateOf<OwedBill?>(null) }
 
     val settleUpModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSettleUpModal by remember { mutableStateOf(false) }
@@ -88,6 +89,8 @@ fun HomeScreen(
             is PayBillSubmissionState.Success -> {
                 showSettleUpModal = false
                 selectedOwingBill = null
+                showRecordPaymentModal = false
+                selectedOwedBill = null
                 toastHostState.showToast(
                     ToastState(message = state.message, type = ToastType.SUCCESS)
                 )
@@ -125,7 +128,10 @@ fun HomeScreen(
                 owedBills = billsUiState.owedBills,
                 owingLoading = billsUiState.isOwingBillsLoading,
                 owingBills = billsUiState.owingBills,
-                openRecordPaymentModal = { showRecordPaymentModal = true },
+                openRecordPaymentModal = { bill ->
+                    selectedOwedBill = bill
+                    showRecordPaymentModal = true }
+                ,
                 openReminderModal = { showBottomSheet = true },
                 openSettleUpModal = { bill ->
                     selectedOwingBill = bill
@@ -143,7 +149,12 @@ fun HomeScreen(
             if (showRecordPaymentModal) {
                 RecordPaymentModal(
                     sheetState = recordPaymentModalState,
-                    onDismissRequest = { showRecordPaymentModal = false }
+                    onDismissRequest = {
+                        showRecordPaymentModal = false
+                        selectedOwedBill = null
+                    },
+                    bill = selectedOwedBill,
+                    settleBill = {data -> billsViewModel.settleBill(data)}
                 )
             }
             if (showSettleUpModal) {
@@ -190,7 +201,7 @@ fun ContentView(
     owingLoading: Boolean,
     owingBills: List<OwingBill>,
     openReminderModal: () -> Unit,
-    openRecordPaymentModal: () -> Unit,
+    openRecordPaymentModal: (OwedBill) -> Unit,
     openSettleUpModal: (OwingBill) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -225,7 +236,7 @@ fun ContentView(
                 } else if (owedBills.isNotEmpty()) {
                     OwedView(
                         openReminderModal = { openReminderModal() },
-                        openRecordPaymentModal = { openRecordPaymentModal() },
+                        openRecordPaymentModal = openRecordPaymentModal,
                         bills = owedBills
                     )
                 }
