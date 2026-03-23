@@ -39,4 +39,9 @@ interface BillApi {
         @Body request: PayBillRequest
     ): Response<PayBillResponse>
 
+    @POST("bill/settle")
+    suspend fun settleBill(
+        @Body request: PayBillRequest
+    ): Response<PayBillResponse>
+
 }

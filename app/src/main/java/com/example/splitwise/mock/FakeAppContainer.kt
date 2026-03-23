@@ -166,6 +166,10 @@ class FakeBillApi: BillApi {
         TODO("Not yet implemented")
     }
 
+    override suspend fun settleBill(request: PayBillRequest): Response<PayBillResponse> {
+        TODO("Not yet implemented")
+    }
+
 }
 
 class FakeAppContainer : IAppContainer {
