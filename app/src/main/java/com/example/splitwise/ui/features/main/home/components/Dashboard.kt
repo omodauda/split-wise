@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.ui.components.AppIconTextButton
-import com.example.splitwise.ui.theme.CurrencyLarge
+import com.example.splitwise.ui.theme.CurrencyMedium
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -139,7 +138,7 @@ fun BalanceView(
         } else {
             Text(
                 text = formatFromCents(value),
-                style = CurrencyLarge,
+                style = CurrencyMedium,
                 color = MaterialTheme.colorScheme.onPrimary
             )
         }

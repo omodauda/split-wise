@@ -6,6 +6,7 @@ import androidx.paging.cachedIn
 import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.OwedBill
 import com.example.splitwise.data.network.model.OwingBill
+import com.example.splitwise.data.network.model.PayBillRequest
 import com.example.splitwise.data.repository.BillsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,6 +17,13 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+sealed interface PayBillSubmissionState {
+    data object Idle : PayBillSubmissionState
+    data object Loading : PayBillSubmissionState
+    data class Error(val message: String) : PayBillSubmissionState
+    data class Success(val message: String) : PayBillSubmissionState
+}
+
 data class BillsUiState(
     val owedBills: List<OwedBill> = emptyList(),
     val isOwedBillsLoading: Boolean = false,
@@ -24,12 +32,15 @@ data class BillsUiState(
     val isOwingBillsLoading: Boolean = false,
 
     val dashboardLoading: Boolean = false,
-    val billDashboard: GetBillsDashboardResponse? = null
+    val billDashboard: GetBillsDashboardResponse? = null,
+
+    val billActionState: PayBillSubmissionState = PayBillSubmissionState.Idle,
 )
 
-class BillsViewModel(private val repo: BillsRepository): ViewModel() {
+class BillsViewModel(private val repo: BillsRepository) : ViewModel() {
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
+
     // Paginated bills
     @OptIn(ExperimentalCoroutinesApi::class)
     val paginatedOwedBills = refreshTrigger
@@ -58,9 +69,16 @@ class BillsViewModel(private val repo: BillsRepository): ViewModel() {
             refreshTrigger.emit(Unit)
         }
     }
+
     private fun loadPreview() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isOwedBillsLoading = true, isOwingBillsLoading = true, dashboardLoading = true) }
+            _uiState.update {
+                it.copy(
+                    isOwedBillsLoading = true,
+                    isOwingBillsLoading = true,
+                    dashboardLoading = true
+                )
+            }
             launch {
                 repo.getBillsDashboard()
                     .onSuccess { data ->
@@ -68,7 +86,8 @@ class BillsViewModel(private val repo: BillsRepository): ViewModel() {
                             it.copy(
                                 billDashboard = data,
                                 dashboardLoading = false
-                            )}
+                            )
+                        }
                     }
                     .onFailure {
                         _uiState.update {
@@ -114,6 +133,46 @@ class BillsViewModel(private val repo: BillsRepository): ViewModel() {
                         }
                     }
             }
+        }
+    }
+
+    fun payBill(data: PayBillRequest) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(billActionState = PayBillSubmissionState.Loading) }
+            val result = repo.payBill(data)
+            result.onSuccess { message ->
+                refresh()
+                _uiState.update { it.copy(billActionState = PayBillSubmissionState.Success(message)) }
+            }
+                .onFailure { exception ->
+                    _uiState.update {
+                        it.copy(
+                            billActionState = PayBillSubmissionState.Error(
+                                exception.message ?: "An error occurred"
+                            )
+                        )
+                    }
+                }
+        }
+    }
+
+    fun settleBill(data: PayBillRequest) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(billActionState = PayBillSubmissionState.Loading) }
+            val result = repo.settleBill(data)
+            result.onSuccess { message ->
+                refresh()
+                _uiState.update { it.copy(billActionState = PayBillSubmissionState.Success(message)) }
+            }
+                .onFailure { exception ->
+                    _uiState.update {
+                        it.copy(
+                            billActionState = PayBillSubmissionState.Error(
+                                exception.message ?: "An error occurred"
+                            )
+                        )
+                    }
+                }
         }
     }
 

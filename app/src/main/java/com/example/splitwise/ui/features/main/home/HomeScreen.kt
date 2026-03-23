@@ -27,6 +27,11 @@ import com.example.splitwise.R
 import com.example.splitwise.data.network.model.OwedBill
 import com.example.splitwise.data.network.model.OwingBill
 import com.example.splitwise.mock.FakeAppContainer
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
 import com.example.splitwise.ui.features.main.friends.FriendViewModel
 import com.example.splitwise.ui.features.main.home.components.BillSectionShimmer
 import com.example.splitwise.ui.features.main.home.components.DashBoard
@@ -49,6 +54,7 @@ fun HomeScreen(
     inviteViewModel: InviteViewModel,
     friendViewModel: FriendViewModel,
     billsViewModel: BillsViewModel,
+    toastHostState: ToastHostState,
     modifier: Modifier = Modifier
 ) {
     val invites = inviteViewModel.inviteFlow.collectAsLazyPagingItems()
@@ -59,18 +65,48 @@ fun HomeScreen(
 
     val showInviteDialog by inviteViewModel.showDialog.collectAsStateWithLifecycle()
 
-    LaunchedEffect(invites) {
-        inviteViewModel.monitorLoadState(invites)
-    }
-
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val recordPaymentModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showRecordPaymentModal by remember { mutableStateOf(false) }
+    var selectedOwedBill by remember { mutableStateOf<OwedBill?>(null) }
 
     val settleUpModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSettleUpModal by remember { mutableStateOf(false) }
+    var selectedOwingBill by remember { mutableStateOf<OwingBill?>(null) }
+
+    LaunchedEffect(invites) {
+        inviteViewModel.monitorLoadState(invites)
+    }
+
+    LaunchedEffect(billsUiState.billActionState) {
+        when (val state = billsUiState.billActionState) {
+            is PayBillSubmissionState.Loading -> {
+                // LoadingView is handled in the UI body below
+            }
+
+            is PayBillSubmissionState.Success -> {
+                showSettleUpModal = false
+                selectedOwingBill = null
+                showRecordPaymentModal = false
+                selectedOwedBill = null
+                toastHostState.showToast(
+                    ToastState(message = state.message, type = ToastType.SUCCESS)
+                )
+            }
+
+            is PayBillSubmissionState.Error -> {
+                toastHostState.showToast(
+                    ToastState(message = state.message, type = ToastType.ERROR)
+                )
+            }
+
+            else -> {}
+        }
+    }
+
+
 
     Scaffold(
         modifier = modifier
@@ -92,9 +128,15 @@ fun HomeScreen(
                 owedBills = billsUiState.owedBills,
                 owingLoading = billsUiState.isOwingBillsLoading,
                 owingBills = billsUiState.owingBills,
-                openRecordPaymentModal = { showRecordPaymentModal = true },
+                openRecordPaymentModal = { bill ->
+                    selectedOwedBill = bill
+                    showRecordPaymentModal = true }
+                ,
                 openReminderModal = { showBottomSheet = true },
-                openSettleUpModal = { showSettleUpModal = true },
+                openSettleUpModal = { bill ->
+                    selectedOwingBill = bill
+                    showSettleUpModal = true
+                },
                 modifier = Modifier
                     .weight(1f)
             )
@@ -107,14 +149,28 @@ fun HomeScreen(
             if (showRecordPaymentModal) {
                 RecordPaymentModal(
                     sheetState = recordPaymentModalState,
-                    onDismissRequest = { showRecordPaymentModal = false }
+                    onDismissRequest = {
+                        showRecordPaymentModal = false
+                        selectedOwedBill = null
+                    },
+                    bill = selectedOwedBill,
+                    settleBill = {data -> billsViewModel.settleBill(data)}
                 )
             }
             if (showSettleUpModal) {
                 SettleUpModal(
+                    bill = selectedOwingBill,
                     sheetState = settleUpModalState,
-                    onDismissRequest = { showSettleUpModal = false }
+                    onDismissRequest = {
+                        showSettleUpModal = false
+                        selectedOwingBill = null
+                    },
+                    payBill = { data -> billsViewModel.payBill(data) }
                 )
+            }
+
+            if (billsUiState.billActionState is PayBillSubmissionState.Loading) {
+                LoadingView()
             }
 
             if (showInviteDialog) {
@@ -145,8 +201,8 @@ fun ContentView(
     owingLoading: Boolean,
     owingBills: List<OwingBill>,
     openReminderModal: () -> Unit,
-    openRecordPaymentModal: () -> Unit,
-    openSettleUpModal: () -> Unit,
+    openRecordPaymentModal: (OwedBill) -> Unit,
+    openSettleUpModal: (OwingBill) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isOverAllLoading = owedLoading || owingLoading
@@ -180,7 +236,7 @@ fun ContentView(
                 } else if (owedBills.isNotEmpty()) {
                     OwedView(
                         openReminderModal = { openReminderModal() },
-                        openRecordPaymentModal = { openRecordPaymentModal() },
+                        openRecordPaymentModal = openRecordPaymentModal,
                         bills = owedBills
                     )
                 }
@@ -216,8 +272,14 @@ fun HomeScreenPreview() {
     val inviteVm = InviteViewModel(container.inviteRepository)
     val friendVm = FriendViewModel(container.friendRepository)
     val billsViewModel = BillsViewModel(container.billsRepository)
-
+    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        HomeScreen(goToAddBill = {}, inviteVm, friendViewModel = friendVm, billsViewModel)
+        HomeScreen(
+            goToAddBill = {},
+            inviteVm,
+            friendViewModel = friendVm,
+            billsViewModel,
+            toastHostState
+        )
     }
 }

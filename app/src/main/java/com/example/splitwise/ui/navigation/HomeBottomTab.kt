@@ -68,7 +68,8 @@ fun HomeBottomTab(
                     goToAddBill = {navController.navigate(Screen.AddBill.route)},
                     inviteViewModel,
                     friendViewModel,
-                    billsViewModel
+                    billsViewModel,
+                    toastHostState
                 )
 
             }
