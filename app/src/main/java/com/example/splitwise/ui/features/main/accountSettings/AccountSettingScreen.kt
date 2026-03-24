@@ -38,16 +38,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.features.auth.AuthViewModel
+import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
 import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordModal
 import com.example.splitwise.ui.features.main.accountSettings.components.DeleteAccountDialog
 import com.example.splitwise.ui.features.main.accountSettings.components.DeleteAccountModal
-import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
-import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -61,10 +62,13 @@ fun AccountSettingScreen(
     goBack: () -> Unit,
     changePasswordViewModel: ChangePasswordViewModel,
     deleteAccountViewModel: DeleteAccountViewModel,
+    authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
     val uiState by changePasswordViewModel.uiState.collectAsState()
     val deleteAccountUiState by deleteAccountViewModel.uiState.collectAsState()
+    val user by authViewModel.user.collectAsStateWithLifecycle()
+    var editableFullName by remember { mutableStateOf("${user?.fullName}") }
 
     // change password
     val changePasswordModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -89,17 +93,26 @@ fun AccountSettingScreen(
             ) {
                 AccountSettingHeader(goBack, paddingTop = innerPadding.calculateTopPadding())
                 HorizontalDivider(thickness = 7.dp)
-                PersonalInfoSection()
+                PersonalInfoSection(
+                    email = user?.email,
+                    fullName = editableFullName,
+                    onFullNameChange = { editableFullName = it }
+                )
                 HorizontalDivider(thickness = 7.dp)
-                SecuritySection(openChangePasswordModal = {showChangePasswordModal = true})
+                SecuritySection(openChangePasswordModal = { showChangePasswordModal = true })
                 HorizontalDivider(thickness = 7.dp)
-                DangerZone(onDeleteAccount = {showDeleteAccountModal = true})
+                DangerZone(onDeleteAccount = { showDeleteAccountModal = true })
             }
             Column(
                 modifier = modifier
                     .shadow(elevation = Elevation.level5)
                     .background(color = MaterialTheme.colorScheme.background)
-                    .padding(top = ScreenDimensions.verticalPadding, bottom = ScreenDimensions.verticalPadding + innerPadding.calculateBottomPadding(), start = Spacing.large, end = Spacing.large)
+                    .padding(
+                        top = ScreenDimensions.verticalPadding,
+                        bottom = ScreenDimensions.verticalPadding + innerPadding.calculateBottomPadding(),
+                        start = Spacing.large,
+                        end = Spacing.large
+                    )
 
             ) {
                 AppTextButton(
@@ -113,9 +126,13 @@ fun AccountSettingScreen(
                     onDismissRequest = { showChangePasswordModal = false },
                     uiState = uiState,
                     onCurrentPasswordChange = { changePasswordViewModel.onCurrentPasswordChange(it) },
-                    onNewPasswordChange = {changePasswordViewModel.onNewPasswordChanged(it)},
-                    onConfirmNewPasswordChange = {changePasswordViewModel.onConfirmNewPasswordChange(it)},
-                    onChangePassword = {changePasswordViewModel.changePassword()}
+                    onNewPasswordChange = { changePasswordViewModel.onNewPasswordChanged(it) },
+                    onConfirmNewPasswordChange = {
+                        changePasswordViewModel.onConfirmNewPasswordChange(
+                            it
+                        )
+                    },
+                    onChangePassword = { changePasswordViewModel.changePassword() }
                 )
             }
             if (showDeleteAccountModal) {
@@ -138,7 +155,6 @@ fun AccountSettingScreen(
 }
 
 
-
 @Composable
 fun AccountSettingHeader(
     goBack: () -> Unit,
@@ -150,10 +166,15 @@ fun AccountSettingHeader(
         horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = Spacing.small, end = Spacing.small, top = paddingTop + Spacing.extraMedium, bottom = Spacing.extraMedium)
+            .padding(
+                start = Spacing.small,
+                end = Spacing.small,
+                top = paddingTop + Spacing.extraMedium,
+                bottom = Spacing.extraMedium
+            )
     ) {
         IconButton(
-            onClick = {goBack()}
+            onClick = { goBack() }
         ) {
             Icon(
                 painter = painterResource(R.drawable.caret_left),
@@ -171,8 +192,12 @@ fun AccountSettingHeader(
 
 @Composable
 fun PersonalInfoSection(
+    fullName: String?,
+    onFullNameChange: (String) -> Unit,
+    email: String?,
     modifier: Modifier = Modifier
 ) {
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -187,12 +212,12 @@ fun PersonalInfoSection(
         )
         Spacer(Modifier.height(Spacing.medium))
         AppTextField(
-            value = "",
-            onValueChange = {},
+            value = fullName ?: "",
+            onValueChange = onFullNameChange,
             label = stringResource(R.string.full_name)
         )
         AppTextField(
-            value = "you@example.com",
+            value = email ?: "",
             onValueChange = {},
             label = stringResource(R.string.email),
             enabled = false
@@ -225,7 +250,7 @@ fun SecuritySection(
             modifier = Modifier
                 .clickable(
                     enabled = true,
-                    onClick = {openChangePasswordModal()}
+                    onClick = { openChangePasswordModal() }
                 )
         )
     }
@@ -254,7 +279,7 @@ fun DangerZone(
             icon = R.drawable.bin_icon,
             color = error_light,
             modifier = Modifier
-                .clickable(enabled = true, onClick = {onDeleteAccount()})
+                .clickable(enabled = true, onClick = { onDeleteAccount() })
         )
     }
 }
@@ -272,7 +297,11 @@ fun SettingsItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = ScreenDimensions.itemSpacing, bottom = ScreenDimensions.itemSpacing, end = Spacing.small)
+            .padding(
+                top = ScreenDimensions.itemSpacing,
+                bottom = ScreenDimensions.itemSpacing,
+                end = Spacing.small
+            )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -282,12 +311,15 @@ fun SettingsItem(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(40.dp)
-                    .background(color = if (color !== null) MaterialTheme.colorScheme.errorContainer else emerald_50, shape = CircleShape)
+                    .background(
+                        color = if (color !== null) MaterialTheme.colorScheme.errorContainer else emerald_50,
+                        shape = CircleShape
+                    )
             ) {
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint =  color ?: MaterialTheme.colorScheme.primary
+                    tint = color ?: MaterialTheme.colorScheme.primary
                 )
             }
             Column {
@@ -321,7 +353,13 @@ fun AccountSettingScreenPreview() {
     val vm = ChangePasswordViewModel()
     val container = FakeAppContainer()
     val deleteVm = DeleteAccountViewModel(container.authRepository)
+    val authViewModel = AuthViewModel(container.authRepository)
     SplitWiseTheme {
-        AccountSettingScreen(goBack = {}, changePasswordViewModel = vm, deleteAccountViewModel = deleteVm)
+        AccountSettingScreen(
+            goBack = {},
+            changePasswordViewModel = vm,
+            deleteAccountViewModel = deleteVm,
+            authViewModel
+        )
     }
 }

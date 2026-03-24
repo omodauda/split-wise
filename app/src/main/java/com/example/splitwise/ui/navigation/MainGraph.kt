@@ -130,7 +130,8 @@ fun NavGraphBuilder.mainNavGraph(
             AccountSettingScreen(
                 goBack = {navController.popBackStack()},
                 changePasswordViewModel,
-                deleteAccountViewModel
+                deleteAccountViewModel,
+                authViewModel
             )
         }
     }
