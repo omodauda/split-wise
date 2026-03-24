@@ -31,7 +31,7 @@ import java.util.Locale
 @Composable
 fun OwedView(
     bills: List<OwedBill>,
-    openReminderModal: () -> Unit,
+    openReminderModal: (OwedBill) -> Unit,
     openRecordPaymentModal: (OwedBill) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -43,7 +43,7 @@ fun OwedView(
             val bill = bills[index]
             OwedItem(
                 bill = bill,
-                openReminderModal,
+                openReminderModal = {openReminderModal(bill)},
                 openRecordPaymentModal = {openRecordPaymentModal(bill)}
             )
         },
