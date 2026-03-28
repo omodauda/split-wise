@@ -4,6 +4,8 @@ import com.example.splitwise.data.local.IAuthPreference
 import com.example.splitwise.data.network.api.AuthApi
 import com.example.splitwise.data.network.model.ApiError
 import com.example.splitwise.data.network.model.AuthUserData
+import com.example.splitwise.data.network.model.ChangePasswordRequest
+import com.example.splitwise.data.network.model.ChangePasswordResponse
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
 import com.example.splitwise.data.network.model.SignupRequest
@@ -49,6 +51,22 @@ class AuthRepository(
                 // authenticate user
                 authPreference.setAuthenticated(true)
                 Result.success(loginResponse)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun changePassword(data: ChangePasswordRequest): Result<ChangePasswordResponse> {
+        return try {
+            val response = authApi.changePassword(data)
+            if (response.isSuccessful && response.body() !== null) {
+                val changePasswordResponse = response.body()!!
+                Result.success(changePasswordResponse)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val apiError = Gson().fromJson(errorBody, ApiError::class.java)
