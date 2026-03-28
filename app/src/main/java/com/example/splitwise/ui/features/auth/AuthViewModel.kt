@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface AuthSubmissionState {
-    data object Idle: AuthSubmissionState
-    data object Loading: AuthSubmissionState
-    data class Error(val message: String): AuthSubmissionState
-    data object Success: AuthSubmissionState
+    data object Idle : AuthSubmissionState
+    data object Loading : AuthSubmissionState
+    data class Error(val message: String) : AuthSubmissionState
+    data object Success : AuthSubmissionState
 }
 
 data class LoginUiState(
@@ -26,7 +26,8 @@ data class LoginUiState(
 data class SignupUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
-class AuthViewModel(private val repo: AuthRepository): ViewModel() {
+
+class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     val isAuthenticated = repo.isAuthenticated
         .stateIn(
             scope = viewModelScope,
@@ -54,7 +55,13 @@ class AuthViewModel(private val repo: AuthRepository): ViewModel() {
             result.onSuccess {
                 _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
             }.onFailure { exception ->
-                _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Error(exception.message ?: "An error occurred")) }
+                _signupUiState.update {
+                    it.copy(
+                        submissionState = AuthSubmissionState.Error(
+                            exception.message ?: "An error occurred"
+                        )
+                    )
+                }
             }
         }
     }
@@ -66,7 +73,13 @@ class AuthViewModel(private val repo: AuthRepository): ViewModel() {
             result.onSuccess {
                 _loginUiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
             }.onFailure { exception ->
-                _loginUiState.update { it.copy(submissionState = AuthSubmissionState.Error(exception.message ?: "An error occurred")) }
+                _loginUiState.update {
+                    it.copy(
+                        submissionState = AuthSubmissionState.Error(
+                            exception.message ?: "An error occurred"
+                        )
+                    )
+                }
             }
         }
     }

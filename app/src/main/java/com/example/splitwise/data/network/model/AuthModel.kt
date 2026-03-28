@@ -24,3 +24,12 @@ data class SignupRequest(
     val email: String,
     val password: String
 )
+
+data class ChangePasswordRequest(
+    val currentPassword: String,
+    val newPassword: String
+)
+
+data class ChangePasswordResponse(
+    val message: String
+)
