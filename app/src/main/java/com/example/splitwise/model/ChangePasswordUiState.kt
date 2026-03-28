@@ -1,5 +1,7 @@
 package com.example.splitwise.model
 
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
+
 data class ChangePasswordUiState(
     val currentPassword: String = "",
     val newPassword: String = "",
@@ -13,7 +15,7 @@ data class ChangePasswordUiState(
 
     val isFormValid: Boolean = false,
 
-    val submissionState: SubmissionState = SubmissionState.Idle
+    val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 ) {
     val newPasswordMatch: Boolean
         get() = newPassword == confirmNewPassword

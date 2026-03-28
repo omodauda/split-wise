@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.accountSettings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +47,7 @@ import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
 import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordModal
@@ -65,7 +69,9 @@ fun AccountSettingScreen(
     authViewModel: AuthViewModel,
     modifier: Modifier = Modifier
 ) {
-    val uiState by changePasswordViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    val changePasswordUiState by changePasswordViewModel.uiState.collectAsState()
     val deleteAccountUiState by deleteAccountViewModel.uiState.collectAsState()
     val user by authViewModel.user.collectAsStateWithLifecycle()
     var editableFullName by remember { mutableStateOf("${user?.fullName}") }
@@ -76,6 +82,17 @@ fun AccountSettingScreen(
     // delete account
     val deleteAccountModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showDeleteAccountModal by remember { mutableStateOf(false) }
+
+    LaunchedEffect(changePasswordUiState.submissionState) {
+        val state = changePasswordUiState.submissionState
+        if (state is AuthSubmissionState.Success) {
+            showChangePasswordModal = false
+        }
+        if (state is AuthSubmissionState.Error) {
+            Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+            changePasswordViewModel.clearError()
+        }
+    }
 
     Scaffold(
         modifier = modifier
@@ -118,13 +135,14 @@ fun AccountSettingScreen(
                 AppTextButton(
                     title = stringResource(R.string.save_changes),
                     onClick = {},
+                    enabled = user?.fullName !== editableFullName
                 )
             }
             if (showChangePasswordModal) {
                 ChangePasswordModal(
                     sheetState = changePasswordModalState,
                     onDismissRequest = { showChangePasswordModal = false },
-                    uiState = uiState,
+                    uiState = changePasswordUiState,
                     onCurrentPasswordChange = { changePasswordViewModel.onCurrentPasswordChange(it) },
                     onNewPasswordChange = { changePasswordViewModel.onNewPasswordChanged(it) },
                     onConfirmNewPasswordChange = {
@@ -142,9 +160,9 @@ fun AccountSettingScreen(
                     viewModel = deleteAccountViewModel
                 )
             }
-            if (uiState.submissionState != SubmissionState.Idle) {
+            if (changePasswordUiState.submissionState === AuthSubmissionState.Success) {
                 ChangePasswordDialog(
-                    uiState = uiState
+                    uiState = changePasswordUiState
                 )
             }
             if (deleteAccountUiState.submissionState != SubmissionState.Idle) {
@@ -350,8 +368,9 @@ fun SettingsItem(
 )
 @Composable
 fun AccountSettingScreenPreview() {
-    val vm = ChangePasswordViewModel()
+
     val container = FakeAppContainer()
+    val vm = ChangePasswordViewModel(container.authRepository)
     val deleteVm = DeleteAccountViewModel(container.authRepository)
     val authViewModel = AuthViewModel(container.authRepository)
     SplitWiseTheme {

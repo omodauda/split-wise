@@ -27,6 +27,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.splitwise.R
 import com.example.splitwise.model.ChangePasswordUiState
 import com.example.splitwise.model.SubmissionState
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
@@ -60,8 +61,8 @@ fun ChangePasswordDialog(
 
 @Composable
 fun ChangePasswordContentCard(uiState: ChangePasswordUiState, modifier: Modifier = Modifier) {
-    val title = if (uiState.submissionState == SubmissionState.Loading) R.string.change_password_loading else R.string.password_changed
-    val subTitle = if (uiState.submissionState == SubmissionState.Loading) R.string.deleting_account_desc else R.string.password_changed_desc
+    val title = if (uiState.submissionState === AuthSubmissionState.Loading) R.string.change_password_loading else R.string.password_changed
+    val subTitle = if (uiState.submissionState === AuthSubmissionState.Loading) R.string.deleting_account_desc else R.string.password_changed_desc
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,9 +77,9 @@ fun ChangePasswordContentCard(uiState: ChangePasswordUiState, modifier: Modifier
                 .size(80.dp)
                 .background(color = emerald_200, shape = CircleShape)
         ) {
-            if (uiState.submissionState == SubmissionState.Loading) {
+            if (uiState.submissionState === AuthSubmissionState.Loading) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            } else if (uiState.submissionState == SubmissionState.Success) {
+            } else if (uiState.submissionState == AuthSubmissionState.Success) {
                 Icon(
                     painter = painterResource(R.drawable.check_icon),
                     contentDescription = null,

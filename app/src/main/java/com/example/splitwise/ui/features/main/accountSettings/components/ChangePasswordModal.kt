@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -22,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,10 +41,12 @@ import com.example.splitwise.R
 import com.example.splitwise.model.ChangePasswordUiState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.emerald_50
+import com.example.splitwise.ui.theme.extendedColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,10 +58,7 @@ fun ChangePasswordModal(
     onNewPasswordChange: (String) -> Unit,
     onConfirmNewPasswordChange: (String) -> Unit,
     onChangePassword: () -> Unit
-//    viewModel: ChangePasswordViewModel,
 ) {
-//    val uiState by viewModel.uiState.collectAsState()
-
     ModalBottomSheet(
         onDismissRequest = {onDismissRequest()},
         sheetState = sheetState,
@@ -77,10 +80,11 @@ fun ChangePasswordModal(
             )
             ChangePasswordModalFooter(
                 isValid = uiState.isFormValid,
+                isLoading = uiState.submissionState === AuthSubmissionState.Loading,
                 onChangePassword = {
-                    onDismissRequest()
                    onChangePassword()
-                }
+                },
+                onDismiss = {onDismissRequest()}
             )
         }
     }
@@ -287,8 +291,10 @@ fun ChangeRequirementItem(
 
 @Composable
 fun ChangePasswordModalFooter(
+    isLoading: Boolean,
     isValid: Boolean,
     onChangePassword: () -> Unit,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -302,19 +308,40 @@ fun ChangePasswordModalFooter(
     ) {
         AppTextButton(
             title = stringResource(R.string.cancel),
-            onClick = {},
+            onClick = {onDismiss()},
             containerColor = MaterialTheme.colorScheme.onSurface,
-            contentColor = MaterialTheme.colorScheme.onBackground,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .weight(1f)
         )
-        AppTextButton(
-            title = stringResource(R.string.change_password),
-            enabled = isValid,
+        TextButton(
             onClick = {onChangePassword()},
-            modifier = Modifier
-                .weight(1f)
-        )
+                    modifier = Modifier
+                .weight(1f),
+            enabled = isValid,
+            colors = ButtonDefaults.textButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.extendedColorScheme.disabledContainer,
+                disabledContentColor = MaterialTheme.extendedColorScheme.onDisabledContainer
+            ),
+            shape = SplitWiseShapes.button,
+            contentPadding = PaddingValues(vertical = ScreenDimensions.verticalPadding),
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp), // Approx height of text
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.change_password),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
     }
 }
 

@@ -6,6 +6,8 @@ import com.example.splitwise.data.network.api.BillApi
 import com.example.splitwise.data.network.api.FriendApi
 import com.example.splitwise.data.network.model.AuthData
 import com.example.splitwise.data.network.model.AuthUserData
+import com.example.splitwise.data.network.model.ChangePasswordRequest
+import com.example.splitwise.data.network.model.ChangePasswordResponse
 import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
 import com.example.splitwise.data.network.model.FriendInviteResponse
@@ -97,6 +99,10 @@ class FakeAuthApi : AuthApi {
             )
         )
         return Response.success(fakeResponse)
+    }
+
+    override suspend fun changePassword(request: ChangePasswordRequest): Response<ChangePasswordResponse> {
+        TODO("Not yet implemented")
     }
 }
 
