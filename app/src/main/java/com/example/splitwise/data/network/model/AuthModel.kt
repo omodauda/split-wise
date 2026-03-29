@@ -33,3 +33,12 @@ data class ChangePasswordRequest(
 data class ChangePasswordResponse(
     val message: String
 )
+
+data class UpdateProfileRequest(
+    val fullName: String
+)
+
+data class UpdateProfileResponse(
+    val message: String,
+    val data: AuthUserData
+)

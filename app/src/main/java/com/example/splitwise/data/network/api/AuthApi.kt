@@ -5,6 +5,8 @@ import com.example.splitwise.data.network.model.ChangePasswordResponse
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
 import com.example.splitwise.data.network.model.SignupRequest
+import com.example.splitwise.data.network.model.UpdateProfileRequest
+import com.example.splitwise.data.network.model.UpdateProfileResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.PATCH
@@ -18,4 +20,10 @@ interface AuthApi {
 
     @PATCH("auth/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ChangePasswordResponse>
+
+    // TODO: update profile
+    @PATCH("auth/update-profile")
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<UpdateProfileResponse>
+
+    // TODO: delete account
 }
