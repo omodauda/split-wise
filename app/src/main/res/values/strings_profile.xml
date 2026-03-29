@@ -50,15 +50,16 @@
     <string name="delete_alert_desc">Once you delete your account, there is no going back. All your data will be permanently removed.</string>
     <string name="delete_instr">What will be deleted:</string>
     <string-array name="delete_instr_items">
-        <item>All your groups and bills - You will be removed from all groups and your bills will be deleted</item>
-        <item>Outstanding balances - All unsettled balances will be lost and cannot be recovered</item>
+<!--        <item>All your groups and bills - You will be removed from all groups and your bills will be deleted</item>-->
+        <item>All your bills - Your bills will be deleted</item>
+<!--        <item>Outstanding balances - All unsettled balances will be lost and cannot be recovered</item>-->
         <item>Personal information - Your profile, email, and all personal data will be permanently deleted</item>
         <item>Transaction history - All payment records and activity logs will be erased</item>
     </string-array>
     <string name="delete_alt">Consider these alternatives:</string>
     <string-array name="delete_alt_items">
         <item>Settle all outstanding balances before leaving</item>
-        <item>Export your transaction history for your records</item>
+<!--        <item>Export your transaction history for your records</item>-->
         <item>Simply log out if you need a temporary break</item>
     </string-array>
     <string name="keep_account">Keep Account</string>
