@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,10 +44,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.UpdateProfileRequest
 import com.example.splitwise.mock.FakeAppContainer
 import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
 import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.features.auth.AuthViewModel
 import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
@@ -67,11 +74,13 @@ fun AccountSettingScreen(
     changePasswordViewModel: ChangePasswordViewModel,
     deleteAccountViewModel: DeleteAccountViewModel,
     authViewModel: AuthViewModel,
+    toastHostState: ToastHostState,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
 
     val changePasswordUiState by changePasswordViewModel.uiState.collectAsState()
+    val profileUiState by authViewModel.profileUiState.collectAsState()
     val deleteAccountUiState by deleteAccountViewModel.uiState.collectAsState()
     val user by authViewModel.user.collectAsStateWithLifecycle()
     var editableFullName by remember { mutableStateOf("${user?.fullName}") }
@@ -83,6 +92,8 @@ fun AccountSettingScreen(
     val deleteAccountModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showDeleteAccountModal by remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
+
     LaunchedEffect(changePasswordUiState.submissionState) {
         val state = changePasswordUiState.submissionState
         if (state is AuthSubmissionState.Success) {
@@ -92,6 +103,32 @@ fun AccountSettingScreen(
             Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
             changePasswordViewModel.clearError()
         }
+    }
+
+    LaunchedEffect(profileUiState.submissionState) {
+        val state = profileUiState.submissionState
+        if (state is AuthSubmissionState.Error) {
+            toastHostState.showToast(toast = ToastState(message = state.message, type = ToastType.ERROR))
+            authViewModel.resetProfileSubmissionState()
+        }
+
+        if (state is AuthSubmissionState.Success) {
+            toastHostState.showToast(toast = ToastState(message = "Profile updated successfully", type = ToastType.SUCCESS))
+            authViewModel.resetProfileSubmissionState()
+//            goBack()
+        }
+    }
+
+    if (profileUiState.submissionState === AuthSubmissionState.Loading) {
+        LoadingView()
+    }
+
+    fun saveChanges() {
+        focusManager.clearFocus()
+        val data = UpdateProfileRequest(
+            fullName = editableFullName
+        )
+        authViewModel.updateProfile(data)
     }
 
     Scaffold(
@@ -134,7 +171,7 @@ fun AccountSettingScreen(
             ) {
                 AppTextButton(
                     title = stringResource(R.string.save_changes),
-                    onClick = {},
+                    onClick = {saveChanges()},
                     enabled = user?.fullName !== editableFullName
                 )
             }
@@ -373,12 +410,14 @@ fun AccountSettingScreenPreview() {
     val vm = ChangePasswordViewModel(container.authRepository)
     val deleteVm = DeleteAccountViewModel(container.authRepository)
     val authViewModel = AuthViewModel(container.authRepository)
+    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
         AccountSettingScreen(
             goBack = {},
             changePasswordViewModel = vm,
             deleteAccountViewModel = deleteVm,
-            authViewModel
+            authViewModel,
+            toastHostState
         )
     }
 }

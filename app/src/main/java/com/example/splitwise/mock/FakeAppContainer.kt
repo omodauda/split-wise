@@ -23,6 +23,8 @@ import com.example.splitwise.data.network.model.PayBillRequest
 import com.example.splitwise.data.network.model.PayBillResponse
 import com.example.splitwise.data.network.model.SendFriendInviteRequest
 import com.example.splitwise.data.network.model.SignupRequest
+import com.example.splitwise.data.network.model.UpdateProfileRequest
+import com.example.splitwise.data.network.model.UpdateProfileResponse
 import com.example.splitwise.data.repository.AuthRepository
 import com.example.splitwise.data.repository.BillsRepository
 import com.example.splitwise.data.repository.FriendRepository
@@ -102,6 +104,10 @@ class FakeAuthApi : AuthApi {
     }
 
     override suspend fun changePassword(request: ChangePasswordRequest): Response<ChangePasswordResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateProfile(request: UpdateProfileRequest): Response<UpdateProfileResponse> {
         TODO("Not yet implemented")
     }
 }
