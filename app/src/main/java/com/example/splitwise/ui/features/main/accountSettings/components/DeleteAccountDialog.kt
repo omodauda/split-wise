@@ -25,6 +25,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.splitwise.R
 import com.example.splitwise.model.SubmissionState
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountUiState
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
@@ -60,8 +61,8 @@ fun DeleteAccountContentCard(
     uiState: DeleteAccountUiState,
     modifier: Modifier = Modifier
 ) {
-    val title = if (uiState.submissionState == SubmissionState.Loading) R.string.deleting_account else R.string.account_deleted
-    val subTitle = if (uiState.submissionState == SubmissionState.Loading) R.string.delete_account_subtitle else R.string.account_deleted_desc
+    val title = if (uiState.submissionState === AuthSubmissionState.Loading) R.string.deleting_account else R.string.account_deleted
+    val subTitle = if (uiState.submissionState === AuthSubmissionState.Loading) R.string.delete_account_subtitle else R.string.account_deleted_desc
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,9 +78,9 @@ fun DeleteAccountContentCard(
                 .size(80.dp)
                 .background(color = MaterialTheme.colorScheme.errorContainer, shape = CircleShape)
         ) {
-            if (uiState.submissionState == SubmissionState.Loading) {
+            if (uiState.submissionState === AuthSubmissionState.Loading) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.error)
-            } else if (uiState.submissionState == SubmissionState.Success) {
+            } else if (uiState.submissionState === AuthSubmissionState.Success) {
                 Icon(
                     painter = painterResource(R.drawable.check_icon),
                     contentDescription = null,

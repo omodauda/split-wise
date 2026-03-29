@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -22,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountUiState
 import com.example.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
 import com.example.splitwise.ui.theme.ScreenDimensions
@@ -49,6 +54,7 @@ import com.example.splitwise.ui.theme.black
 import com.example.splitwise.ui.theme.emerald_50
 import com.example.splitwise.ui.theme.emerald_700
 import com.example.splitwise.ui.theme.emerald_800
+import com.example.splitwise.ui.theme.extendedColorScheme
 import com.example.splitwise.ui.theme.white
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +89,7 @@ fun DeleteAccountModal(
             DeletePasswordModalFooter(
                 step = uiState.step,
                 isValid = uiState.isFormValid,
+                isLoading = uiState.submissionState === AuthSubmissionState.Loading,
                 goToNextStep = {viewModel.onGoToNextStep()},
                 goToPrevStep = {viewModel.onGoToPrevStep()}
             )
@@ -356,6 +363,7 @@ fun DeletePasswordModalFooter(
     goToPrevStep: () -> Unit,
     goToNextStep: () -> Unit,
     isValid: Boolean,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -371,18 +379,46 @@ fun DeletePasswordModalFooter(
             title = stringResource(if (step == 1) R.string.keep_account else R.string.go_back),
             onClick = {goToPrevStep()},
             containerColor = MaterialTheme.colorScheme.inverseSurface,
-            contentColor = MaterialTheme.colorScheme.onBackground,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier
                 .weight(1f)
         )
-        AppTextButton(
-            title = stringResource(if (step == 1) R.string.continue_delete else R.string.delete_my_account),
+//        AppTextButton(
+//            title = stringResource(if (step == 1) R.string.continue_delete else R.string.delete_my_account),
+//            onClick = {goToNextStep()},
+//            containerColor = MaterialTheme.colorScheme.error,
+//            contentColor = MaterialTheme.colorScheme.onError,
+//            enabled = isValid,
+//            modifier = Modifier
+//                .weight(1f)
+//        )
+        TextButton(
             onClick = {goToNextStep()},
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError,
-            enabled = isValid,
             modifier = Modifier
-                .weight(1f)
-        )
+                .weight(1f),
+            enabled = isValid,
+            colors = ButtonDefaults.textButtonColors(
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError,
+                disabledContainerColor = MaterialTheme.extendedColorScheme.disabledContainer,
+                disabledContentColor = MaterialTheme.extendedColorScheme.onDisabledContainer
+            ),
+            shape = SplitWiseShapes.button,
+            contentPadding = PaddingValues(vertical = ScreenDimensions.verticalPadding),
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp), // Approx height of text
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = stringResource(if (step == 1) R.string.continue_delete else R.string.delete_my_account),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+        }
     }
 }

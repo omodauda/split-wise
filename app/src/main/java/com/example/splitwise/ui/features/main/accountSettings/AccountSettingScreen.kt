@@ -46,7 +46,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
 import com.example.splitwise.data.network.model.UpdateProfileRequest
 import com.example.splitwise.mock.FakeAppContainer
-import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
 import com.example.splitwise.ui.components.LoadingView
@@ -115,7 +114,13 @@ fun AccountSettingScreen(
         if (state is AuthSubmissionState.Success) {
             toastHostState.showToast(toast = ToastState(message = "Profile updated successfully", type = ToastType.SUCCESS))
             authViewModel.resetProfileSubmissionState()
-//            goBack()
+        }
+    }
+
+    LaunchedEffect(deleteAccountUiState.submissionState) {
+        val state = deleteAccountUiState.submissionState
+        if (state is AuthSubmissionState.Error) {
+            Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -202,7 +207,7 @@ fun AccountSettingScreen(
                     uiState = changePasswordUiState
                 )
             }
-            if (deleteAccountUiState.submissionState != SubmissionState.Idle) {
+            if (deleteAccountUiState.submissionState === AuthSubmissionState.Success) {
                 DeleteAccountDialog(uiState = deleteAccountUiState)
             }
         }
