@@ -10,6 +10,8 @@ import com.example.splitwise.data.network.model.ChangePasswordRequest
 import com.example.splitwise.data.network.model.ChangePasswordResponse
 import com.example.splitwise.data.network.model.CreateBillRequest
 import com.example.splitwise.data.network.model.CreateBillResponse
+import com.example.splitwise.data.network.model.DeleteAccountRequest
+import com.example.splitwise.data.network.model.DeleteAccountResponse
 import com.example.splitwise.data.network.model.FriendInviteResponse
 import com.example.splitwise.data.network.model.GetBillsDashboardResponse
 import com.example.splitwise.data.network.model.GetFriendsResponse
@@ -108,6 +110,10 @@ class FakeAuthApi : AuthApi {
     }
 
     override suspend fun updateProfile(request: UpdateProfileRequest): Response<UpdateProfileResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteAccount(request: DeleteAccountRequest): Response<DeleteAccountResponse> {
         TODO("Not yet implemented")
     }
 }

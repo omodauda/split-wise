@@ -6,6 +6,8 @@ import com.example.splitwise.data.network.model.ApiError
 import com.example.splitwise.data.network.model.AuthUserData
 import com.example.splitwise.data.network.model.ChangePasswordRequest
 import com.example.splitwise.data.network.model.ChangePasswordResponse
+import com.example.splitwise.data.network.model.DeleteAccountRequest
+import com.example.splitwise.data.network.model.DeleteAccountResponse
 import com.example.splitwise.data.network.model.LoginRequest
 import com.example.splitwise.data.network.model.LoginResponse
 import com.example.splitwise.data.network.model.SignupRequest
@@ -86,6 +88,22 @@ class AuthRepository(
                 val updateProfileResponse = response.body()!!
                 authPreference.saveUser(updateProfileResponse.data)
                 Result.success(updateProfileResponse)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun deleteAccount(data: DeleteAccountRequest): Result<DeleteAccountResponse> {
+        return try {
+            val response = authApi.deleteAccount(data)
+            if (response.isSuccessful && response.body() !== null) {
+                val deleteAccountResponse = response.body()!!
+                Result.success(deleteAccountResponse)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val apiError = Gson().fromJson(errorBody, ApiError::class.java)

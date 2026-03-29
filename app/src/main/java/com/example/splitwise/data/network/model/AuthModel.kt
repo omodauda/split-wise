@@ -37,8 +37,15 @@ data class ChangePasswordResponse(
 data class UpdateProfileRequest(
     val fullName: String
 )
-
 data class UpdateProfileResponse(
     val message: String,
     val data: AuthUserData
+)
+
+data class DeleteAccountRequest(
+    val password: String
+)
+
+data class DeleteAccountResponse(
+    val message: String
 )
