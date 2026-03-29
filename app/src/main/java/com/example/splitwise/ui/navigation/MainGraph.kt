@@ -121,7 +121,7 @@ fun NavGraphBuilder.mainNavGraph(
         composable (route = Screen.AccountSettings.route){
             val application = LocalContext.current.applicationContext as SplitWiseApplication
             val changePasswordViewModel: ChangePasswordViewModel = viewModel(
-                factory = ChangePasswordViewModelFactory()
+                factory = ChangePasswordViewModelFactory(application.appContainer.authRepository)
             )
 
             val deleteAccountViewModel: DeleteAccountViewModel = viewModel(
@@ -130,7 +130,9 @@ fun NavGraphBuilder.mainNavGraph(
             AccountSettingScreen(
                 goBack = {navController.popBackStack()},
                 changePasswordViewModel,
-                deleteAccountViewModel
+                deleteAccountViewModel,
+                authViewModel,
+                toastHostState
             )
         }
     }

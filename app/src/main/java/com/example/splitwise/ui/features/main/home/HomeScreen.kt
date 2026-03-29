@@ -132,7 +132,10 @@ fun HomeScreen(
                     selectedOwedBill = bill
                     showRecordPaymentModal = true }
                 ,
-                openReminderModal = { showBottomSheet = true },
+                openReminderModal = { bill ->
+                    selectedOwedBill = bill
+                    showBottomSheet = true
+                },
                 openSettleUpModal = { bill ->
                     selectedOwingBill = bill
                     showSettleUpModal = true
@@ -143,7 +146,8 @@ fun HomeScreen(
             if (showBottomSheet) {
                 ReminderModal(
                     sheetState,
-                    onDismissRequest = { showBottomSheet = false }
+                    onDismissRequest = { showBottomSheet = false },
+                    bill = selectedOwedBill
                 )
             }
             if (showRecordPaymentModal) {
@@ -200,7 +204,7 @@ fun ContentView(
     owedBills: List<OwedBill>,
     owingLoading: Boolean,
     owingBills: List<OwingBill>,
-    openReminderModal: () -> Unit,
+    openReminderModal: (OwedBill) -> Unit,
     openRecordPaymentModal: (OwedBill) -> Unit,
     openSettleUpModal: (OwingBill) -> Unit,
     modifier: Modifier = Modifier
@@ -235,7 +239,7 @@ fun ContentView(
                     )
                 } else if (owedBills.isNotEmpty()) {
                     OwedView(
-                        openReminderModal = { openReminderModal() },
+                        openReminderModal = openReminderModal,
                         openRecordPaymentModal = openRecordPaymentModal,
                         bills = owedBills
                     )

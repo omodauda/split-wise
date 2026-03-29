@@ -2,14 +2,17 @@ package com.example.splitwise.ui.features.main.accountSettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.splitwise.data.network.model.DeleteAccountRequest
 import com.example.splitwise.data.repository.AuthRepository
 import com.example.splitwise.model.SubmissionState
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.onFailure
 
 data class DeleteAccountUiState(
     val step: Int = 1,
@@ -19,10 +22,10 @@ data class DeleteAccountUiState(
     val isFormValid: Boolean = true,
     val isDeleteTextError: Boolean = false,
 
-    val submissionState: SubmissionState = SubmissionState.Idle
+    val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 
-class DeleteAccountViewModel(private val authRepository: AuthRepository): ViewModel() {
+class DeleteAccountViewModel(private val authRepository: AuthRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(DeleteAccountUiState())
     val uiState: StateFlow<DeleteAccountUiState> = _uiState.asStateFlow()
 
@@ -41,7 +44,8 @@ class DeleteAccountViewModel(private val authRepository: AuthRepository): ViewMo
             _uiState.update { it.copy(step = 2) }
             validateForm()
         } else {
-            deleteAccount()
+            val data = DeleteAccountRequest(password = _uiState.value.password)
+            deleteAccount(data)
         }
     }
 
@@ -52,13 +56,24 @@ class DeleteAccountViewModel(private val authRepository: AuthRepository): ViewMo
         }
     }
 
-    fun deleteAccount() {
+    fun deleteAccount(data: DeleteAccountRequest) {
         viewModelScope.launch {
-            _uiState.update { it.copy(submissionState = SubmissionState.Loading) }
-            delay(5_000L)
-            _uiState.update { it.copy(submissionState = SubmissionState.Success) }
-            delay(3_000L)
-            authRepository.logout()
+            _uiState.update { it.copy(submissionState = AuthSubmissionState.Loading) }
+            val result = authRepository.deleteAccount(data)
+            result.onSuccess {
+                _uiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
+                delay(5_000L)
+                authRepository.logout()
+            }
+                .onFailure { exception ->
+                    _uiState.update {
+                        it.copy(
+                            submissionState = AuthSubmissionState.Error(
+                                exception.message ?: "An error occurred"
+                            )
+                        )
+                    }
+                }
         }
     }
 

@@ -23,7 +23,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -56,21 +55,20 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.SplitWiseTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
-    viewModel: LoginViewModel = viewModel(),
+
     authViewModel: AuthViewModel,
     toastHostState: ToastHostState,
     goToSignup: () -> Unit,
     goToForgotPassword: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val authState by authViewModel.loginUiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
 
     fun handleLogin() {
         if (viewModel.validateForm()){
@@ -84,18 +82,15 @@ fun LoginScreen(
         LoadingView()
     }
 
-    if (authState.submissionState is AuthSubmissionState.Error) {
-        val errorMessage = (authState.submissionState as AuthSubmissionState.Error).message
-        scope.launch {
+    LaunchedEffect(authState.submissionState) {
+        val state = authState.submissionState
+        if (state is AuthSubmissionState.Error) {
             toastHostState.showToast(
                 toast = ToastState(
-                    message = errorMessage,
+                    message = state.message,
                     type = ToastType.ERROR
                 )
             )
-        }
-        // Automatically reset the state after showing the error so it doesn't linger
-        LaunchedEffect(authState.submissionState) {
             authViewModel.resetLoginSubmissionState()
         }
     }

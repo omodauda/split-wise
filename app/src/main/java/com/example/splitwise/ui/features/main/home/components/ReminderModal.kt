@@ -26,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.OwedBill
 import com.example.splitwise.ui.components.AppIconTextButton
 import com.example.splitwise.ui.theme.BalanceNegative
 import com.example.splitwise.ui.theme.ComponentDimensions
@@ -33,12 +34,14 @@ import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
 import com.example.splitwise.ui.theme.SplitWiseShapes
 import com.example.splitwise.ui.theme.emerald_200
+import com.example.splitwise.utils.formatFromCents
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReminderModal(
     sheetState: SheetState,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    bill: OwedBill?
 ) {
     ModalBottomSheet(
         onDismissRequest = {onDismissRequest()},
@@ -53,7 +56,7 @@ fun ReminderModal(
                 )
         ) {
             ModalHeader(onDismiss = {onDismissRequest()})
-            ModalContent()
+            ModalContent(bill)
         }
     }
 }
@@ -106,8 +109,12 @@ fun ModalHeader(
 
 @Composable
 fun ModalContent(
+    bill: OwedBill?,
     modifier: Modifier = Modifier
 ) {
+    val remainingAmount = if (bill !== null) {
+        bill.amount - bill.paidAmount
+    } else 0
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -116,15 +123,15 @@ fun ModalContent(
         AvatarView(avatarText = "S")
         Spacer(Modifier.height(Spacing.medium))
         Text(
-            text = "Sarah Johnson owes you",
+            text = "${bill?.user?.fullName} owes you",
             style = BalanceNegative,
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
-        AmountView(balance = "$138.63")
+        AmountView(balance = formatFromCents(remainingAmount))
         Spacer(Modifier.height(Spacing.medium))
         Text(
-            text = "Send a friendly reminder to Sarah?",
+            text = "Send a friendly reminder to ${bill?.user?.fullName?.split(" ")[0]}?",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center

@@ -1,5 +1,6 @@
 package com.example.splitwise.ui.features.main.accountSettings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,21 +35,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.splitwise.R
+import com.example.splitwise.data.network.model.UpdateProfileRequest
 import com.example.splitwise.mock.FakeAppContainer
-import com.example.splitwise.model.SubmissionState
 import com.example.splitwise.ui.components.AppTextButton
 import com.example.splitwise.ui.components.AppTextField
+import com.example.splitwise.ui.components.LoadingView
+import com.example.splitwise.ui.components.toast.ToastHostState
+import com.example.splitwise.ui.components.toast.ToastState
+import com.example.splitwise.ui.components.toast.ToastType
+import com.example.splitwise.ui.components.toast.rememberToastHostState
+import com.example.splitwise.ui.features.auth.AuthSubmissionState
+import com.example.splitwise.ui.features.auth.AuthViewModel
+import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
 import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordModal
 import com.example.splitwise.ui.features.main.accountSettings.components.DeleteAccountDialog
 import com.example.splitwise.ui.features.main.accountSettings.components.DeleteAccountModal
-import com.example.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
-import com.example.splitwise.ui.features.main.accountSettings.ChangePasswordViewModel
 import com.example.splitwise.ui.theme.Elevation
 import com.example.splitwise.ui.theme.ScreenDimensions
 import com.example.splitwise.ui.theme.Spacing
@@ -61,10 +72,17 @@ fun AccountSettingScreen(
     goBack: () -> Unit,
     changePasswordViewModel: ChangePasswordViewModel,
     deleteAccountViewModel: DeleteAccountViewModel,
+    authViewModel: AuthViewModel,
+    toastHostState: ToastHostState,
     modifier: Modifier = Modifier
 ) {
-    val uiState by changePasswordViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+
+    val changePasswordUiState by changePasswordViewModel.uiState.collectAsState()
+    val profileUiState by authViewModel.profileUiState.collectAsState()
     val deleteAccountUiState by deleteAccountViewModel.uiState.collectAsState()
+    val user by authViewModel.user.collectAsStateWithLifecycle()
+    var editableFullName by remember { mutableStateOf("${user?.fullName}") }
 
     // change password
     val changePasswordModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -72,6 +90,51 @@ fun AccountSettingScreen(
     // delete account
     val deleteAccountModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showDeleteAccountModal by remember { mutableStateOf(false) }
+
+    val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(changePasswordUiState.submissionState) {
+        val state = changePasswordUiState.submissionState
+        if (state is AuthSubmissionState.Success) {
+            showChangePasswordModal = false
+        }
+        if (state is AuthSubmissionState.Error) {
+            Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+            changePasswordViewModel.clearError()
+        }
+    }
+
+    LaunchedEffect(profileUiState.submissionState) {
+        val state = profileUiState.submissionState
+        if (state is AuthSubmissionState.Error) {
+            toastHostState.showToast(toast = ToastState(message = state.message, type = ToastType.ERROR))
+            authViewModel.resetProfileSubmissionState()
+        }
+
+        if (state is AuthSubmissionState.Success) {
+            toastHostState.showToast(toast = ToastState(message = "Profile updated successfully", type = ToastType.SUCCESS))
+            authViewModel.resetProfileSubmissionState()
+        }
+    }
+
+    LaunchedEffect(deleteAccountUiState.submissionState) {
+        val state = deleteAccountUiState.submissionState
+        if (state is AuthSubmissionState.Error) {
+            Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    if (profileUiState.submissionState === AuthSubmissionState.Loading) {
+        LoadingView()
+    }
+
+    fun saveChanges() {
+        focusManager.clearFocus()
+        val data = UpdateProfileRequest(
+            fullName = editableFullName
+        )
+        authViewModel.updateProfile(data)
+    }
 
     Scaffold(
         modifier = modifier
@@ -89,33 +152,47 @@ fun AccountSettingScreen(
             ) {
                 AccountSettingHeader(goBack, paddingTop = innerPadding.calculateTopPadding())
                 HorizontalDivider(thickness = 7.dp)
-                PersonalInfoSection()
+                PersonalInfoSection(
+                    email = user?.email,
+                    fullName = editableFullName,
+                    onFullNameChange = { editableFullName = it }
+                )
                 HorizontalDivider(thickness = 7.dp)
-                SecuritySection(openChangePasswordModal = {showChangePasswordModal = true})
+                SecuritySection(openChangePasswordModal = { showChangePasswordModal = true })
                 HorizontalDivider(thickness = 7.dp)
-                DangerZone(onDeleteAccount = {showDeleteAccountModal = true})
+                DangerZone(onDeleteAccount = { showDeleteAccountModal = true })
             }
             Column(
                 modifier = modifier
                     .shadow(elevation = Elevation.level5)
                     .background(color = MaterialTheme.colorScheme.background)
-                    .padding(top = ScreenDimensions.verticalPadding, bottom = ScreenDimensions.verticalPadding + innerPadding.calculateBottomPadding(), start = Spacing.large, end = Spacing.large)
+                    .padding(
+                        top = ScreenDimensions.verticalPadding,
+                        bottom = ScreenDimensions.verticalPadding + innerPadding.calculateBottomPadding(),
+                        start = Spacing.large,
+                        end = Spacing.large
+                    )
 
             ) {
                 AppTextButton(
                     title = stringResource(R.string.save_changes),
-                    onClick = {},
+                    onClick = {saveChanges()},
+                    enabled = user?.fullName !== editableFullName
                 )
             }
             if (showChangePasswordModal) {
                 ChangePasswordModal(
                     sheetState = changePasswordModalState,
                     onDismissRequest = { showChangePasswordModal = false },
-                    uiState = uiState,
+                    uiState = changePasswordUiState,
                     onCurrentPasswordChange = { changePasswordViewModel.onCurrentPasswordChange(it) },
-                    onNewPasswordChange = {changePasswordViewModel.onNewPasswordChanged(it)},
-                    onConfirmNewPasswordChange = {changePasswordViewModel.onConfirmNewPasswordChange(it)},
-                    onChangePassword = {changePasswordViewModel.changePassword()}
+                    onNewPasswordChange = { changePasswordViewModel.onNewPasswordChanged(it) },
+                    onConfirmNewPasswordChange = {
+                        changePasswordViewModel.onConfirmNewPasswordChange(
+                            it
+                        )
+                    },
+                    onChangePassword = { changePasswordViewModel.changePassword() }
                 )
             }
             if (showDeleteAccountModal) {
@@ -125,18 +202,17 @@ fun AccountSettingScreen(
                     viewModel = deleteAccountViewModel
                 )
             }
-            if (uiState.submissionState != SubmissionState.Idle) {
+            if (changePasswordUiState.submissionState === AuthSubmissionState.Success) {
                 ChangePasswordDialog(
-                    uiState = uiState
+                    uiState = changePasswordUiState
                 )
             }
-            if (deleteAccountUiState.submissionState != SubmissionState.Idle) {
+            if (deleteAccountUiState.submissionState === AuthSubmissionState.Success) {
                 DeleteAccountDialog(uiState = deleteAccountUiState)
             }
         }
     }
 }
-
 
 
 @Composable
@@ -150,10 +226,15 @@ fun AccountSettingHeader(
         horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = Spacing.small, end = Spacing.small, top = paddingTop + Spacing.extraMedium, bottom = Spacing.extraMedium)
+            .padding(
+                start = Spacing.small,
+                end = Spacing.small,
+                top = paddingTop + Spacing.extraMedium,
+                bottom = Spacing.extraMedium
+            )
     ) {
         IconButton(
-            onClick = {goBack()}
+            onClick = { goBack() }
         ) {
             Icon(
                 painter = painterResource(R.drawable.caret_left),
@@ -171,8 +252,12 @@ fun AccountSettingHeader(
 
 @Composable
 fun PersonalInfoSection(
+    fullName: String?,
+    onFullNameChange: (String) -> Unit,
+    email: String?,
     modifier: Modifier = Modifier
 ) {
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -187,12 +272,12 @@ fun PersonalInfoSection(
         )
         Spacer(Modifier.height(Spacing.medium))
         AppTextField(
-            value = "",
-            onValueChange = {},
+            value = fullName ?: "",
+            onValueChange = onFullNameChange,
             label = stringResource(R.string.full_name)
         )
         AppTextField(
-            value = "you@example.com",
+            value = email ?: "",
             onValueChange = {},
             label = stringResource(R.string.email),
             enabled = false
@@ -225,7 +310,7 @@ fun SecuritySection(
             modifier = Modifier
                 .clickable(
                     enabled = true,
-                    onClick = {openChangePasswordModal()}
+                    onClick = { openChangePasswordModal() }
                 )
         )
     }
@@ -254,7 +339,7 @@ fun DangerZone(
             icon = R.drawable.bin_icon,
             color = error_light,
             modifier = Modifier
-                .clickable(enabled = true, onClick = {onDeleteAccount()})
+                .clickable(enabled = true, onClick = { onDeleteAccount() })
         )
     }
 }
@@ -272,7 +357,11 @@ fun SettingsItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = ScreenDimensions.itemSpacing, bottom = ScreenDimensions.itemSpacing, end = Spacing.small)
+            .padding(
+                top = ScreenDimensions.itemSpacing,
+                bottom = ScreenDimensions.itemSpacing,
+                end = Spacing.small
+            )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -282,12 +371,15 @@ fun SettingsItem(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(40.dp)
-                    .background(color = if (color !== null) MaterialTheme.colorScheme.errorContainer else emerald_50, shape = CircleShape)
+                    .background(
+                        color = if (color !== null) MaterialTheme.colorScheme.errorContainer else emerald_50,
+                        shape = CircleShape
+                    )
             ) {
                 Icon(
                     painter = painterResource(icon),
                     contentDescription = null,
-                    tint =  color ?: MaterialTheme.colorScheme.primary
+                    tint = color ?: MaterialTheme.colorScheme.primary
                 )
             }
             Column {
@@ -318,10 +410,19 @@ fun SettingsItem(
 )
 @Composable
 fun AccountSettingScreenPreview() {
-    val vm = ChangePasswordViewModel()
+
     val container = FakeAppContainer()
+    val vm = ChangePasswordViewModel(container.authRepository)
     val deleteVm = DeleteAccountViewModel(container.authRepository)
+    val authViewModel = AuthViewModel(container.authRepository)
+    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        AccountSettingScreen(goBack = {}, changePasswordViewModel = vm, deleteAccountViewModel = deleteVm)
+        AccountSettingScreen(
+            goBack = {},
+            changePasswordViewModel = vm,
+            deleteAccountViewModel = deleteVm,
+            authViewModel,
+            toastHostState
+        )
     }
 }

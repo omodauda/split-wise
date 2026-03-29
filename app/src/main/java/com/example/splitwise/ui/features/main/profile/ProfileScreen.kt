@@ -1,6 +1,5 @@
 package com.example.splitwise.ui.features.main.profile
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,8 +49,6 @@ fun ProfileScreen(
     goToAccountSettings: () -> Unit
 ) {
     val user by authViewModel.user.collectAsStateWithLifecycle()
-
-    Log.d("Profile", "$user")
 
     Scaffold(
         modifier = modifier
