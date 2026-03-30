@@ -2,16 +2,17 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
 }
 
 android {
-    namespace = "com.example.splitwise"
+    namespace = "com.omodauda.splitwise"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.example.splitwise"
+        applicationId = "com.omodauda.splitwise"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -68,4 +69,7 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.compose.shimmer)
     implementation(libs.androidx.paging)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 }

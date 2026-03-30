@@ -1,0 +1,158 @@
+package com.omodauda.splitwise.data.repository
+
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.omodauda.splitwise.data.network.OwedBillsPagingSource
+import com.omodauda.splitwise.data.network.OwingBillsPagingSource
+import com.omodauda.splitwise.data.network.api.BillApi
+import com.omodauda.splitwise.data.network.model.ApiError
+import com.omodauda.splitwise.data.network.model.CreateBillRequest
+import com.omodauda.splitwise.data.network.model.CreateBillResponse
+import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
+import com.omodauda.splitwise.data.network.model.OwedBill
+import com.omodauda.splitwise.data.network.model.OwingBill
+import com.omodauda.splitwise.data.network.model.PayBillRequest
+import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import java.io.IOException
+
+class BillsRepository(private val billApi: BillApi) {
+
+    suspend fun addBill(data: CreateBillRequest): Result<CreateBillResponse> {
+        return try {
+            val response = billApi.addBill(data)
+            if (response.isSuccessful && response.body() !== null) {
+                val responseBody = response.body()!!
+                Result.success(responseBody)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun getOwedBillsStream(): Flow<PagingData<OwedBill>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                OwedBillsPagingSource(billApi)
+            }
+        ).flow
+    }
+
+    suspend fun getOwedBillsFirstPage(): Result<List<OwedBill>> {
+        return try {
+            val response = billApi.getOwedBills(
+                limit = 5,
+                cursorId = null
+            )
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body.data)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun getOwingBillsStream(): Flow<PagingData<OwingBill>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                OwingBillsPagingSource(billApi)
+            }
+        ).flow
+    }
+
+    suspend fun getOwingBillsFirstPage(): Result<List<OwingBill>> {
+        return try {
+            val response = billApi.getOwingBills(
+                limit = 5,
+                cursorId = null
+            )
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body.data)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getBillsDashboard(): Result<GetBillsDashboardResponse> {
+        return try {
+            val response = billApi.getBillsDashboard()
+            val body = response.body()
+//            Log.d("dashboard", body.toString())
+            if (response.isSuccessful && body !== null) {
+                Result.success(body)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun payBill(data: PayBillRequest): Result<String> {
+        return try {
+            val response = billApi.payBill(data)
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body.message)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        }catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun settleBill(data: PayBillRequest): Result<String> {
+        return try {
+            val response = billApi.settleBill(data)
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body.message)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        }catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+}
