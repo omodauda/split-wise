@@ -14,7 +14,11 @@ import com.omodauda.splitwise.data.network.model.SignupRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileResponse
 import com.google.gson.Gson
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenResponse
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+
 class AuthRepository(
     private val authPreference: IAuthPreference,
     private val authApi: AuthApi
@@ -114,7 +118,27 @@ class AuthRepository(
         }
     }
 
-    suspend fun logout() {
+    suspend fun updateFcmToken(data: UpdateFcmTokenRequest): Result<UpdateFcmTokenResponse> {
+        return try {
+            val response = authApi.updateFcmToken(data)
+            if (response.isSuccessful && response.body() !== null) {
+                val updateTokenResponse = response.body()!!
+                Result.success(updateTokenResponse)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun logout(scope: kotlinx.coroutines.CoroutineScope) {
+        scope.launch {
+            updateFcmToken(UpdateFcmTokenRequest(null))
+        }
         authPreference.clearAll()
     }
 }

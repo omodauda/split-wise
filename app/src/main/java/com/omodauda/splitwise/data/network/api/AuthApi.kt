@@ -7,6 +7,8 @@ import com.omodauda.splitwise.data.network.model.DeleteAccountResponse
 import com.omodauda.splitwise.data.network.model.LoginRequest
 import com.omodauda.splitwise.data.network.model.LoginResponse
 import com.omodauda.splitwise.data.network.model.SignupRequest
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenResponse
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileResponse
 import retrofit2.Response
@@ -24,11 +26,12 @@ interface AuthApi {
     @PATCH("auth/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ChangePasswordResponse>
 
-    // TODO: update profile
     @PATCH("auth/update-profile")
     suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<UpdateProfileResponse>
 
-    // TODO: delete account
     @HTTP(method = "DELETE", path = "auth/delete-account", hasBody = true)
     suspend fun deleteAccount(@Body request: DeleteAccountRequest): Response<DeleteAccountResponse>
+
+    @PATCH("auth/update-fcm-token")
+    suspend fun updateFcmToken(@Body request: UpdateFcmTokenRequest): Response<UpdateFcmTokenResponse>
 }

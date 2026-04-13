@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omodauda.splitwise.data.network.model.LoginRequest
 import com.omodauda.splitwise.data.network.model.SignupRequest
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,9 +24,6 @@ data class LoginUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 data class SignupUiState(
-    val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
-)
-data class ProfileUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 
@@ -108,6 +106,12 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         }
     }
 
+    fun updateFcmToken(data: UpdateFcmTokenRequest) {
+        viewModelScope.launch {
+           repo.updateFcmToken(data)
+        }
+    }
+
     fun resetSignupState() {
         _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
     }
@@ -122,7 +126,7 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
 
     fun logout() {
         viewModelScope.launch {
-            repo.logout()
+            repo.logout(this)
         }
     }
 }

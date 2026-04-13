@@ -25,6 +25,8 @@ import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.omodauda.splitwise.data.network.model.PayBillResponse
 import com.omodauda.splitwise.data.network.model.SendFriendInviteRequest
 import com.omodauda.splitwise.data.network.model.SignupRequest
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenResponse
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileResponse
 import com.omodauda.splitwise.data.repository.AuthRepository
@@ -114,6 +116,10 @@ class FakeAuthApi : AuthApi {
     }
 
     override suspend fun deleteAccount(request: DeleteAccountRequest): Response<DeleteAccountResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateFcmToken(request: UpdateFcmTokenRequest): Response<UpdateFcmTokenResponse> {
         TODO("Not yet implemented")
     }
 }
