@@ -33,12 +33,14 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.components.LoadingView
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.components.toast.ToastState
 import com.omodauda.splitwise.ui.components.toast.ToastType
 import com.omodauda.splitwise.ui.components.toast.rememberToastHostState
+import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.components.BillSectionShimmer
 import com.omodauda.splitwise.ui.features.main.home.components.DashBoard
@@ -61,6 +63,7 @@ fun HomeScreen(
     inviteViewModel: InviteViewModel,
     friendViewModel: FriendViewModel,
     billsViewModel: BillsViewModel,
+    authViewModel: AuthViewModel,
     toastHostState: ToastHostState,
     modifier: Modifier = Modifier
 ) {
@@ -109,7 +112,6 @@ fun HomeScreen(
                     ToastState(message = state.message, type = ToastType.ERROR)
                 )
             }
-
             else -> {}
         }
     }
@@ -126,11 +128,12 @@ fun HomeScreen(
         if (hasPermission) {
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
-                    Log.w("FCM", "Fetching FCM registration token failed", task.exception)
                     return@addOnCompleteListener
                 }
                 val token = task.result
-                // TODO: send token to backend
+                authViewModel.updateFcmToken(
+                    data = UpdateFcmTokenRequest(token)
+                )
             }
         } else {
 //            Log.w("FCM", "Cannot fetch token: Notification permission not granted.")
@@ -306,6 +309,7 @@ fun HomeScreenPreview() {
     val inviteVm = InviteViewModel(container.inviteRepository)
     val friendVm = FriendViewModel(container.friendRepository)
     val billsViewModel = BillsViewModel(container.billsRepository)
+    val authVm = AuthViewModel(container.authRepository)
     val toastHostState = rememberToastHostState()
     SplitWiseTheme {
         HomeScreen(
@@ -313,6 +317,7 @@ fun HomeScreenPreview() {
             inviteVm,
             friendViewModel = friendVm,
             billsViewModel,
+            authVm,
             toastHostState
         )
     }

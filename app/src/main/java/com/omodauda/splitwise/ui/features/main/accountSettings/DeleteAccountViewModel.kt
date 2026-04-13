@@ -62,7 +62,7 @@ class DeleteAccountViewModel(private val authRepository: AuthRepository) : ViewM
             result.onSuccess {
                 _uiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
                 delay(5_000L)
-                authRepository.logout()
+                authRepository.logout(this)
             }
                 .onFailure { exception ->
                     _uiState.update {

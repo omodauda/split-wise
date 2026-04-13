@@ -41,11 +41,15 @@ data class UpdateProfileResponse(
     val message: String,
     val data: AuthUserData
 )
-
 data class DeleteAccountRequest(
     val password: String
 )
-
 data class DeleteAccountResponse(
+    val message: String
+)
+data class UpdateFcmTokenRequest(
+    val token: String? = null
+)
+data class UpdateFcmTokenResponse(
     val message: String
 )

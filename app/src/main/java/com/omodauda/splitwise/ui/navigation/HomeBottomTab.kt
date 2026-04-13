@@ -1,5 +1,6 @@
 package com.omodauda.splitwise.ui.navigation
 
+//import com.example.splitwise.ui.features.main.groups.GroupScreen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -12,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -21,14 +21,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.omodauda.splitwise.R
-import com.omodauda.splitwise.SplitWiseApplication
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.activity.ActivityScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
-//import com.example.splitwise.ui.features.main.groups.GroupScreen
 import com.omodauda.splitwise.ui.features.main.home.HomeScreen
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
 import com.omodauda.splitwise.ui.features.main.profile.ProfileScreen
@@ -46,12 +44,6 @@ fun HomeBottomTab(
 ) {
     val bottomNavController = rememberNavController()
 
-    val application = LocalContext.current.applicationContext as SplitWiseApplication
-    val friendRepository = application.appContainer.friendRepository
-//    val friendViewModel: FriendViewModel = viewModel(
-//        factory = FriendViewModelFactory(friendRepository)
-//    )
-
     Scaffold(
         bottomBar = {BottomNavigationBar(bottomNavController)}
     ) { innerPadding ->
@@ -66,6 +58,7 @@ fun HomeBottomTab(
                     inviteViewModel,
                     friendViewModel,
                     billsViewModel,
+                    authViewModel,
                     toastHostState
                 )
 

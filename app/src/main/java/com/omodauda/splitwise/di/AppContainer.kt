@@ -1,6 +1,7 @@
 package com.omodauda.splitwise.di
 
 import android.content.Context
+import com.google.gson.GsonBuilder
 import com.omodauda.splitwise.data.local.AuthPreference
 import com.omodauda.splitwise.data.network.api.AuthApi
 import com.omodauda.splitwise.data.network.api.BillApi
@@ -30,6 +31,10 @@ class AppContainerImpl(private val context: Context): IAppContainer {
 
     private val baseUrl = "https://split-wise-backend.fly.dev/v1/"
     private val authPreference = AuthPreference(context)
+
+    private val gson = GsonBuilder()
+        .serializeNulls()
+        .create()
     private val okHttpClient: OkHttpClient by lazy {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -44,7 +49,7 @@ class AppContainerImpl(private val context: Context): IAppContainer {
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(okHttpClient)
             .build()
     }
