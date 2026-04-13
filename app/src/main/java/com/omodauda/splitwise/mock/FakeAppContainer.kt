@@ -1,5 +1,6 @@
 package com.omodauda.splitwise.mock
 
+import com.omodauda.splitwise.data.local.AuthPreference
 import com.omodauda.splitwise.data.local.IAuthPreference
 import com.omodauda.splitwise.data.network.api.AuthApi
 import com.omodauda.splitwise.data.network.api.BillApi
@@ -201,6 +202,8 @@ class FakeAppContainer : IAppContainer {
     // First, implement the missing 'authApi' member.
     override val authApi: AuthApi = FakeAuthApi()
     override val friendApi: FriendApi = FakeFriendApi()
+    override val authPreference: AuthPreference
+        get() = TODO("Not yet implemented")
 
     // Now, use the fake authApi when creating the AuthRepository.
     override val authRepository = AuthRepository(

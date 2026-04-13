@@ -26,11 +26,13 @@ interface IAppContainer {
  val inviteRepository: InviteRepository
  val billApi: BillApi
  val billsRepository: BillsRepository
+
+ val authPreference: AuthPreference
 }
 class AppContainerImpl(private val context: Context): IAppContainer {
 
     private val baseUrl = "https://split-wise-backend.fly.dev/v1/"
-    private val authPreference = AuthPreference(context)
+    override val authPreference = AuthPreference(context)
 
     private val gson = GsonBuilder()
         .serializeNulls()

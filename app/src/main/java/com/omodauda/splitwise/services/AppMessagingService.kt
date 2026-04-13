@@ -3,18 +3,30 @@ package com.omodauda.splitwise.services
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.omodauda.splitwise.MainActivity
+import com.omodauda.splitwise.R
+import com.omodauda.splitwise.SplitWiseApplication
+import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.launch
 
 class AppMessagingService: FirebaseMessagingService() {
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        // TODO: send new token to backend
+        val appContainer = (application as SplitWiseApplication).appContainer
+        val repo = appContainer.authRepository
+        val authPreference = appContainer.authPreference
+
+        kotlinx.coroutines.GlobalScope.launch {
+            if (authPreference.getAccessTokenSync() != null) {
+                repo.updateFcmToken(UpdateFcmTokenRequest(token))
+            }
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
@@ -26,7 +38,7 @@ class AppMessagingService: FirebaseMessagingService() {
 
     private fun showNotification(title: String?, message: String?) {
         val channelId = "default_notification_channel"
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager = getSystemService(NotificationManager::class.java)
 
         // 1. Create the Notification Channel (Required for Android 8.0+)
         val channel = NotificationChannel(
@@ -48,7 +60,7 @@ class AppMessagingService: FirebaseMessagingService() {
 
         // 3. Build the Notification
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(android.R.drawable.sym_def_app_icon) // Replace with your app icon, e.g., R.drawable.ic_notification
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true) // Removes notification when clicked
