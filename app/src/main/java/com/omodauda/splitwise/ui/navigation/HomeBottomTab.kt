@@ -24,6 +24,7 @@ import com.omodauda.splitwise.R
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.activity.ActivityScreen
+import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
@@ -39,6 +40,7 @@ fun HomeBottomTab(
     inviteViewModel: InviteViewModel,
     friendViewModel: FriendViewModel,
     billsViewModel: BillsViewModel,
+    activityViewModel: ActivityViewModel,
     toastHostState: ToastHostState,
     startDestination: String = Screen.Home.route
 ) {
@@ -67,7 +69,7 @@ fun HomeBottomTab(
 //                GroupScreen()
 //            }
             composable(route = Screen.Activity.route) {
-                ActivityScreen()
+                ActivityScreen(viewModel = activityViewModel)
             }
             composable(route = Screen.Friends.route) {
                 FriendScreen(viewModel = friendViewModel, inviteViewModel)

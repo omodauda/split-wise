@@ -62,3 +62,11 @@ data class PayBillRequest(
 data class PayBillResponse(
     val message: String
 )
+
+data class SendBillReminderRequest(
+    val splitId: String
+)
+
+data class SendBillReminderResponse(
+    val message: String
+)

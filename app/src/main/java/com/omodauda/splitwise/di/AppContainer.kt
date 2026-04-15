@@ -3,10 +3,12 @@ package com.omodauda.splitwise.di
 import android.content.Context
 import com.google.gson.GsonBuilder
 import com.omodauda.splitwise.data.local.AuthPreference
+import com.omodauda.splitwise.data.network.api.ActivitiesApi
 import com.omodauda.splitwise.data.network.api.AuthApi
 import com.omodauda.splitwise.data.network.api.BillApi
 import com.omodauda.splitwise.data.network.api.FriendApi
 import com.omodauda.splitwise.data.network.interceptor.AuthInterceptor
+import com.omodauda.splitwise.data.repository.ActivityRepository
 import com.omodauda.splitwise.data.repository.AuthRepository
 import com.omodauda.splitwise.data.repository.BillsRepository
 import com.omodauda.splitwise.data.repository.FriendRepository
@@ -26,6 +28,9 @@ interface IAppContainer {
  val inviteRepository: InviteRepository
  val billApi: BillApi
  val billsRepository: BillsRepository
+
+ val activityApi: ActivitiesApi
+ val activityRepository: ActivityRepository
 
  val authPreference: AuthPreference
 }
@@ -65,8 +70,14 @@ class AppContainerImpl(private val context: Context): IAppContainer {
         retrofit.create(BillApi::class.java)
     }
 
+    override val activityApi: ActivitiesApi by lazy {
+        retrofit.create(ActivitiesApi::class.java)
+    }
+
+
     override val authRepository = AuthRepository(authPreference, authApi)
     override val friendRepository = FriendRepository(friendApi)
     override val inviteRepository = InviteRepository(friendApi)
     override val billsRepository = BillsRepository(billApi)
+    override val activityRepository: ActivityRepository = ActivityRepository(activityApi)
 }

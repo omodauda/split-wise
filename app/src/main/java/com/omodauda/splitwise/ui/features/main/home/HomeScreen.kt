@@ -33,6 +33,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
+import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.components.LoadingView
@@ -105,12 +106,14 @@ fun HomeScreen(
                 toastHostState.showToast(
                     ToastState(message = state.message, type = ToastType.SUCCESS)
                 )
+                billsViewModel.resetSubmissionState()
             }
 
             is PayBillSubmissionState.Error -> {
                 toastHostState.showToast(
                     ToastState(message = state.message, type = ToastType.ERROR)
                 )
+                billsViewModel.resetSubmissionState()
             }
             else -> {}
         }
@@ -138,6 +141,12 @@ fun HomeScreen(
         } else {
 //            Log.w("FCM", "Cannot fetch token: Notification permission not granted.")
         }
+    }
+
+    fun handleSendReminder() {
+        val data = SendBillReminderRequest(splitId = selectedOwedBill!!.id)
+        billsViewModel.sendBillReminder(data)
+        showBottomSheet = false
     }
 
 
@@ -180,6 +189,7 @@ fun HomeScreen(
                 ReminderModal(
                     sheetState,
                     onDismissRequest = { showBottomSheet = false },
+                    onSend = {handleSendReminder()},
                     bill = selectedOwedBill
                 )
             }

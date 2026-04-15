@@ -14,6 +14,7 @@ import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.google.gson.Gson
+import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
 
@@ -141,6 +142,24 @@ class BillsRepository(private val billApi: BillApi) {
     suspend fun settleBill(data: PayBillRequest): Result<String> {
         return try {
             val response = billApi.settleBill(data)
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body.message)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        }catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun sendBillReminder(data: SendBillReminderRequest): Result<String> {
+        return try {
+            val response = billApi.sendBillReminder(data)
             val body = response.body()
             if (response.isSuccessful && body !== null) {
                 Result.success(body.message)
