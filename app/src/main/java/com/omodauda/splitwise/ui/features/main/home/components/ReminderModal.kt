@@ -41,7 +41,8 @@ import com.omodauda.splitwise.utils.formatFromCents
 fun ReminderModal(
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
-    bill: OwedBill?
+    bill: OwedBill?,
+    onSend: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = {onDismissRequest()},
@@ -56,7 +57,7 @@ fun ReminderModal(
                 )
         ) {
             ModalHeader(onDismiss = {onDismissRequest()})
-            ModalContent(bill)
+            ModalContent(onSend, bill)
         }
     }
 }
@@ -109,6 +110,7 @@ fun ModalHeader(
 
 @Composable
 fun ModalContent(
+    onSend: () -> Unit,
     bill: OwedBill?,
     modifier: Modifier = Modifier
 ) {
@@ -138,7 +140,7 @@ fun ModalContent(
         )
         Spacer(Modifier.height(Spacing.small))
         AppIconTextButton(
-            onClick = {},
+            onClick = {onSend()},
             leadingIcon = R.drawable.send_icon,
             title = "Send Reminder",
             modifier = Modifier
