@@ -106,12 +106,14 @@ fun HomeScreen(
                 toastHostState.showToast(
                     ToastState(message = state.message, type = ToastType.SUCCESS)
                 )
+                billsViewModel.resetSubmissionState()
             }
 
             is PayBillSubmissionState.Error -> {
                 toastHostState.showToast(
                     ToastState(message = state.message, type = ToastType.ERROR)
                 )
+                billsViewModel.resetSubmissionState()
             }
             else -> {}
         }

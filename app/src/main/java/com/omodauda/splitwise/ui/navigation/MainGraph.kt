@@ -17,6 +17,8 @@ import com.omodauda.splitwise.ui.features.main.accountSettings.ChangePasswordVie
 import com.omodauda.splitwise.ui.features.main.accountSettings.ChangePasswordViewModelFactory
 import com.omodauda.splitwise.ui.features.main.accountSettings.DeleteAccountViewModel
 import com.omodauda.splitwise.ui.features.main.accountSettings.DeleteAccountViewModelFactory
+import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
+import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModelFactory
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillScreen
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModelFactory
@@ -57,12 +59,19 @@ fun NavGraphBuilder.mainNavGraph(
                 viewModelStoreOwner = parentEntry,
                 factory = BillsViewModelFactory(application.appContainer.billsRepository)
             )
+
+            val activityViewModel: ActivityViewModel = viewModel(
+                viewModelStoreOwner = parentEntry,
+                factory = ActivityViewModelFactory(application.appContainer.activityRepository)
+            )
+
             HomeBottomTab(
                 navController,
                 authViewModel,
                 inviteViewModel,
                 friendViewModel,
                 billsViewModel,
+                activityViewModel,
                 toastHostState
             )
         }
