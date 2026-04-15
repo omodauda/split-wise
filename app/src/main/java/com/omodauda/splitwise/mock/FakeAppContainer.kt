@@ -24,6 +24,8 @@ import com.omodauda.splitwise.data.network.model.LoginResponse
 import com.omodauda.splitwise.data.network.model.PaginationMetaData
 import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.omodauda.splitwise.data.network.model.PayBillResponse
+import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
+import com.omodauda.splitwise.data.network.model.SendBillReminderResponse
 import com.omodauda.splitwise.data.network.model.SendFriendInviteRequest
 import com.omodauda.splitwise.data.network.model.SignupRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
@@ -192,6 +194,10 @@ class FakeBillApi: BillApi {
     }
 
     override suspend fun settleBill(request: PayBillRequest): Response<PayBillResponse> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun sendBillReminder(request: SendBillReminderRequest): Response<SendBillReminderResponse> {
         TODO("Not yet implemented")
     }
 

@@ -7,6 +7,7 @@ import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
 import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.PayBillRequest
+import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import com.omodauda.splitwise.data.repository.BillsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -173,6 +174,12 @@ class BillsViewModel(private val repo: BillsRepository) : ViewModel() {
                         )
                     }
                 }
+        }
+    }
+
+    fun sendBillReminder(data: SendBillReminderRequest) {
+        viewModelScope.launch {
+            repo.sendBillReminder(data)
         }
     }
 
