@@ -2,6 +2,7 @@ package com.omodauda.splitwise.mock
 
 import com.omodauda.splitwise.data.local.AuthPreference
 import com.omodauda.splitwise.data.local.IAuthPreference
+import com.omodauda.splitwise.data.network.api.ActivitiesApi
 import com.omodauda.splitwise.data.network.api.AuthApi
 import com.omodauda.splitwise.data.network.api.BillApi
 import com.omodauda.splitwise.data.network.api.FriendApi
@@ -14,6 +15,7 @@ import com.omodauda.splitwise.data.network.model.CreateBillResponse
 import com.omodauda.splitwise.data.network.model.DeleteAccountRequest
 import com.omodauda.splitwise.data.network.model.DeleteAccountResponse
 import com.omodauda.splitwise.data.network.model.FriendInviteResponse
+import com.omodauda.splitwise.data.network.model.GetActivitiesResponse
 import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
 import com.omodauda.splitwise.data.network.model.GetFriendsResponse
 import com.omodauda.splitwise.data.network.model.GetOwedBillsResponse
@@ -32,6 +34,7 @@ import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenResponse
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileResponse
+import com.omodauda.splitwise.data.repository.ActivityRepository
 import com.omodauda.splitwise.data.repository.AuthRepository
 import com.omodauda.splitwise.data.repository.BillsRepository
 import com.omodauda.splitwise.data.repository.FriendRepository
@@ -203,6 +206,13 @@ class FakeBillApi: BillApi {
 
 }
 
+class FakeActivityApi: ActivitiesApi {
+    override suspend fun getUserActivities(cursorId: String?): Response<GetActivitiesResponse> {
+        TODO("Not yet implemented")
+    }
+
+}
+
 class FakeAppContainer : IAppContainer {
 
     // First, implement the missing 'authApi' member.
@@ -226,5 +236,10 @@ class FakeAppContainer : IAppContainer {
     override val billApi: BillApi = FakeBillApi()
 
     override val billsRepository: BillsRepository
+        get() = TODO("Not yet implemented")
+
+    override val activityApi: ActivitiesApi = FakeActivityApi()
+
+    override val activityRepository: ActivityRepository
         get() = TODO("Not yet implemented")
 }
