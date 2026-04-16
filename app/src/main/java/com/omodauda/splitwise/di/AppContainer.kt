@@ -2,6 +2,7 @@ package com.omodauda.splitwise.di
 
 import android.content.Context
 import com.google.gson.GsonBuilder
+import com.omodauda.splitwise.BuildConfig
 import com.omodauda.splitwise.data.local.AuthPreference
 import com.omodauda.splitwise.data.network.api.ActivitiesApi
 import com.omodauda.splitwise.data.network.api.AuthApi
@@ -15,9 +16,10 @@ import com.omodauda.splitwise.data.repository.FriendRepository
 import com.omodauda.splitwise.data.repository.InviteRepository
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-
+import java.util.concurrent.TimeUnit
 
 
 interface IAppContainer {
@@ -36,18 +38,22 @@ interface IAppContainer {
 }
 class AppContainerImpl(private val context: Context): IAppContainer {
 
-    private val baseUrl = "https://split-wise-backend.fly.dev/v1/"
+    private val baseUrl = BuildConfig.BASE_URL
     override val authPreference = AuthPreference(context)
 
     private val gson = GsonBuilder()
         .serializeNulls()
         .create()
     private val okHttpClient: OkHttpClient by lazy {
+
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) Level.BODY else Level.NONE
         }
 
         OkHttpClient.Builder()
+            .connectTimeout(3, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(AuthInterceptor(authPreference))
             .addInterceptor(loggingInterceptor)
             .build()

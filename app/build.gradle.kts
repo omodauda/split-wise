@@ -1,8 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.google.crashlytics)
+}
+
+val properties = Properties().apply {
+    val propertiesFile = rootProject.file("local.properties")
+    if (propertiesFile.exists()) {
+        load(propertiesFile.inputStream())
+    }
 }
 
 android {
@@ -23,11 +33,23 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // RELEASE BASE URL
+            val baseUrl = properties.getProperty("BASE_URL")
+            buildConfigField("String", "BASE_URL", baseUrl)
+        }
+
+        getByName("debug") {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            // DEBUG BASE URL
+            val baseUrl = properties.getProperty("BASE_URL")
+            buildConfigField("String", "BASE_URL", baseUrl)
         }
     }
     compileOptions {
@@ -39,6 +61,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -72,4 +95,5 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.crashlytics)
 }
