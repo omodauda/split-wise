@@ -51,7 +51,7 @@ class AppContainerImpl(private val context: Context): IAppContainer {
         }
 
         OkHttpClient.Builder()
-            .connectTimeout(3, TimeUnit.SECONDS)
+            .connectTimeout(1, TimeUnit.MINUTES)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
             .addInterceptor(AuthInterceptor(authPreference))
