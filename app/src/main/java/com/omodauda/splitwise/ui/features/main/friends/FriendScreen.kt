@@ -47,7 +47,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.Friend
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.model.InviteSubmissionState
 import com.omodauda.splitwise.ui.components.AppTextField
 import com.omodauda.splitwise.ui.components.UserAvatar
@@ -385,11 +384,7 @@ fun FriendPlaceholder(
 )
 @Composable
 fun FriendScreenPreview() {
-    val container = FakeAppContainer()
-    val vm = FriendViewModel(container.friendRepository)
-    val inviteVm = InviteViewModel(container.inviteRepository)
-//    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        FriendScreen(viewModel = vm, inviteViewModel = inviteVm)
+//        FriendScreen(viewModel = vm, inviteViewModel = inviteVm)
     }
 }

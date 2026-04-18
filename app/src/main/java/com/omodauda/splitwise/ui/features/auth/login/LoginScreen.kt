@@ -40,7 +40,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.LoginRequest
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.components.AppTextButton
 import com.omodauda.splitwise.ui.components.AppTextField
 import com.omodauda.splitwise.ui.components.GoogleButton
@@ -48,7 +47,6 @@ import com.omodauda.splitwise.ui.components.LoadingView
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.components.toast.ToastState
 import com.omodauda.splitwise.ui.components.toast.ToastType
-import com.omodauda.splitwise.ui.components.toast.rememberToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthSubmissionState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
@@ -288,10 +286,8 @@ uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 @Composable
 fun LoginScreenPreview() {
-    val container = FakeAppContainer()
-    val vm = AuthViewModel(container.authRepository)
-    val toastHostState = rememberToastHostState()
+//    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        LoginScreen(goToSignup = {}, goToForgotPassword = {}, authViewModel = vm, toastHostState = toastHostState)
+//        LoginScreen(goToSignup = {}, goToForgotPassword = {}, authViewModel = vm, toastHostState = toastHostState)
     }
 }

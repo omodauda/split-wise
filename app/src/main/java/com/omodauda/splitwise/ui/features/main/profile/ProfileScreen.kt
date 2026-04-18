@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
@@ -157,12 +156,6 @@ fun ProfileContent(
                 .clickable(enabled = true, onClick = {goToAccountSettings()})
         )
         Spacer(Modifier.height(Spacing.medium))
-//        ProfileItem(
-//            title = R.string.notifications,
-//            subTitle = R.string.notifications_desc,
-//            icon = R.drawable.notification_icon,
-//
-//        )
         Spacer(Modifier.height(Spacing.medium))
         ProfileItem(
             title = R.string.help_support,
@@ -266,9 +259,7 @@ fun ProfileItem(
 )
 @Composable
 fun ProfileScreenPreview() {
-    val container = FakeAppContainer()
-    val vm = AuthViewModel(container.authRepository)
     SplitWiseTheme {
-        ProfileScreen(authViewModel = vm, goToAccountSettings = {})
+
     }
 }

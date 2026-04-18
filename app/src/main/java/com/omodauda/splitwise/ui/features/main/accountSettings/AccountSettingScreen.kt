@@ -45,14 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.components.AppTextButton
 import com.omodauda.splitwise.ui.components.AppTextField
 import com.omodauda.splitwise.ui.components.LoadingView
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.components.toast.ToastState
 import com.omodauda.splitwise.ui.components.toast.ToastType
-import com.omodauda.splitwise.ui.components.toast.rememberToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthSubmissionState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.accountSettings.components.ChangePasswordDialog
@@ -410,19 +408,13 @@ fun SettingsItem(
 )
 @Composable
 fun AccountSettingScreenPreview() {
-
-    val container = FakeAppContainer()
-    val vm = ChangePasswordViewModel(container.authRepository)
-    val deleteVm = DeleteAccountViewModel(container.authRepository)
-    val authViewModel = AuthViewModel(container.authRepository)
-    val toastHostState = rememberToastHostState()
     SplitWiseTheme {
-        AccountSettingScreen(
-            goBack = {},
-            changePasswordViewModel = vm,
-            deleteAccountViewModel = deleteVm,
-            authViewModel,
-            toastHostState
-        )
+//        AccountSettingScreen(
+//            goBack = {},
+//            changePasswordViewModel = vm,
+//            deleteAccountViewModel = deleteVm,
+//            authViewModel,
+//            toastHostState
+//        )
     }
 }

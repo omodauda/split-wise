@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,12 +34,10 @@ import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.components.LoadingView
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.components.toast.ToastState
 import com.omodauda.splitwise.ui.components.toast.ToastType
-import com.omodauda.splitwise.ui.components.toast.rememberToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.components.BillSectionShimmer
@@ -315,20 +312,15 @@ fun ContentView(
 )
 @Composable
 fun HomeScreenPreview() {
-    val container = FakeAppContainer()
-    val inviteVm = InviteViewModel(container.inviteRepository)
-    val friendVm = FriendViewModel(container.friendRepository)
-    val billsViewModel = BillsViewModel(container.billsRepository)
-    val authVm = AuthViewModel(container.authRepository)
-    val toastHostState = rememberToastHostState()
+
     SplitWiseTheme {
-        HomeScreen(
-            goToAddBill = {},
-            inviteVm,
-            friendViewModel = friendVm,
-            billsViewModel,
-            authVm,
-            toastHostState
-        )
+//        HomeScreen(
+//            goToAddBill = {},
+//            inviteVm,
+//            friendViewModel = friendVm,
+//            billsViewModel,
+//            authVm,
+//            toastHostState
+//        )
     }
 }

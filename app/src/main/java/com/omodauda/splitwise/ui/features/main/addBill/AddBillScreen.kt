@@ -34,17 +34,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.omodauda.splitwise.R
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.model.AddBillSubmissionState
 import com.omodauda.splitwise.ui.components.AppTextButton
 import com.omodauda.splitwise.ui.components.LoadingView
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.components.toast.ToastState
 import com.omodauda.splitwise.ui.components.toast.ToastType
-import com.omodauda.splitwise.ui.components.toast.rememberToastHostState
-import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepFive.StepFive
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepFour.StepFour
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepOne.StepOne
@@ -307,13 +303,8 @@ fun AddBillFooter(
 )
 @Composable
 fun AddBillScreenPreview() {
-    val container = FakeAppContainer()
-    val authVm = AuthViewModel(repo = container.authRepository)
-    val vm = AddBillViewModel(container.billsRepository, userFlow = authVm.user)
-    val billsVm = BillsViewModel(container.billsRepository)
-    val toastHostState = rememberToastHostState()
-    val navController = rememberNavController()
+
     SplitWiseTheme {
-        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm, toastHostState = toastHostState, rootNavController = navController, currentUserId = "", billsViewModel = billsVm)
+//        AddBillScreen(goBack = {}, goToAddBillSuccess = {}, addBillViewModel = vm, toastHostState = toastHostState, rootNavController = navController, currentUserId = "", billsViewModel = billsVm)
     }
 }
