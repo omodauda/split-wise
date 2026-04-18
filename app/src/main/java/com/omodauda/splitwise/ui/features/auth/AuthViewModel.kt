@@ -7,12 +7,14 @@ import com.omodauda.splitwise.data.network.model.SignupRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.repository.AuthRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface AuthSubmissionState {
     data object Idle : AuthSubmissionState
@@ -27,7 +29,8 @@ data class SignupUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 
-class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
+@HiltViewModel
+class AuthViewModel @Inject constructor(private val repo: AuthRepository) : ViewModel() {
     val isAuthenticated = repo.isAuthenticated
         .stateIn(
             scope = viewModelScope,

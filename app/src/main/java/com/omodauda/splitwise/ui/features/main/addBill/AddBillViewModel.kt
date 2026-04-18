@@ -2,26 +2,29 @@ package com.omodauda.splitwise.ui.features.main.addBill
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.omodauda.splitwise.data.network.model.AuthUserData
 import com.omodauda.splitwise.data.network.model.BillSplit
 import com.omodauda.splitwise.data.network.model.CreateBillRequest
 import com.omodauda.splitwise.data.network.model.Friend
+import com.omodauda.splitwise.data.repository.AuthRepository
 import com.omodauda.splitwise.data.repository.BillsRepository
 import com.omodauda.splitwise.model.AddBillSubmissionState
 import com.omodauda.splitwise.model.AddBillUiState
 import com.omodauda.splitwise.model.SplitEntryState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Date
+import javax.inject.Inject
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-class AddBillViewModel(
+@HiltViewModel
+class AddBillViewModel @Inject constructor(
     private val repo: BillsRepository,
-    private val userFlow: StateFlow<AuthUserData?>,
+    private val authRepository: AuthRepository,
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AddBillUiState())
     val uiState: StateFlow<AddBillUiState> = _uiState.asStateFlow()
@@ -30,7 +33,7 @@ class AddBillViewModel(
 
     init {
         viewModelScope.launch {
-            userFlow.collect { user ->
+            authRepository.user.collect { user ->
                 if (user !== null) {
                     val me = Friend (
                         friendshipId = user.id,
