@@ -11,8 +11,9 @@ import com.omodauda.splitwise.data.network.model.FriendInviteResponse
 import com.omodauda.splitwise.data.network.model.SendFriendInviteRequest
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class InviteRepository(private val friendApi: FriendApi) {
+class InviteRepository @Inject constructor(private val friendApi: FriendApi) {
 
     suspend fun sendInvite(data: SendFriendInviteRequest): Result<FriendInviteResponse> {
         return try {

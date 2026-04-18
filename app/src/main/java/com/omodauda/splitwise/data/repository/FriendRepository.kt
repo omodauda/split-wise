@@ -7,8 +7,9 @@ import com.omodauda.splitwise.data.network.FriendPagingSource
 import com.omodauda.splitwise.data.network.api.FriendApi
 import com.omodauda.splitwise.data.network.model.Friend
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class FriendRepository(private val friendApi: FriendApi) {
+class FriendRepository @Inject constructor(private val friendApi: FriendApi) {
     fun getFriendsStream(searchQuery: String?): Flow<PagingData<Friend>> {
         return Pager(
             config = PagingConfig(

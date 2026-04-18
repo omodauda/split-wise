@@ -7,8 +7,9 @@ import com.omodauda.splitwise.data.network.ActivitiesPagingSource
 import com.omodauda.splitwise.data.network.api.ActivitiesApi
 import com.omodauda.splitwise.data.network.model.Activity
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class ActivityRepository(private val api: ActivitiesApi) {
+class ActivityRepository @Inject constructor(private val api: ActivitiesApi) {
 
     fun getActivitiesStream(): Flow<PagingData<Activity>> {
         return Pager(
