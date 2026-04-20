@@ -16,10 +16,28 @@ import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.google.gson.Gson
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.io.IOException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class BillsRepository @Inject constructor(private val billApi: BillApi) {
+
+    private val _refreshOwedBillsSignal = MutableSharedFlow<Unit>(replay = 0)
+    val refreshOwedBillSignal = _refreshOwedBillsSignal.asSharedFlow()
+
+    private val _refreshOwingBillsSignal = MutableSharedFlow<Unit>(replay = 0)
+    val refreshOwingBillSignal = _refreshOwingBillsSignal.asSharedFlow()
+
+    suspend fun triggerRefreshOwedBills() {
+        _refreshOwedBillsSignal.emit(Unit)
+    }
+
+    suspend fun triggerRefreshOwingBills() {
+        _refreshOwingBillsSignal.emit(Unit)
+    }
 
     suspend fun addBill(data: CreateBillRequest): Result<CreateBillResponse> {
         return try {
