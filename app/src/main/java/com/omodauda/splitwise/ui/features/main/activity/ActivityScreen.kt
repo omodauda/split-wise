@@ -35,7 +35,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.Activity
-import com.omodauda.splitwise.mock.FakeAppContainer
 import com.omodauda.splitwise.ui.features.main.activity.components.EmptyActivity
 import com.omodauda.splitwise.ui.features.main.friends.FriendListPlaceholder
 import com.omodauda.splitwise.ui.features.main.friends.FriendPlaceholder
@@ -244,9 +243,7 @@ fun ActivityItemView(
 )
 @Composable
 fun ActivityScreenPreview() {
-    val container = FakeAppContainer()
-    val vm = ActivityViewModel(container.activityRepository)
     SplitWiseTheme {
-        ActivityScreen(viewModel = vm)
+//        ActivityScreen(viewModel = vm)
     }
 }

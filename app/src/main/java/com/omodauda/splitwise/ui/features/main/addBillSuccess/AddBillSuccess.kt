@@ -35,8 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
-import com.omodauda.splitwise.mock.FakeAppContainer
-import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
@@ -177,10 +175,8 @@ fun SuccessItem(
 )
 @Composable
 fun AddBillSuccessPreview() {
-    val container = FakeAppContainer()
-    val authVm = AuthViewModel(repo = container.authRepository)
-    val vm = AddBillViewModel(container.billsRepository, authVm.user)
+
     SplitWiseTheme {
-        AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
+//        AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
     }
 }

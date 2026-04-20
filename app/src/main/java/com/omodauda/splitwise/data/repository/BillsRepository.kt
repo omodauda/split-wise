@@ -17,8 +17,9 @@ import com.google.gson.Gson
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import kotlinx.coroutines.flow.Flow
 import java.io.IOException
+import javax.inject.Inject
 
-class BillsRepository(private val billApi: BillApi) {
+class BillsRepository @Inject constructor(private val billApi: BillApi) {
 
     suspend fun addBill(data: CreateBillRequest): Result<CreateBillResponse> {
         return try {

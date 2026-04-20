@@ -10,6 +10,7 @@ import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import com.omodauda.splitwise.data.repository.BillsRepository
 import com.omodauda.splitwise.model.AddBillSubmissionState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed interface PayBillSubmissionState {
     data object Idle : PayBillSubmissionState
@@ -39,7 +41,8 @@ data class BillsUiState(
     val billActionState: PayBillSubmissionState = PayBillSubmissionState.Idle,
 )
 
-class BillsViewModel(private val repo: BillsRepository) : ViewModel() {
+@HiltViewModel
+class BillsViewModel @Inject constructor(private val repo: BillsRepository) : ViewModel() {
 
     private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
 

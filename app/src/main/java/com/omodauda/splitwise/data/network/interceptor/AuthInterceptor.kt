@@ -1,10 +1,11 @@
 package com.omodauda.splitwise.data.network.interceptor
 
-import com.omodauda.splitwise.data.local.AuthPreference
+import com.omodauda.splitwise.data.local.IAuthPreference
 import okhttp3.Interceptor
 import okhttp3.Response
+import javax.inject.Inject
 
-class AuthInterceptor(private val authPreference: AuthPreference): Interceptor {
+class AuthInterceptor @Inject constructor(private val authPreference: IAuthPreference): Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()

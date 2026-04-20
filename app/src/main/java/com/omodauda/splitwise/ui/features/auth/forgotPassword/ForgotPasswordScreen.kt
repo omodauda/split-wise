@@ -43,19 +43,20 @@ import com.omodauda.splitwise.ui.theme.SplitWiseTheme
 @Composable
 fun ForgotPasswordScreen(
     goBack: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: ForgotPasswordViewModel = viewModel(),
-    modifier: Modifier = Modifier
+
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     fun handleSubmit() {
-        if (viewModel.validateForm()) {}
+//        if (viewModel.validateForm()) {}
     }
 
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-    ) {
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

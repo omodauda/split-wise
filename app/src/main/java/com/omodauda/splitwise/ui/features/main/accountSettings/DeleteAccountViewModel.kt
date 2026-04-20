@@ -5,12 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.omodauda.splitwise.data.network.model.DeleteAccountRequest
 import com.omodauda.splitwise.data.repository.AuthRepository
 import com.omodauda.splitwise.ui.features.auth.AuthSubmissionState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.onFailure
 
 data class DeleteAccountUiState(
@@ -24,7 +26,8 @@ data class DeleteAccountUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 
-class DeleteAccountViewModel(private val authRepository: AuthRepository) : ViewModel() {
+@HiltViewModel
+class DeleteAccountViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(DeleteAccountUiState())
     val uiState: StateFlow<DeleteAccountUiState> = _uiState.asStateFlow()
 

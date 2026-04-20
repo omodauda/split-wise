@@ -9,22 +9,32 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.omodauda.splitwise.MainActivity
 import com.omodauda.splitwise.R
-import com.omodauda.splitwise.SplitWiseApplication
+import com.omodauda.splitwise.data.local.IAuthPreference
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
-import kotlinx.coroutines.DelicateCoroutinesApi
+import com.omodauda.splitwise.data.repository.AuthRepository
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AppMessagingService: FirebaseMessagingService() {
-    @OptIn(DelicateCoroutinesApi::class)
+@AndroidEntryPoint
+class AppMessagingService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var authRepository: AuthRepository
+
+    @Inject
+    lateinit var authPreference: IAuthPreference
+
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        val appContainer = (application as SplitWiseApplication).appContainer
-        val repo = appContainer.authRepository
-        val authPreference = appContainer.authPreference
-
-        kotlinx.coroutines.GlobalScope.launch {
+        serviceScope.launch {
             if (authPreference.getAccessTokenSync() != null) {
-                repo.updateFcmToken(UpdateFcmTokenRequest(token))
+                authRepository.updateFcmToken(UpdateFcmTokenRequest(token))
             }
         }
     }
@@ -68,7 +78,6 @@ class AppMessagingService: FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         // 4. Show the notification
-        // Use a unique ID (like current time) so multiple notifications don't overwrite each other
         notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
     }
 }

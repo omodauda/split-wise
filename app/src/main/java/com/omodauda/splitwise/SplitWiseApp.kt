@@ -6,25 +6,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.omodauda.splitwise.ui.components.toast.ToastHost
 import com.omodauda.splitwise.ui.components.toast.rememberToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
-import com.omodauda.splitwise.ui.features.auth.AuthViewModelFactory
 import com.omodauda.splitwise.ui.navigation.authNavGraph
 import com.omodauda.splitwise.ui.navigation.mainNavGraph
 
 @Composable
-fun SplitWiseApp() {
-    val application = LocalContext.current.applicationContext as SplitWiseApplication
-    val authRepository = application.appContainer.authRepository
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(authRepository)
-    )
-
+fun SplitWiseApp(
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
     val navController = rememberNavController()
     val toastHostState = rememberToastHostState()

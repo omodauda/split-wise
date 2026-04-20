@@ -6,14 +6,17 @@ import com.omodauda.splitwise.data.network.model.ChangePasswordRequest
 import com.omodauda.splitwise.data.repository.AuthRepository
 import com.omodauda.splitwise.model.ChangePasswordUiState
 import com.omodauda.splitwise.ui.features.auth.AuthSubmissionState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChangePasswordViewModel(private val repo: AuthRepository): ViewModel() {
+@HiltViewModel
+class ChangePasswordViewModel @Inject constructor(private val repo: AuthRepository): ViewModel() {
     private val _uiState = MutableStateFlow(ChangePasswordUiState())
     val uiState: StateFlow<ChangePasswordUiState> = _uiState.asStateFlow()
 

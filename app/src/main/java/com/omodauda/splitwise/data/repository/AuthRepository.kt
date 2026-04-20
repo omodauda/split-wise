@@ -18,8 +18,9 @@ import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthRepository(
+class AuthRepository @Inject constructor(
     private val authPreference: IAuthPreference,
     private val authApi: AuthApi
 ) {
