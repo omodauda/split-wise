@@ -258,7 +258,7 @@ fun AlternativeLoginView(
         }
         pop()
     }
-    GoogleButton(onClicked = {})
+    GoogleButton()
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,
