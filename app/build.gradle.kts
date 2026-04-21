@@ -42,6 +42,9 @@ android {
             // RELEASE BASE URL
             val baseUrl = properties.getProperty("BASE_URL")
             buildConfigField("String", "BASE_URL", baseUrl)
+
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
+            buildConfigField("String", "GOGGLE_SERVER_CLIENT_ID", googleServerClientId)
         }
 
         getByName("debug") {
@@ -50,6 +53,9 @@ android {
             // DEBUG BASE URL
             val baseUrl = properties.getProperty("BASE_URL")
             buildConfigField("String", "BASE_URL", baseUrl)
+
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
+            buildConfigField("String", "GOGGLE_SERVER_CLIENT_ID", googleServerClientId)
         }
     }
     compileOptions {
@@ -79,6 +85,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.googleid)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
