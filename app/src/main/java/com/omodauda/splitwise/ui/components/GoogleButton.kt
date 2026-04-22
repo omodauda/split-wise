@@ -47,6 +47,7 @@ import java.util.Base64
 
 @Composable
 fun GoogleButton(
+    continueWithGoogle: (idToken: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -89,7 +90,7 @@ fun GoogleButton(
                     Log.d(tag, "Profile Picture: ${googleIdTokenCredential.profilePictureUri}")
 
                     // TODO: Send idToken to your backend API for authentication
-                    // authViewModel.loginWithGoogle(idToken)
+                    continueWithGoogle(idToken)
 
                 } catch (e: GoogleIdTokenParsingException) {
                     Log.e(tag, "Received invalid Google ID token response", e)
@@ -176,7 +177,7 @@ fun GoogleButton(
 fun GoogleButtonPreview() {
     SplitWiseTheme {
         GoogleButton(
-//            onClicked = {}
+            continueWithGoogle = {}
         )
     }
 }
