@@ -14,6 +14,7 @@ import com.omodauda.splitwise.data.network.model.SignupRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileRequest
 import com.omodauda.splitwise.data.network.model.UpdateProfileResponse
 import com.google.gson.Gson
+import com.omodauda.splitwise.data.network.model.GoogleAuthRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenResponse
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,28 @@ class AuthRepository @Inject constructor(
                 // authenticate user
                 authPreference.setAuthenticated(true)
                 Result.success(signupResponse)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun googleAuth(data: GoogleAuthRequest): Result<LoginResponse> {
+        return try {
+            val response = authApi.googleAuth(data)
+            if (response.isSuccessful && response.body() !== null) {
+                val authResponse = response.body()!!
+                // save access token
+                authPreference.saveAccessToken(authResponse.data.token)
+                // save user data
+                authPreference.saveUser(authResponse.data.user)
+                // authenticate user
+                authPreference.setAuthenticated(true)
+                Result.success(authResponse)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val apiError = Gson().fromJson(errorBody, ApiError::class.java)

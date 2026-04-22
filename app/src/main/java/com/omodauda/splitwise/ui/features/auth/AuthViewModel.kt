@@ -2,6 +2,7 @@ package com.omodauda.splitwise.ui.features.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.omodauda.splitwise.data.network.model.GoogleAuthRequest
 import com.omodauda.splitwise.data.network.model.LoginRequest
 import com.omodauda.splitwise.data.network.model.SignupRequest
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
@@ -29,6 +30,10 @@ data class SignupUiState(
     val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
 )
 
+data class GoogleAuthUiState(
+    val submissionState: AuthSubmissionState = AuthSubmissionState.Idle
+)
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(private val repo: AuthRepository) : ViewModel() {
     val isAuthenticated = repo.isAuthenticated
@@ -48,6 +53,9 @@ class AuthViewModel @Inject constructor(private val repo: AuthRepository) : View
     private val _signupUiState = MutableStateFlow(SignupUiState())
     val signupUiState = _signupUiState.asStateFlow()
 
+    private val _googleAuthUiState = MutableStateFlow(GoogleAuthUiState())
+    val googleAuthUiState = _googleAuthUiState.asStateFlow()
+
     private val _loginUiState = MutableStateFlow(LoginUiState())
     val loginUiState = _loginUiState.asStateFlow()
 
@@ -59,6 +67,24 @@ class AuthViewModel @Inject constructor(private val repo: AuthRepository) : View
                 _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
             }.onFailure { exception ->
                 _signupUiState.update {
+                    it.copy(
+                        submissionState = AuthSubmissionState.Error(
+                            exception.message ?: "An error occurred"
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun continueWithGoogle(data: GoogleAuthRequest) {
+        viewModelScope.launch {
+            _googleAuthUiState.update { it.copy(submissionState = AuthSubmissionState.Loading) }
+            val result = repo.googleAuth(data)
+            result.onSuccess {
+                _googleAuthUiState.update { it.copy(submissionState = AuthSubmissionState.Success) }
+            }.onFailure { exception ->
+                _googleAuthUiState.update {
                     it.copy(
                         submissionState = AuthSubmissionState.Error(
                             exception.message ?: "An error occurred"
@@ -117,6 +143,10 @@ class AuthViewModel @Inject constructor(private val repo: AuthRepository) : View
 
     fun resetSignupState() {
         _signupUiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
+    }
+
+    fun resetGoogleAuthState() {
+        _googleAuthUiState.update { it.copy(submissionState = AuthSubmissionState.Idle) }
     }
 
     fun resetLoginSubmissionState() {
