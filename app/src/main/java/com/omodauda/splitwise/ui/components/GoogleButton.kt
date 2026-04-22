@@ -124,7 +124,7 @@ fun GoogleButton(
 
     val onClick: () -> Unit = {
         val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption
-            .Builder(serverClientId = BuildConfig.GOGGLE_SERVER_CLIENT_ID)
+            .Builder(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
             .setNonce(generateSecureRandomNonce())
             .build()
 
