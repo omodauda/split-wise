@@ -46,6 +46,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.omodauda.splitwise.R
+import com.omodauda.splitwise.data.network.model.GoogleAuthRequest
 import com.omodauda.splitwise.data.network.model.SignupRequest
 import com.omodauda.splitwise.ui.components.AppTextButton
 import com.omodauda.splitwise.ui.components.AppTextField
@@ -70,6 +71,7 @@ fun SignupScreen(
     viewModel: SignupViewModel = viewModel(),
 ) {
     val authUiState by authViewModel.signupUiState.collectAsStateWithLifecycle()
+    val googleAuthUiState by authViewModel.googleAuthUiState.collectAsStateWithLifecycle()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
@@ -106,7 +108,11 @@ fun SignupScreen(
         }
     }
 
-    if (authUiState.submissionState is AuthSubmissionState.Loading) {
+    fun handleContinueWithGoogle(idToken: String) {
+        authViewModel.continueWithGoogle(data = GoogleAuthRequest(idToken))
+    }
+
+    if (authUiState.submissionState is AuthSubmissionState.Loading || googleAuthUiState.submissionState is AuthSubmissionState.Loading) {
         LoadingView()
     }
 
@@ -120,6 +126,19 @@ fun SignupScreen(
                 )
             )
             authViewModel.resetSignupState()
+        }
+    }
+
+    LaunchedEffect(googleAuthUiState.submissionState) {
+        val state = googleAuthUiState.submissionState
+        if (state is AuthSubmissionState.Error) {
+            toastHostState.showToast(
+                toast = ToastState(
+                    message = state.message,
+                    type = ToastType.ERROR
+                )
+            )
+            authViewModel.resetGoogleAuthState()
         }
     }
 
@@ -284,7 +303,12 @@ fun SignupScreen(
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
                 DividerView()
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
-                AlternativeSignupView(goToLogin = {goBack()})
+                AlternativeSignupView(
+                    goToLogin = {goBack()},
+                    continueWithGoogle = {idToken ->
+                        handleContinueWithGoogle(idToken)
+                    }
+                )
                 Spacer(Modifier.height(Spacing.extraLarge))
             }
         }
@@ -344,7 +368,10 @@ fun DividerView(
 }
 
 @Composable
-fun AlternativeSignupView(goToLogin: () -> Unit) {
+fun AlternativeSignupView(
+    goToLogin: () -> Unit,
+    continueWithGoogle: (idToken: String) -> Unit
+) {
     val annotatedString = buildAnnotatedString {
         // Append the first part of the text with the default style
         append(stringResource(R.string.existing_account) + " ")
@@ -364,7 +391,11 @@ fun AlternativeSignupView(goToLogin: () -> Unit) {
 
         pop()
     }
-    GoogleButton(onClicked = {})
+    GoogleButton(
+        continueWithGoogle = {idToken ->
+            continueWithGoogle(idToken)
+        }
+    )
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,

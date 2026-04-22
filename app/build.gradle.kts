@@ -25,8 +25,8 @@ android {
         applicationId = "com.omodauda.splitwise"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -42,6 +42,9 @@ android {
             // RELEASE BASE URL
             val baseUrl = properties.getProperty("BASE_URL")
             buildConfigField("String", "BASE_URL", baseUrl)
+
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
+            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", googleServerClientId)
         }
 
         getByName("debug") {
@@ -50,6 +53,9 @@ android {
             // DEBUG BASE URL
             val baseUrl = properties.getProperty("BASE_URL")
             buildConfigField("String", "BASE_URL", baseUrl)
+
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
+            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", googleServerClientId)
         }
     }
     compileOptions {
@@ -79,6 +85,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.googleid)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.omodauda.splitwise.R
+import com.omodauda.splitwise.data.network.model.GoogleAuthRequest
 import com.omodauda.splitwise.data.network.model.LoginRequest
 import com.omodauda.splitwise.ui.components.AppTextButton
 import com.omodauda.splitwise.ui.components.AppTextField
@@ -66,6 +67,7 @@ fun LoginScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val authState by authViewModel.loginUiState.collectAsStateWithLifecycle()
+    val googleAuthUiState by authViewModel.googleAuthUiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
 
     fun handleLogin() {
@@ -76,7 +78,11 @@ fun LoginScreen(
         }
     }
 
-    if (authState.submissionState is AuthSubmissionState.Loading) {
+    fun handleContinueWithGoogle(idToken: String) {
+        authViewModel.continueWithGoogle(data = GoogleAuthRequest(idToken))
+    }
+
+    if (authState.submissionState is AuthSubmissionState.Loading || googleAuthUiState.submissionState is AuthSubmissionState.Loading) {
         LoadingView()
     }
 
@@ -90,6 +96,19 @@ fun LoginScreen(
                 )
             )
             authViewModel.resetLoginSubmissionState()
+        }
+    }
+
+    LaunchedEffect(googleAuthUiState.submissionState) {
+        val state = googleAuthUiState.submissionState
+        if (state is AuthSubmissionState.Error) {
+            toastHostState.showToast(
+                toast = ToastState(
+                    message = state.message,
+                    type = ToastType.ERROR
+                )
+            )
+            authViewModel.resetGoogleAuthState()
         }
     }
 
@@ -202,7 +221,12 @@ fun LoginScreen(
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
                 DividerView()
                 Spacer(Modifier.height(ScreenDimensions.largePadding))
-                AlternativeLoginView(goToSignup)
+                AlternativeLoginView(
+                    goToSignup,
+                    continueWithGoogle = {idToken ->
+                        handleContinueWithGoogle(idToken)
+                    }
+                )
                 Spacer(Modifier.height(Spacing.extraLarge))
             }
         }
@@ -238,6 +262,7 @@ fun DividerView(
 @Composable
 fun AlternativeLoginView(
     goToSignup: () -> Unit,
+    continueWithGoogle: (idToken: String) -> Unit,
 //    modifier: Modifier = Modifier
 ) {
     val annotatedString = buildAnnotatedString {
@@ -258,7 +283,11 @@ fun AlternativeLoginView(
         }
         pop()
     }
-    GoogleButton(onClicked = {})
+    GoogleButton(
+        continueWithGoogle = {idToken ->
+            continueWithGoogle(idToken)
+        }
+    )
     Spacer(Modifier.height(Spacing.extraLarge))
     ClickableText(
         text = annotatedString,

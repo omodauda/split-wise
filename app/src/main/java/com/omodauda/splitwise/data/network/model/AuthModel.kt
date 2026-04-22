@@ -25,6 +25,10 @@ data class SignupRequest(
     val password: String
 )
 
+data class GoogleAuthRequest(
+    val idToken: String
+)
+
 data class ChangePasswordRequest(
     val currentPassword: String,
     val newPassword: String

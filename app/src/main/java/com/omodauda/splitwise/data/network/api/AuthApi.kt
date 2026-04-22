@@ -4,6 +4,7 @@ import com.omodauda.splitwise.data.network.model.ChangePasswordRequest
 import com.omodauda.splitwise.data.network.model.ChangePasswordResponse
 import com.omodauda.splitwise.data.network.model.DeleteAccountRequest
 import com.omodauda.splitwise.data.network.model.DeleteAccountResponse
+import com.omodauda.splitwise.data.network.model.GoogleAuthRequest
 import com.omodauda.splitwise.data.network.model.LoginRequest
 import com.omodauda.splitwise.data.network.model.LoginResponse
 import com.omodauda.splitwise.data.network.model.SignupRequest
@@ -22,6 +23,9 @@ interface AuthApi {
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
     @POST("auth/signup")
     suspend fun signup(@Body request: SignupRequest): Response<LoginResponse>
+
+    @POST("auth/google-auth")
+    suspend fun googleAuth(@Body request: GoogleAuthRequest): Response<LoginResponse>
 
     @PATCH("auth/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ChangePasswordResponse>

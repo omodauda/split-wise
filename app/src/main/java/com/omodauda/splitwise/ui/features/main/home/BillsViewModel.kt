@@ -9,9 +9,9 @@ import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import com.omodauda.splitwise.data.repository.BillsRepository
-import com.omodauda.splitwise.model.AddBillSubmissionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,35 +43,87 @@ data class BillsUiState(
 
 @HiltViewModel
 class BillsViewModel @Inject constructor(private val repo: BillsRepository) : ViewModel() {
+    private val owedRefreshTrigger = MutableSharedFlow<Unit>(replay = 1)
+    private val owingRefreshTrigger = MutableSharedFlow<Unit>(replay = 1)
 
-    private val refreshTrigger = MutableSharedFlow<Unit>(replay = 1)
 
     // Paginated bills
     @OptIn(ExperimentalCoroutinesApi::class)
-    val paginatedOwedBills = refreshTrigger
+    val paginatedOwedBills = owedRefreshTrigger
         .onStart { emit(Unit) }
         .flatMapLatest { repo.getOwedBillsStream() }
         .cachedIn(viewModelScope)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val paginatedOwingBills = refreshTrigger
+    val paginatedOwingBills = owingRefreshTrigger
         .onStart { emit(Unit) }
         .flatMapLatest { repo.getOwingBillsStream() }
         .cachedIn(viewModelScope)
 
-    // owed bills first page
     private val _uiState = MutableStateFlow(BillsUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         loadPreview()
+        observeRefreshSignals()
+    }
+
+    private fun observeRefreshSignals() {
+        viewModelScope.launch {
+            // Observe Owed Signals
+            launch {
+                repo.refreshOwedBillSignal.collect {
+                    silentRefresh(refreshOwed = true)
+                }
+            }
+            // Observe Owing Signals
+            launch {
+                repo.refreshOwingBillSignal.collect {
+                    silentRefresh(refreshOwing = true)
+                }
+            }
+        }
+    }
+
+    /**
+     * Performs a background refresh without showing loading spinners.
+     */
+    private suspend fun silentRefresh(
+        refreshOwed: Boolean = false,
+        refreshOwing: Boolean = false
+    ) = coroutineScope {
+        // Both signals should update the dashboard
+        launch {
+            repo.getBillsDashboard().onSuccess { data ->
+                _uiState.update { it.copy(billDashboard = data) }
+            }
+        }
+
+        if (refreshOwed) {
+            owedRefreshTrigger.emit(Unit)
+            launch {
+                repo.getOwedBillsFirstPage().onSuccess { bills ->
+                    _uiState.update { it.copy(owedBills = bills) }
+                }
+            }
+        }
+
+        if (refreshOwing) {
+            owingRefreshTrigger.emit(Unit)
+            launch {
+                repo.getOwingBillsFirstPage().onSuccess { bills ->
+                    _uiState.update { it.copy(owingBills = bills) }
+                }
+            }
+        }
     }
 
     fun refresh() {
         loadPreview()
         // Refresh the Paginated streams
         viewModelScope.launch {
-            refreshTrigger.emit(Unit)
+            owedRefreshTrigger.emit(Unit)
+            owingRefreshTrigger.emit(Unit)
         }
     }
 

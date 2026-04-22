@@ -12,6 +12,7 @@ import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.local.IAuthPreference
 import com.omodauda.splitwise.data.network.model.UpdateFcmTokenRequest
 import com.omodauda.splitwise.data.repository.AuthRepository
+import com.omodauda.splitwise.data.repository.BillsRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,18 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class FcmAction(val key: String) {
+    NEW_BILL("NEW_BILL"),
+    BILL_SETTLEMENT("BILL_SETTLEMENT"),
+    PAYMENT_RECEIVED("PAYMENT_RECEIVED"),
+    UNKNOWN("UNKNOWN");
+
+    companion object {
+        fun fromString(key: String?): FcmAction {
+            return entries.find { it.key == key } ?: UNKNOWN
+        }
+    }
+}
 @AndroidEntryPoint
 class AppMessagingService : FirebaseMessagingService() {
 
@@ -27,6 +40,9 @@ class AppMessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var authPreference: IAuthPreference
+
+    @Inject
+    lateinit var billsRepository: BillsRepository
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -41,6 +57,16 @@ class AppMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+        val action = FcmAction.fromString(message.data["action"])
+
+        serviceScope.launch {
+            when (action) {
+                FcmAction.NEW_BILL -> billsRepository.triggerRefreshOwingBills()
+                FcmAction.BILL_SETTLEMENT -> billsRepository.triggerRefreshOwingBills()
+                FcmAction.PAYMENT_RECEIVED -> billsRepository.triggerRefreshOwedBills()
+                FcmAction.UNKNOWN -> {}
+            }
+        }
         message.notification?.let {
             showNotification(it.title, it.body)
         }
