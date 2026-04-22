@@ -1,6 +1,10 @@
 # SplitWise - Expense Splitting App
 
-SplitWise is a modern Android application built with **Jetpack Compose** designed to simplify the process of tracking and splitting expenses with friends and groups. It provides a seamless experience for managing shared bills, monitoring balances, and staying updated on group activities.
+SplitWise is a **full-stack** application designed to simplify the process of tracking and splitting expenses with friends and groups. This project features a modern Android application built with **Jetpack Compose** and a robust backend infrastructure.
+
+The backend is a custom-built API developed using **TypeScript** and **NestJS**, deployed in the cloud to provide a seamless, real-time experience for users.
+
+> **Note:** This repository contains the Android client code. The backend source code is maintained in a separate repository.
 
 ## 📸 Screenshots
 
@@ -48,6 +52,7 @@ SplitWise is a modern Android application built with **Jetpack Compose** designe
 
 ## 🛠 Tech Stack
 
+### **Android (Frontend)**
 - **UI:** [Jetpack Compose](https://developer.android.com/jetpack/compose) - Modern, declarative UI toolkit.
 - **Architecture:** MVVM (Model-View-ViewModel) with Clean Architecture principles.
 - **Dependency Injection:** [Hilt](https://dagger.dev/hilt/) - Standard library for DI in Android.
@@ -57,6 +62,12 @@ SplitWise is a modern Android application built with **Jetpack Compose** designe
 - **Local Storage:** [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) & EncryptedSharedPreferences for secure data persistence.
 - **Security & Optimization:** [R8/ProGuard](https://developer.android.com/studio/build/shrink-code) for code shrinking, obfuscation, and optimization.
 - **Backend Services:** Firebase Analytics, Crashlytics, and Cloud Messaging.
+
+### **Backend**
+- **Framework:** [NestJS](https://nestjs.com/) (Node.js framework)
+- **Language:** TypeScript
+- **Deployment:** Cloud-hosted API
+- **Repository:** Private/Separate repository
 
 ## 🏗 Project Structure
 
