@@ -52,6 +52,7 @@ data class OwingBill(
 )
 data class OwingBillItemModel(
     val id: String,
+    val description: String,
     val paidBy: User
 )
 data class GetBillsDashboardResponse(

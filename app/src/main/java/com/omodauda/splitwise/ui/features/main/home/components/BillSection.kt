@@ -162,7 +162,7 @@ fun BillSectionHeader(
             )
         }
         TextButton(
-            onClick = {onViewAll()}
+            onClick = {onViewAll()},
         ) {
             Text(
                 text = stringResource(R.string.view_all),

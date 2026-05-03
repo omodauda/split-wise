@@ -91,14 +91,14 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
         }
     }
 
-    fun getOwingBillsStream(): Flow<PagingData<OwingBill>> {
+    fun getOwingBillsStream(searchQuery: String?, sort: String?): Flow<PagingData<OwingBill>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 10,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                OwingBillsPagingSource(billApi)
+                OwingBillsPagingSource(billApi, searchQuery, sort)
             }
         ).flow
     }
@@ -107,7 +107,9 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
         return try {
             val response = billApi.getOwingBills(
                 limit = 5,
-                cursorId = null
+                cursorId = null,
+                search = null,
+                sort = null
             )
             val body = response.body()
             if (response.isSuccessful && body !== null) {

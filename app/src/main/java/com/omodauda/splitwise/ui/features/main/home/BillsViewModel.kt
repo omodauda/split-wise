@@ -53,6 +53,12 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
     private val _owedBillSearchQuery = MutableStateFlow<String?>(null)
     val owedBillSearchQuery = _owedBillSearchQuery.asStateFlow()
 
+    private val _owingSort = MutableStateFlow<BillSortOption?>(BillSortOption.MOST_RECENT)
+    val owingSort = _owingSort.asStateFlow()
+
+    private val _owingBillSearchQuery = MutableStateFlow<String?>(null)
+    val owingBillSearchQuery = _owingBillSearchQuery.asStateFlow()
+
     // Paginated bills
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val paginatedOwedBills = combine(
@@ -74,11 +80,27 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
     }.flatMapLatest { (query, sortBy) -> repo.getOwedBillsStream(query, sortBy) }
         .cachedIn(viewModelScope)
 
-//    @OptIn(ExperimentalCoroutinesApi::class)
-//    val paginatedOwingBills = owingRefreshTrigger
-//        .onStart { emit(Unit) }
-//        .flatMapLatest { repo.getOwingBillsStream() }
-//        .cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val paginatedOwingBills = combine(
+        repo.refreshOwingBillSignal.onStart { emit(Unit) },
+        owingBillSearchQuery.debounce { query ->
+            if (query.isNullOrBlank()) 0L else 500L
+        },
+        _owingSort
+    ) { _, query, sort ->
+        val sortValue = when (sort) {
+//            BillSortOption.AMOUNT_HIGH_TO_LOW -> "amount_high"
+//            BillSortOption.AMOUNT_LOW_TO_HIGH -> "amount_low"
+            BillSortOption.MOST_RECENT -> "recent"
+            BillSortOption.ASC -> "name_asc"
+            BillSortOption.DESC -> "name_desc"
+            else -> null
+        }
+        query to sortValue
+    }.flatMapLatest { (query, sortBy) -> repo.getOwingBillsStream(query, sortBy) }
+        .cachedIn(viewModelScope)
+
+
 
     private val _uiState = MutableStateFlow(BillsUiState())
     val uiState = _uiState.asStateFlow()
@@ -269,5 +291,13 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
 
     fun onOwedSortChanged(sort: BillSortOption) {
         _owedSort.update { sort }
+    }
+
+    fun onOwingBillSearchQueryChanged(query: String?) {
+        _owingBillSearchQuery.update { query }
+    }
+
+    fun onOwingSortChanged(sort: BillSortOption) {
+        _owingSort.update { sort }
     }
 }
