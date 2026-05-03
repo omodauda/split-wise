@@ -47,23 +47,27 @@ data class BillsUiState(
 
 @HiltViewModel
 class BillsViewModel @Inject constructor(private val repo: BillsRepository) : ViewModel() {
-    private val _owedSort = MutableStateFlow<BillSortOption?>(null)
+    private val _owedSort = MutableStateFlow<BillSortOption?>(BillSortOption.MOST_RECENT)
     val owedSort = _owedSort.asStateFlow()
 
     private val _owedBillSearchQuery = MutableStateFlow<String?>(null)
     val owedBillSearchQuery = _owedBillSearchQuery.asStateFlow()
 
     // Paginated bills
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val paginatedOwedBills = combine(
         repo.refreshOwedBillSignal.onStart { emit(Unit) },
-        owedBillSearchQuery,
+        owedBillSearchQuery.debounce { query ->
+            if (query.isNullOrBlank()) 0L else 500L
+        },
         _owedSort
     ) { _, query, sort ->
         val sortValue = when (sort) {
-            BillSortOption.AMOUNT_HIGH_TO_LOW -> "amount_desc"
-            BillSortOption.AMOUNT_LOW_TO_HIGH -> "amount_asc"
-            BillSortOption.MOST_RECENT -> "date_desc"
+//            BillSortOption.AMOUNT_HIGH_TO_LOW -> "amount_high"
+//            BillSortOption.AMOUNT_LOW_TO_HIGH -> "amount_low"
+            BillSortOption.MOST_RECENT -> "recent"
+            BillSortOption.ASC -> "name_asc"
+            BillSortOption.DESC -> "name_desc"
             else -> null
         }
         query to sortValue
