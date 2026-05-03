@@ -9,13 +9,17 @@ import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import com.omodauda.splitwise.data.repository.BillsRepository
+import com.omodauda.splitwise.ui.features.main.billList.BillSortOption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,22 +47,34 @@ data class BillsUiState(
 
 @HiltViewModel
 class BillsViewModel @Inject constructor(private val repo: BillsRepository) : ViewModel() {
-    private val owedRefreshTrigger = MutableSharedFlow<Unit>(replay = 1)
-    private val owingRefreshTrigger = MutableSharedFlow<Unit>(replay = 1)
+    private val _owedSort = MutableStateFlow<BillSortOption?>(null)
+    val owedSort = _owedSort.asStateFlow()
 
+    private val _owedBillSearchQuery = MutableStateFlow<String?>(null)
+    val owedBillSearchQuery = _owedBillSearchQuery.asStateFlow()
 
     // Paginated bills
     @OptIn(ExperimentalCoroutinesApi::class)
-    val paginatedOwedBills = owedRefreshTrigger
-        .onStart { emit(Unit) }
-        .flatMapLatest { repo.getOwedBillsStream() }
+    val paginatedOwedBills = combine(
+        repo.refreshOwedBillSignal.onStart { emit(Unit) },
+        owedBillSearchQuery,
+        _owedSort
+    ) { _, query, sort ->
+        val sortValue = when (sort) {
+            BillSortOption.AMOUNT_HIGH_TO_LOW -> "amount_desc"
+            BillSortOption.AMOUNT_LOW_TO_HIGH -> "amount_asc"
+            BillSortOption.MOST_RECENT -> "date_desc"
+            else -> null
+        }
+        query to sortValue
+    }.flatMapLatest { (query, sortBy) -> repo.getOwedBillsStream(query, sortBy) }
         .cachedIn(viewModelScope)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val paginatedOwingBills = owingRefreshTrigger
-        .onStart { emit(Unit) }
-        .flatMapLatest { repo.getOwingBillsStream() }
-        .cachedIn(viewModelScope)
+//    @OptIn(ExperimentalCoroutinesApi::class)
+//    val paginatedOwingBills = owingRefreshTrigger
+//        .onStart { emit(Unit) }
+//        .flatMapLatest { repo.getOwingBillsStream() }
+//        .cachedIn(viewModelScope)
 
     private val _uiState = MutableStateFlow(BillsUiState())
     val uiState = _uiState.asStateFlow()
@@ -68,8 +84,27 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
         observeRefreshSignals()
     }
 
+    @OptIn(FlowPreview::class)
     private fun observeRefreshSignals() {
         viewModelScope.launch {
+            // Dashboard: Consolidate signals to avoid redundant fetching
+            launch {
+                merge(repo.refreshOwedBillSignal, repo.refreshOwingBillSignal)
+                    .debounce(100L)
+                    .collect {
+                        repo.getBillsDashboard().onSuccess { data ->
+                            _uiState.update {
+                                it.copy(
+                                    billDashboard = data,
+                                    dashboardLoading = false
+                                )
+                            }
+                        }.onFailure {
+                            _uiState.update { it.copy(dashboardLoading = false) }
+                        }
+                    }
+            }
+
             // Observe Owed Signals
             launch {
                 repo.refreshOwedBillSignal.collect {
@@ -92,15 +127,8 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
         refreshOwed: Boolean = false,
         refreshOwing: Boolean = false
     ) = coroutineScope {
-        // Both signals should update the dashboard
-        launch {
-            repo.getBillsDashboard().onSuccess { data ->
-                _uiState.update { it.copy(billDashboard = data) }
-            }
-        }
 
         if (refreshOwed) {
-            owedRefreshTrigger.emit(Unit)
             launch {
                 repo.getOwedBillsFirstPage().onSuccess { bills ->
                     _uiState.update { it.copy(owedBills = bills) }
@@ -109,21 +137,11 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
         }
 
         if (refreshOwing) {
-            owingRefreshTrigger.emit(Unit)
             launch {
                 repo.getOwingBillsFirstPage().onSuccess { bills ->
                     _uiState.update { it.copy(owingBills = bills) }
                 }
             }
-        }
-    }
-
-    fun refresh() {
-        loadPreview()
-        // Refresh the Paginated streams
-        viewModelScope.launch {
-            owedRefreshTrigger.emit(Unit)
-            owingRefreshTrigger.emit(Unit)
         }
     }
 
@@ -198,7 +216,6 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
             _uiState.update { it.copy(billActionState = PayBillSubmissionState.Loading) }
             val result = repo.payBill(data)
             result.onSuccess { message ->
-                refresh()
                 _uiState.update { it.copy(billActionState = PayBillSubmissionState.Success(message)) }
             }
                 .onFailure { exception ->
@@ -218,7 +235,6 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
             _uiState.update { it.copy(billActionState = PayBillSubmissionState.Loading) }
             val result = repo.settleBill(data)
             result.onSuccess { message ->
-                refresh()
                 _uiState.update { it.copy(billActionState = PayBillSubmissionState.Success(message)) }
             }
                 .onFailure { exception ->
@@ -243,4 +259,11 @@ class BillsViewModel @Inject constructor(private val repo: BillsRepository) : Vi
         _uiState.update { it.copy(billActionState = PayBillSubmissionState.Idle) }
     }
 
+    fun onOwedBillSearchQueryChanged(query: String?) {
+        _owedBillSearchQuery.update { query }
+    }
+
+    fun onOwedSortChanged(sort: BillSortOption) {
+        _owedSort.update { sort }
+    }
 }

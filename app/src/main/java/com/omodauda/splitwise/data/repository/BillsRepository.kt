@@ -24,7 +24,6 @@ import javax.inject.Singleton
 
 @Singleton
 class BillsRepository @Inject constructor(private val billApi: BillApi) {
-
     private val _refreshOwedBillsSignal = MutableSharedFlow<Unit>(replay = 0)
     val refreshOwedBillSignal = _refreshOwedBillsSignal.asSharedFlow()
 
@@ -43,6 +42,8 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
         return try {
             val response = billApi.addBill(data)
             if (response.isSuccessful && response.body() !== null) {
+                triggerRefreshOwingBills()
+                triggerRefreshOwedBills()
                 val responseBody = response.body()!!
                 Result.success(responseBody)
             } else {
@@ -55,14 +56,14 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
         }
     }
 
-    fun getOwedBillsStream(): Flow<PagingData<OwedBill>> {
+    fun getOwedBillsStream(searchQuery: String?, sort: String?): Flow<PagingData<OwedBill>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 10,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {
-                OwedBillsPagingSource(billApi)
+                OwedBillsPagingSource(billApi, searchQuery, sort)
             }
         ).flow
     }
@@ -71,7 +72,9 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
         return try {
             val response = billApi.getOwedBills(
                 limit = 5,
-                cursorId = null
+                cursorId = null,
+                search = null,
+                sort = null
             )
             val body = response.body()
             if (response.isSuccessful && body !== null) {
@@ -145,6 +148,7 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
             val response = billApi.payBill(data)
             val body = response.body()
             if (response.isSuccessful && body !== null) {
+                triggerRefreshOwingBills()
                 Result.success(body.message)
             } else {
                 val errorBody = response.errorBody()?.string()
@@ -163,6 +167,7 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
             val response = billApi.settleBill(data)
             val body = response.body()
             if (response.isSuccessful && body !== null) {
+                triggerRefreshOwedBills()
                 Result.success(body.message)
             } else {
                 val errorBody = response.errorBody()?.string()
