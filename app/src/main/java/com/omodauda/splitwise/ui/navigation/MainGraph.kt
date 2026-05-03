@@ -115,6 +115,7 @@ fun NavGraphBuilder.mainNavGraph(
             OwedBillListScreen(
                 viewModel = billsViewModel,
                 goBack = {navController.popBackStack()},
+                goToBillDetails = {}
             )
         }
     }

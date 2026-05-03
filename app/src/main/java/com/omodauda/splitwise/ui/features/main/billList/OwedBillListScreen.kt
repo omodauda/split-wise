@@ -2,7 +2,7 @@ package com.omodauda.splitwise.ui.features.main.billList
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,12 +54,16 @@ import com.omodauda.splitwise.ui.components.AppTextField
 import com.omodauda.splitwise.ui.features.main.friends.FriendListPlaceholder
 import com.omodauda.splitwise.ui.features.main.friends.FriendPlaceholder
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
-import com.omodauda.splitwise.ui.features.main.home.components.OwedItem
+import com.omodauda.splitwise.ui.theme.ComponentDimensions
+import com.omodauda.splitwise.ui.theme.CurrencySmall
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
 import com.omodauda.splitwise.ui.theme.black
+import com.omodauda.splitwise.ui.theme.emerald_200
 import com.omodauda.splitwise.ui.theme.emerald_50
+import com.omodauda.splitwise.utils.formatDate
 import com.omodauda.splitwise.utils.formatFromCents
+import java.util.Date
 
 enum class BillSortOption(val label: Int) {
 //    AMOUNT_HIGH_TO_LOW(R.string.sort_high),
@@ -71,6 +76,7 @@ enum class BillSortOption(val label: Int) {
 fun OwedBillListScreen(
     viewModel: BillsViewModel,
     goBack: () -> Unit,
+    goToBillDetails: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val bills = viewModel.paginatedOwedBills.collectAsLazyPagingItems()
@@ -103,7 +109,8 @@ fun OwedBillListScreen(
             OwedBillList(
                 bills,
                 onRefresh = {bills.refresh()},
-                searchQuery = searchQuery
+                searchQuery = searchQuery,
+                onClick = { goToBillDetails(it) }
             )
         }
     }
@@ -115,6 +122,7 @@ fun OwedBillList(
     bills: LazyPagingItems<OwedBill>,
     onRefresh: () -> Unit,
     searchQuery: String?,
+    onClick: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val loadState = bills.loadState
@@ -148,10 +156,15 @@ fun OwedBillList(
                         key = bills.itemKey { it.id }) { index ->
                         val bill = bills[index]
                         if (bill !== null) {
-                            OwedItem(
-                                bill = bill,
-                                openReminderModal = {},
-                                openRecordPaymentModal = {},
+                            val remainder = bill.amount - bill.paidAmount
+                            OwedBillListItem(
+                                personName = bill.user.fullName,
+                                remainingAmount = formatFromCents(remainder),
+                                descriptionText = bill.bill.description,
+                                date = bill.createdAt,
+                                modifier = Modifier
+                                    .clickable(enabled = true, onClick = {onClick(bill.id)}),
+
                             )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -236,25 +249,25 @@ fun BillListHeader(
                 modifier = Modifier
                     .weight(1f)
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-                modifier = Modifier
-                    .border(width = 1.5.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), shape = MaterialTheme.shapes.large)
-                    .background(emerald_50)
-                    .padding(vertical = 12.dp, horizontal = 16.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.arrow_down),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "0",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+//            Row(
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+//                modifier = Modifier
+//                    .border(width = 1.5.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), shape = MaterialTheme.shapes.large)
+//                    .background(emerald_50)
+//                    .padding(vertical = 12.dp, horizontal = 16.dp)
+//            ) {
+//                Icon(
+//                    painter = painterResource(R.drawable.arrow_down),
+//                    contentDescription = null,
+//                    tint = MaterialTheme.colorScheme.primary
+//                )
+//                Text(
+//                    text = "0",
+//                    style = MaterialTheme.typography.titleSmall,
+//                    color = MaterialTheme.colorScheme.primary
+//                )
+//            }
         }
         SortDropdownMenu(
             expanded = expanded,
@@ -386,6 +399,85 @@ fun SortDropdownMenu(
                     .background(
                         if (isSelected) emerald_50 else MaterialTheme.colorScheme.background
                     )
+            )
+        }
+    }
+}
+
+@Composable
+private fun OwedBillListItem(
+    personName: String,
+    descriptionText: String,
+    remainingAmount: String,
+    date: Date,
+    modifier: Modifier = Modifier,
+) {
+    val avatarText = personName[0].uppercase()
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(ScreenDimensions.contentPadding)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+            modifier = Modifier.weight(1f)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(ComponentDimensions.avatarSizeMedium)
+                    .clip(shape = CircleShape)
+                    .background(color = emerald_200)
+            ) {
+                Text(
+                    text = avatarText,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Column{
+                Text(
+                    text = personName,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 2
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = descriptionText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = remainingAmount,
+                    style = CurrencySmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = formatDate(date),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            Icon(
+                painter = painterResource(R.drawable.caret_right),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .size(12.dp)
             )
         }
     }
