@@ -16,4 +16,5 @@ sealed class Screen(val route: String) {
 
     // profile screens
     object AccountSettings: Screen(route = "AccountSettings")
+    object OwedBillList: Screen(route = "OwedBillList")
 }

@@ -17,6 +17,7 @@ import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillScreen
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
+import com.omodauda.splitwise.ui.features.main.billList.OwedBillListScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
@@ -71,7 +72,6 @@ fun NavGraphBuilder.mainNavGraph(
                 },
                 addBillViewModel,
                 currentUserId = currentUser?.id,
-                billsViewModel = billsViewModel,
                 toastHostState = toastHostState,
             )
         }
@@ -105,6 +105,16 @@ fun NavGraphBuilder.mainNavGraph(
                 deleteAccountViewModel,
                 authViewModel,
                 toastHostState
+            )
+        }
+        composable(route = Screen.OwedBillList.route) {
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry("main_graph")
+            }
+            val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
+            OwedBillListScreen(
+                viewModel = billsViewModel,
+                goBack = {navController.popBackStack()},
             )
         }
     }

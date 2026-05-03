@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_bill">Search by name </string>
+    <string name="bill_title_owed">You Are Owed</string>
+    <string name="bill_title_owing">You Owe</string>
+    <string name="bill_search_placeholder">Search by name or description…</string>
+    <string name="sort">Sort</string>
+    <string name="empty_search_bill_title">No Outstanding Balances</string>
+    <string name="empty_search_bill_desc">No results found for your search</string>
+    <string name="sort_high">Amount: High to Low</string>
+    <string name="sort_low">Amount: Low to High</string>
+    <string name="sort_asc">Name: A to Z</string>
+    <string name="sort_desc">Name: Z to A</string>
+    <string name="sort_most_recent">Most Recent</string>
+</resources>
