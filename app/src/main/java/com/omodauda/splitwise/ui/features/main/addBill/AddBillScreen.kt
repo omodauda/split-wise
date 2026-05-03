@@ -48,7 +48,6 @@ import com.omodauda.splitwise.ui.features.main.addBill.components.stepSeven.Step
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepSix.StepSix
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepThree.StepThree
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepTwo.StepTwo
-import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.theme.Elevation
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
@@ -61,7 +60,6 @@ fun AddBillScreen(
     goBack: () -> Unit,
     goToAddBillSuccess: () -> Unit,
     addBillViewModel: AddBillViewModel,
-    billsViewModel: BillsViewModel,
     currentUserId: String?,
     toastHostState: ToastHostState,
     modifier: Modifier = Modifier
@@ -82,7 +80,6 @@ fun AddBillScreen(
                 // LoadingView is handled in the UI body below
             }
             is AddBillSubmissionState.Success -> {
-                billsViewModel.refresh()
                 goToAddBillSuccess()
             }
             is AddBillSubmissionState.Error -> {
@@ -273,10 +270,10 @@ fun AddBillFooter(
     isLastStep: Boolean,
     goToNextStep: () -> Unit,
     modifier: Modifier = Modifier
-        .systemBarsPadding()
 ) {
     Column(
         modifier = modifier
+            .systemBarsPadding()
             .shadow(elevation = Elevation.level5)
             .background(color = MaterialTheme.colorScheme.background)
             .padding(vertical = ScreenDimensions.verticalPadding, horizontal = Spacing.large)
@@ -287,7 +284,6 @@ fun AddBillFooter(
             onClick = {goToNextStep()},
             enabled = enabled
         )
-//        Spacer(Modifier.height(Spacing.extraLarge))
     }
 }
 
