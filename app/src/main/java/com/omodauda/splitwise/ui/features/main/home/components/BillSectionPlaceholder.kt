@@ -29,13 +29,15 @@ import com.valentinilk.shimmer.shimmer
 fun BillSectionShimmer(
     @StringRes titleRes: Int,
     @DrawableRes iconRes: Int,
+    modifier: Modifier = Modifier,
     itemCount: Int = 5,
-    modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         BillSectionHeader(
             title = titleRes,
-            icon = iconRes
+            icon = iconRes,
+            isOwing = false,
+            onViewAll = {}
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         Column(

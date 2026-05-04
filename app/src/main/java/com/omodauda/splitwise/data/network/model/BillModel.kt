@@ -27,7 +27,12 @@ data class OwedBill(
     val id: String,
     val amount: Int,
     val paidAmount: Int,
-    val user: User
+    val createdAt: Date,
+    val user: User,
+    val bill: OwedBillItemModel
+)
+data class OwedBillItemModel(
+    val description: String,
 )
 data class User(
     val id: String,
@@ -42,10 +47,12 @@ data class OwingBill(
     val id: String,
     val amount: Int,
     val paidAmount: Int,
-    val bill: Bill
+    val createdAt: Date,
+    val bill: OwingBillItemModel
 )
-data class Bill(
+data class OwingBillItemModel(
     val id: String,
+    val description: String,
     val paidBy: User
 )
 data class GetBillsDashboardResponse(

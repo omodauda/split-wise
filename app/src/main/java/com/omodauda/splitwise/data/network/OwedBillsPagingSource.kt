@@ -9,14 +9,20 @@ import com.google.gson.Gson
 import retrofit2.HttpException
 import java.io.IOException
 
-class OwedBillsPagingSource(private val api: BillApi): PagingSource<String, OwedBill>() {
+class OwedBillsPagingSource(
+    private val api: BillApi,
+    private val searchQuery: String?,
+    private val sort: String?
+): PagingSource<String, OwedBill>() {
     override suspend fun load(params: LoadParams<String>): LoadResult<String, OwedBill> {
         val cursorId = params.key
 
         return try {
             val response = api.getOwedBills(
                 cursorId = cursorId,
-                limit = params.loadSize
+                limit = params.loadSize,
+                search = searchQuery,
+                sort = sort
             )
 
             if (response.isSuccessful && response.body() !== null) {

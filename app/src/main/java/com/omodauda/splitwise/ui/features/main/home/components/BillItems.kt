@@ -43,19 +43,21 @@ fun OwedItem(
     openRecordPaymentModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val billAmount = bill.amount - bill.paidAmount
+    val remainingAmount = bill.amount - bill.paidAmount
     BillItem(
         avatarBackgroundColor = emerald_200,
         avatarContentColor = MaterialTheme.colorScheme.primary,
         personName = bill.user.fullName,
         descriptionText = stringResource(R.string.owes_you),
-        amountText = formatFromCents(billAmount),
+        billAmount = formatFromCents(bill.amount),
+        paidAmount = formatFromCents(bill.paidAmount),
+        remainingAmount = formatFromCents(remainingAmount),
         amountColor = MaterialTheme.colorScheme.primary,
         buttonText = R.string.settle,
         buttonContainerColor = emerald_200,
         buttonContentColor = MaterialTheme.colorScheme.primary,
-        actOnBill = {openRecordPaymentModal()},
-        sendReminder = {openReminderModal()},
+        actOnBill = { openRecordPaymentModal() },
+        sendReminder = { openReminderModal() },
         modifier = modifier
     )
 }
@@ -66,18 +68,20 @@ fun OwingItem(
     openSettleUpModal: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val billAmount = bill.amount - bill.paidAmount
+    val remainingAmount = bill.amount - bill.paidAmount
     BillItem(
         avatarBackgroundColor = MaterialTheme.colorScheme.errorContainer,
         avatarContentColor = MaterialTheme.colorScheme.error,
         personName = bill.bill.paidBy.fullName,
         descriptionText = stringResource(R.string.you_owe),
-        amountText = formatFromCents(billAmount),
+        billAmount = formatFromCents(bill.amount),
+        paidAmount = formatFromCents(bill.paidAmount),
+        remainingAmount = formatFromCents(remainingAmount),
         amountColor = MaterialTheme.colorScheme.error,
         buttonText = R.string.pay,
         buttonContainerColor = MaterialTheme.colorScheme.errorContainer,
         buttonContentColor = MaterialTheme.colorScheme.error,
-        actOnBill = {openSettleUpModal()},
+        actOnBill = { openSettleUpModal() },
         modifier = modifier
     )
 }
@@ -88,7 +92,9 @@ private fun BillItem(
     avatarContentColor: Color,
     personName: String,
     descriptionText: String,
-    amountText: String,
+    billAmount: String,
+    paidAmount: String,
+    remainingAmount: String,
     amountColor: Color,
     buttonText: Int,
     buttonContainerColor: Color,
@@ -98,78 +104,117 @@ private fun BillItem(
     sendReminder: (() -> Unit)? = null,
 ) {
     val avatarText = personName[0].uppercase()
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+    Column(
+        verticalArrangement = Arrangement.spacedBy(14.dp),
         modifier = modifier
             .fillMaxWidth()
             .padding(ScreenDimensions.contentPadding)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
-            modifier = Modifier.weight(1f)
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(ComponentDimensions.avatarSizeMedium)
-                    .clip(shape = CircleShape)
-                    .background(color = avatarBackgroundColor)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+                modifier = Modifier.weight(1f)
             ) {
-                Text(
-                    text = avatarText,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = avatarContentColor
-                )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(ComponentDimensions.avatarSizeMedium)
+                        .clip(shape = CircleShape)
+                        .background(color = avatarBackgroundColor)
+                ) {
+                    Text(
+                        text = avatarText,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = avatarContentColor
+                    )
+                }
+                Column {
+                    Text(
+                        text = personName,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        maxLines = 2
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = descriptionText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
-            Column{
-                Text(
-                    text = personName,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    maxLines = 2
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = descriptionText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
-        ) {
-            Text(
-                text = amountText,
-                style = CurrencySmall,
-                color = amountColor
-            )
-            Button(
-                onClick = {actOnBill()},
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = buttonContainerColor,
-                    contentColor = buttonContentColor
-                ),
-                contentPadding = PaddingValues(vertical = Spacing.extraSmall, horizontal = ScreenDimensions.itemSpacing),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
             ) {
-                Text(
-                    text = stringResource(buttonText),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-            if (sendReminder != null) {
-                Icon(
-                    painter = painterResource(id = R.drawable.bell_icon),
-                    contentDescription = stringResource(R.string.send_reminder),
-                    tint = MaterialTheme.colorScheme.primary,
+                Button(
+                    onClick = { actOnBill() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = buttonContainerColor,
+                        contentColor = buttonContentColor
+                    ),
+                    contentPadding = PaddingValues(
+                        vertical = Spacing.extraSmall,
+                        horizontal = ScreenDimensions.itemSpacing
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(buttonText),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                }
+                if (sendReminder != null) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.bell_icon),
+                        contentDescription = stringResource(R.string.send_reminder),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .clickable(
                                 enabled = true,
-                                onClick = {sendReminder()}
+                                onClick = { sendReminder() }
                             )
+                    )
+                }
+            }
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.extraMedium),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Total: $billAmount",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Paid: $paidAmount",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Column {
+                Text(
+                    text = remainingAmount,
+                    style = CurrencySmall,
+                    color = amountColor
+                )
+                Text(
+                    text = "remaining",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }

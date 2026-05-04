@@ -63,6 +63,8 @@ fun HomeScreen(
     billsViewModel: BillsViewModel,
     authViewModel: AuthViewModel,
     toastHostState: ToastHostState,
+    viewAllOwedBills: () -> Unit,
+    viewAllOwingBills: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -179,6 +181,8 @@ fun HomeScreen(
                     selectedOwingBill = bill
                     showSettleUpModal = true
                 },
+                viewAllOwedBills = viewAllOwedBills,
+                viewAllOwingBills = viewAllOwingBills,
                 modifier = Modifier
                     .weight(1f)
             )
@@ -247,6 +251,8 @@ fun ContentView(
     openReminderModal: (OwedBill) -> Unit,
     openRecordPaymentModal: (OwedBill) -> Unit,
     openSettleUpModal: (OwingBill) -> Unit,
+    viewAllOwedBills: () -> Unit,
+    viewAllOwingBills: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isOverAllLoading = owedLoading || owingLoading
@@ -281,7 +287,8 @@ fun ContentView(
                     OwedView(
                         openReminderModal = openReminderModal,
                         openRecordPaymentModal = openRecordPaymentModal,
-                        bills = owedBills
+                        bills = owedBills,
+                        onViewAll = {viewAllOwedBills()}
                     )
                 }
                 Spacer(Modifier.height(Spacing.large))
@@ -292,7 +299,7 @@ fun ContentView(
                         itemCount = 5,
                     )
                 } else if (owingBills.isNotEmpty()) {
-                    OwingView(bills = owingBills, openSettleUpModal)
+                    OwingView(bills = owingBills, openSettleUpModal, onViewAll = {viewAllOwingBills()})
                 }
             }
         }

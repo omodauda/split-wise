@@ -13,12 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.OwedBill
@@ -33,6 +35,7 @@ fun OwedView(
     bills: List<OwedBill>,
     openReminderModal: (OwedBill) -> Unit,
     openRecordPaymentModal: (OwedBill) -> Unit,
+    onViewAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
@@ -47,6 +50,8 @@ fun OwedView(
                 openRecordPaymentModal = {openRecordPaymentModal(bill)}
             )
         },
+        isOwing = false,
+        onViewAll,
         modifier = modifier
     )
 }
@@ -55,6 +60,7 @@ fun OwedView(
 fun OwingView(
     bills: List<OwingBill>,
     openSettleUpModal: (OwingBill) -> Unit,
+    onViewAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
@@ -67,6 +73,8 @@ fun OwingView(
                 bill = bill,
                 openSettleUpModal = { openSettleUpModal(bill) })
         },
+        isOwing = true,
+        onViewAll,
         modifier = modifier
     )
 }
@@ -86,12 +94,16 @@ private fun BillSection(
     @DrawableRes iconRes: Int,
     itemCount: Int,
     itemContent: @Composable (Int) -> Unit,
-    modifier: Modifier = Modifier
+    isOwing: Boolean,
+    onViewAll: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         BillSectionHeader(
             title = titleRes,
-            icon = iconRes
+            icon = iconRes,
+            isOwing = isOwing,
+            onViewAll = onViewAll
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         Column(
@@ -126,21 +138,39 @@ private fun BillSection(
 fun BillSectionHeader(
     title: Int,
     icon: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isOwing: Boolean,
+    onViewAll: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = null
-        )
-        Text(
-            text = stringResource(title).uppercase(Locale.getDefault()),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.small),
+        ) {
+            Image(
+                painter = painterResource(icon),
+                contentDescription = null
+            )
+            Text(
+                text = stringResource(title).uppercase(Locale.getDefault()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        TextButton(
+            onClick = {onViewAll()},
+        ) {
+            Text(
+                text = stringResource(R.string.view_all),
+                style = MaterialTheme.typography.titleSmall,
+                color = if (!isOwing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                textDecoration = TextDecoration.Underline,
+            )
+        }
+
     }
 }

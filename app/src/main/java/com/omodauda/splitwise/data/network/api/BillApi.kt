@@ -24,13 +24,17 @@ interface BillApi {
     @GET("bill/owed")
     suspend fun getOwedBills(
         @Query("cursorId") cursorId: String?,
-        @Query("limit") limit: Int?
+        @Query("limit") limit: Int?,
+        @Query("search") search: String?,
+        @Query("sortBy") sort: String?
     ): Response<GetOwedBillsResponse>
 
     @GET("bill/owing")
     suspend fun getOwingBills(
         @Query("cursorId") cursorId: String?,
-        @Query("limit") limit: Int?
+        @Query("limit") limit: Int?,
+        @Query("search") search: String?,
+        @Query("sortBy") sort: String?,
     ): Response<GetOwingBillsResponse>
 
     @GET("bill/dashboard")
