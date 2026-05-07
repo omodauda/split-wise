@@ -98,7 +98,8 @@ data class Split(
     val id: String,
     val paidAmount: Int,
     val percentage: Double,
-    val user: User
+    val user: User,
+    val settled: Boolean
 )
 
 data class GetBillDetailsResponse(

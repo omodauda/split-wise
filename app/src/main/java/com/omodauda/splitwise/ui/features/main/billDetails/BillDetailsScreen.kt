@@ -322,7 +322,7 @@ fun BillSplitBreakDownView(
                 .padding(Spacing.large)
         ) {
             splits.forEachIndexed { index, split ->
-                BillSplitBreakDown(split = split, currentUserId = currentUserId)
+                BillSplitBreakDown(split = split, currentUserId = currentUserId )
 
                 if (index < splits.lastIndex) {
                     HorizontalDivider(Modifier.padding(vertical = Spacing.medium))
@@ -365,7 +365,8 @@ fun BillSplitBreakDown(
                         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onBackground
                     )
-                    val isSettled = split.paidAmount >= split.amount
+                    val isSettled = split.settled
+//                    val isSettled = if (paidById === split.user.id && split.settled) true else (split.paidAmount >= split.amount)
                     Text(
                         text = if (isSettled) "Paid in full" else "Payment Pending",
                         style = MaterialTheme.typography.labelMedium,
@@ -405,7 +406,7 @@ fun BillSplitBreakDown(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formatFromCents(split.paidAmount),
+                    text = formatFromCents(if (split.settled) split.amount else split.paidAmount),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -422,12 +423,12 @@ fun BillSplitBreakDown(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                val balance = split.amount - split.paidAmount
-                val isSplitSettled = split.paidAmount >= split.amount
+                val balance = if (split.settled) 0 else (split.amount - split.paidAmount)
+//                val isSplitSettled = split.paidAmount >= split.amount
                 Text(
                     text = formatFromCents(balance),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                    color = if (isSplitSettled) MaterialTheme.colorScheme.primary else hotOrange
+                    color = if (balance > 0) hotOrange else MaterialTheme.colorScheme.primary
                 )
             }
         }
