@@ -18,4 +18,8 @@ sealed class Screen(val route: String) {
     object AccountSettings: Screen(route = "AccountSettings")
     object OwedBillList: Screen(route = "OwedBillList")
     object OwingBillList: Screen(route = "OwingBillList")
+
+    object BillDetails: Screen(route = "BillDetails/{billId}") {
+        fun createRoute(billId: String) = "BillDetails/$billId"
+    }
 }

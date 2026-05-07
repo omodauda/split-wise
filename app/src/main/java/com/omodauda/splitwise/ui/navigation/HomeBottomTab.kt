@@ -63,7 +63,10 @@ fun HomeBottomTab(
                     authViewModel,
                     toastHostState,
                     viewAllOwedBills = {navController.navigate(Screen.OwedBillList.route)},
-                    viewAllOwingBills = {navController.navigate(Screen.OwingBillList.route)}
+                    viewAllOwingBills = {navController.navigate(Screen.OwingBillList.route)},
+                    onBillItemClicked = { billId ->
+                        navController.navigate(Screen.BillDetails.createRoute(billId))
+                    }
                 )
 
             }

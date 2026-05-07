@@ -36,6 +36,7 @@ fun OwedView(
     openReminderModal: (OwedBill) -> Unit,
     openRecordPaymentModal: (OwedBill) -> Unit,
     onViewAll: () -> Unit,
+    onBillItemClicked: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
@@ -47,7 +48,8 @@ fun OwedView(
             OwedItem(
                 bill = bill,
                 openReminderModal = {openReminderModal(bill)},
-                openRecordPaymentModal = {openRecordPaymentModal(bill)}
+                openRecordPaymentModal = {openRecordPaymentModal(bill)},
+                onBillItemClicked = {onBillItemClicked(it)}
             )
         },
         isOwing = false,
@@ -61,6 +63,7 @@ fun OwingView(
     bills: List<OwingBill>,
     openSettleUpModal: (OwingBill) -> Unit,
     onViewAll: () -> Unit,
+    onBillItemClicked: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BillSection(
@@ -71,7 +74,9 @@ fun OwingView(
             val bill = bills[index]
             OwingItem(
                 bill = bill,
-                openSettleUpModal = { openSettleUpModal(bill) })
+                openSettleUpModal = { openSettleUpModal(bill) },
+                onBillItemClicked = {onBillItemClicked(it)}
+            )
         },
         isOwing = true,
         onViewAll,

@@ -1,19 +1,23 @@
 package com.omodauda.splitwise.data.repository
 
+import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.google.gson.Gson
 import com.omodauda.splitwise.data.network.OwedBillsPagingSource
 import com.omodauda.splitwise.data.network.OwingBillsPagingSource
 import com.omodauda.splitwise.data.network.api.BillApi
 import com.omodauda.splitwise.data.network.model.ApiError
+import com.omodauda.splitwise.data.network.model.BillDetails
 import com.omodauda.splitwise.data.network.model.CreateBillRequest
 import com.omodauda.splitwise.data.network.model.CreateBillResponse
+import com.omodauda.splitwise.data.network.model.GetBillDetailsRequest
+import com.omodauda.splitwise.data.network.model.GetBillDetailsResponse
 import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
 import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.PayBillRequest
-import com.google.gson.Gson
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -195,6 +199,24 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
                 Result.failure(Exception(apiError.message))
             }
         }catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getBillDetails(data: GetBillDetailsRequest): Result<BillDetails> {
+        return try {
+            val response = billApi.getBillDetails(data.billId)
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body.data)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
             Result.failure(e)
         } catch (e: Exception) {
             Result.failure(e)

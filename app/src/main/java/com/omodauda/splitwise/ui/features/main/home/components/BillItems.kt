@@ -41,6 +41,7 @@ fun OwedItem(
     bill: OwedBill,
     openReminderModal: () -> Unit,
     openRecordPaymentModal: () -> Unit,
+    onBillItemClicked: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val remainingAmount = bill.amount - bill.paidAmount
@@ -59,6 +60,7 @@ fun OwedItem(
         actOnBill = { openRecordPaymentModal() },
         sendReminder = { openReminderModal() },
         modifier = modifier
+            .clickable(enabled = true, onClick = {onBillItemClicked(bill.bill.id)})
     )
 }
 
@@ -66,6 +68,7 @@ fun OwedItem(
 fun OwingItem(
     bill: OwingBill,
     openSettleUpModal: () -> Unit,
+    onBillItemClicked: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val remainingAmount = bill.amount - bill.paidAmount
@@ -83,6 +86,7 @@ fun OwingItem(
         buttonContentColor = MaterialTheme.colorScheme.error,
         actOnBill = { openSettleUpModal() },
         modifier = modifier
+            .clickable(enabled = true, onClick = {onBillItemClicked(bill.bill.id)})
     )
 }
 
