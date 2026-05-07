@@ -165,7 +165,7 @@ fun OwedBillList(
                                 descriptionText = bill.bill.description,
                                 date = bill.createdAt,
                                 modifier = Modifier
-                                    .clickable(enabled = true, onClick = {onClick(bill.id)}),
+                                    .clickable(enabled = true, onClick = {onClick(bill.bill.id)}),
 
                             )
                             HorizontalDivider(
