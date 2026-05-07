@@ -2,6 +2,7 @@ package com.omodauda.splitwise.data.network.api
 
 import com.omodauda.splitwise.data.network.model.CreateBillRequest
 import com.omodauda.splitwise.data.network.model.CreateBillResponse
+import com.omodauda.splitwise.data.network.model.GetBillDetailsResponse
 import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
 import com.omodauda.splitwise.data.network.model.GetOwedBillsResponse
 import com.omodauda.splitwise.data.network.model.GetOwingBillsResponse
@@ -13,6 +14,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface BillApi {
@@ -52,5 +54,8 @@ interface BillApi {
 
     @POST("bill/send-reminder")
     suspend fun sendBillReminder(@Body request: SendBillReminderRequest): Response<SendBillReminderResponse>
+
+    @GET("bill/{billId}")
+    suspend fun getBillDetails(@Path("billId") billId: String): Response<GetBillDetailsResponse>
 
 }

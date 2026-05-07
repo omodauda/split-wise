@@ -32,6 +32,7 @@ data class OwedBill(
     val bill: OwedBillItemModel
 )
 data class OwedBillItemModel(
+    val id: String,
     val description: String,
 )
 data class User(
@@ -76,4 +77,31 @@ data class SendBillReminderRequest(
 
 data class SendBillReminderResponse(
     val message: String
+)
+
+data class GetBillDetailsRequest(
+    val billId: String
+)
+
+data class BillDetails(
+    val category: String,
+    val date: Date,
+    val description: String,
+    val id: String,
+    val paidBy: User,
+    val splitMethod: String,
+    val splits: List<Split>,
+    val totalAmount: Int
+)
+data class Split(
+    val amount: Int,
+    val id: String,
+    val paidAmount: Int,
+    val percentage: Double,
+    val user: User
+)
+
+data class GetBillDetailsResponse(
+    val message: String,
+    val data: BillDetails
 )
