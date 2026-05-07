@@ -17,6 +17,7 @@ import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillScreen
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
+import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwedBillListScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwingBillListScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
@@ -115,7 +116,9 @@ fun NavGraphBuilder.mainNavGraph(
             OwedBillListScreen(
                 viewModel = billsViewModel,
                 goBack = {navController.popBackStack()},
-                goToBillDetails = {}
+                goToBillDetails = {billId ->
+                    navController.navigate(Screen.BillDetails.createRoute(billId))
+                }
             )
         }
         composable(route = Screen.OwingBillList.route) {
@@ -126,7 +129,16 @@ fun NavGraphBuilder.mainNavGraph(
             OwingBillListScreen(
                 viewModel = billsViewModel,
                 goBack = {navController.popBackStack()},
-                goToBillDetails = {}
+                goToBillDetails = {billId ->
+                    navController.navigate(Screen.BillDetails.createRoute(billId))
+                }
+            )
+        }
+        composable(route = Screen.BillDetails.route) {
+            val currentUser by authViewModel.user.collectAsStateWithLifecycle()
+            BillDetailsScreen(
+                currentUserId = currentUser?.id ?: "",
+                onBackClick = {navController.popBackStack()}
             )
         }
     }
