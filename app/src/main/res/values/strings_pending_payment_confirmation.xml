@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alert_title">%s payments waiting for confirmation</string>
+    <string name="alert_desc">Review and confirm payments from your group members</string>
+    <string name="review_now">Review Now →</string>
+    <string name="payment_confirmation">Payment Confirmation</string>
+    <string name="await_alert_desc">You have a payment waiting for confirmation</string>
+    <string name="paid_share">paid their share</string>
+    <string name="bill">Bill</string>
+    <string name="payment_date">Date Paid</string>
+    <string name="to_balance">To Balance</string>
+    <string name="review_later">I\'ll do this later</string>
+    <string name="pending">pending</string>
+    <string name="no_pending_confirmations">No Pending Confirmations</string>
+    <string name="bill_details">BILL DETAILS</string>
+    <string name="total_bill_amount">Total Bill Amount</string>
+    <string name="your_share">Your Share</string>
+    <string name="payment_info">PAYMENT INFORMATION</string>
+    <string name="amount_paid">Amount Paid</string>
+    <string name="verify_payment">Verify Payment</string>
+    <string name="verify_desc">Please confirm that %1$s has paid %2$s for their share of this bill</string>
+</resources>
