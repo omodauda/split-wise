@@ -21,10 +21,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -45,7 +47,9 @@ import com.omodauda.splitwise.ui.features.main.home.components.DashBoard
 import com.omodauda.splitwise.ui.features.main.home.components.EmptyBillView
 import com.omodauda.splitwise.ui.features.main.home.components.OwedView
 import com.omodauda.splitwise.ui.features.main.home.components.OwingView
+import com.omodauda.splitwise.ui.features.main.home.components.PaymentPendingConfirmationAlert
 import com.omodauda.splitwise.ui.features.main.home.components.PendingInvites
+import com.omodauda.splitwise.ui.features.main.home.components.PendingPaymentConfirmationDialog
 import com.omodauda.splitwise.ui.features.main.home.components.RecordPaymentModal
 import com.omodauda.splitwise.ui.features.main.home.components.ReminderModal
 import com.omodauda.splitwise.ui.features.main.home.components.SettleUpModal
@@ -81,12 +85,15 @@ fun HomeScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val recordPaymentModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showRecordPaymentModal by remember { mutableStateOf(false) }
-    var selectedOwedBill by remember { mutableStateOf<OwedBill?>(null) }
+    var showRecordPaymentModal by rememberSaveable { mutableStateOf(false) }
+    var selectedOwedBill by rememberSaveable { mutableStateOf<OwedBill?>(null) }
 
     val settleUpModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showSettleUpModal by remember { mutableStateOf(false) }
-    var selectedOwingBill by remember { mutableStateOf<OwingBill?>(null) }
+    var showSettleUpModal by rememberSaveable { mutableStateOf(false) }
+    var selectedOwingBill by rememberSaveable { mutableStateOf<OwingBill?>(null) }
+
+    var pendingPaymentAlert by rememberSaveable { mutableStateOf(true) }
+    var showPendingPaymentConfirmationDialog by rememberSaveable { mutableStateOf(true) }
 
     LaunchedEffect(invites) {
         inviteViewModel.monitorLoadState(invites)
@@ -165,6 +172,14 @@ fun HomeScreen(
                 data = billsUiState.billDashboard,
                 isLoading = billsUiState.dashboardLoading
             )
+            if (pendingPaymentAlert) {
+                PaymentPendingConfirmationAlert(
+                    onReview = {},
+                    onDismiss = {pendingPaymentAlert = false},
+                    modifier = Modifier
+                        .padding(top = 16.dp, start = ScreenDimensions.sectionSpacing, end = ScreenDimensions.sectionSpacing)
+                )
+            }
             ContentView(
                 owedLoading = billsUiState.isOwedBillsLoading,
                 owedBills = billsUiState.owedBills,
@@ -240,6 +255,10 @@ fun HomeScreen(
                     },
                 )
             }
+
+            if (showPendingPaymentConfirmationDialog) {
+                PendingPaymentConfirmationDialog(onDismiss = {showPendingPaymentConfirmationDialog = false})
+            }
         }
     }
 }
@@ -267,7 +286,7 @@ fun ContentView(
             .padding(
                 start = ScreenDimensions.sectionSpacing,
                 end = ScreenDimensions.sectionSpacing,
-                top = ScreenDimensions.verticalPadding
+//                top = ScreenDimensions.verticalPadding
             )
     ) {
         Spacer(Modifier.height(Spacing.medium))

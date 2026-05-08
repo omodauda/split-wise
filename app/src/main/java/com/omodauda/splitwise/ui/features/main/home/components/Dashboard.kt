@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.omodauda.splitwise.R
@@ -27,6 +32,7 @@ import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
 import com.omodauda.splitwise.ui.theme.SplitWiseShapes
 import com.omodauda.splitwise.ui.theme.emerald_500
+import com.omodauda.splitwise.ui.theme.emerald_700
 import com.omodauda.splitwise.utils.formatFromCents
 import com.valentinilk.shimmer.shimmer
 
@@ -49,11 +55,51 @@ fun DashBoard(
                 bottom = ScreenDimensions.verticalPadding
             )
     ) {
-        Text(
-            text = stringResource(R.string.dashboard),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onPrimary
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+
+        ) {
+            Text(
+                text = stringResource(R.string.dashboard),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+
+
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(color = emerald_700.copy(alpha = 0.9f), shape = RoundedCornerShape(40.dp))
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.pending_payment_icon),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .padding(14.dp)
+                        .align(Alignment.Center)
+                )
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .offset(x = 4.dp, y = (-4).dp)
+                        .background(color = MaterialTheme.colorScheme.error, shape = RoundedCornerShape(24.dp))
+                        .padding(vertical = 2.dp, horizontal = 6.dp)
+
+                ) {
+                    Text(
+                        text = "3",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onError
+                    )
+                }
+            }
+        }
         Spacer(Modifier.height(Spacing.large))
         BalanceView(
             title = R.string.net_balance,
