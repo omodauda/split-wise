@@ -66,7 +66,8 @@ fun HomeBottomTab(
                     viewAllOwingBills = {navController.navigate(Screen.OwingBillList.route)},
                     onBillItemClicked = { billId ->
                         navController.navigate(Screen.BillDetails.createRoute(billId))
-                    }
+                    },
+                    goToPaymentConfirmation = {navController.navigate(Screen.PaymentConfirmation.route)}
                 )
 
             }

@@ -70,6 +70,7 @@ fun HomeScreen(
     viewAllOwedBills: () -> Unit,
     viewAllOwingBills: () -> Unit,
     onBillItemClicked: (billId: String) -> Unit,
+    goToPaymentConfirmation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -170,11 +171,12 @@ fun HomeScreen(
                 paddingTop = innerPadding.calculateTopPadding(),
                 onAddBill = { goToAddBill() },
                 data = billsUiState.billDashboard,
-                isLoading = billsUiState.dashboardLoading
+                isLoading = billsUiState.dashboardLoading,
+                goToPaymentPendingConfirmations = goToPaymentConfirmation
             )
             if (pendingPaymentAlert) {
                 PaymentPendingConfirmationAlert(
-                    onReview = {},
+                    onReview = {goToPaymentConfirmation()},
                     onDismiss = {pendingPaymentAlert = false},
                     modifier = Modifier
                         .padding(top = 16.dp, start = ScreenDimensions.sectionSpacing, end = ScreenDimensions.sectionSpacing)

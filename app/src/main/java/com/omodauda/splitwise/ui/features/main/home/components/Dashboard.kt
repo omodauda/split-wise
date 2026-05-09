@@ -2,6 +2,7 @@ package com.omodauda.splitwise.ui.features.main.home.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ fun DashBoard(
     data: GetBillsDashboardResponse?,
     paddingTop: Dp,
     onAddBill: () -> Unit,
+    goToPaymentPendingConfirmations: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -90,6 +92,7 @@ fun DashBoard(
                         .offset(x = 4.dp, y = (-4).dp)
                         .background(color = MaterialTheme.colorScheme.error, shape = RoundedCornerShape(24.dp))
                         .padding(vertical = 2.dp, horizontal = 6.dp)
+                        .clickable(enabled = true, onClick = {goToPaymentPendingConfirmations()})
 
                 ) {
                     Text(

@@ -23,6 +23,7 @@ import com.omodauda.splitwise.ui.features.main.billList.OwingBillListScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentConfirmationScreen
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
@@ -139,6 +140,16 @@ fun NavGraphBuilder.mainNavGraph(
             BillDetailsScreen(
                 currentUserId = currentUser?.id ?: "",
                 onBackClick = {navController.popBackStack()}
+            )
+        }
+        composable(route = Screen.PaymentConfirmation.route) {
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry("main_graph")
+            }
+            val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
+            PaymentConfirmationScreen(
+                goBack = {navController.popBackStack()},
+                viewModel = billsViewModel
             )
         }
     }
