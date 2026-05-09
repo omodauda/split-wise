@@ -18,5 +18,5 @@
     <string name="payment_info">PAYMENT INFORMATION</string>
     <string name="amount_paid">Amount Paid</string>
     <string name="verify_payment">Verify Payment</string>
-    <string name="verify_desc">Please confirm that %1$s has paid %2$s for their share of this bill</string>
+    <string name="verify_desc">Please confirm that %1$s has paid %2$s for their share of this bill.</string>
 </resources>

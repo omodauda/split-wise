@@ -62,6 +62,7 @@ import java.util.Date
 fun PaymentConfirmationScreen(
     viewModel: BillsViewModel,
     goBack: () -> Unit,
+    goToConfirmPayment: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val bills = viewModel.paginatedOwingBills.collectAsLazyPagingItems()
@@ -90,7 +91,7 @@ fun PaymentConfirmationScreen(
                 bills,
                 onRefresh = {bills.refresh()},
                 searchQuery = searchQuery,
-                onClick = {  }
+                onClick = { goToConfirmPayment() }
             )
         }
     }

@@ -20,6 +20,7 @@ import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScre
 import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwedBillListScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwingBillListScreen
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
@@ -149,7 +150,13 @@ fun NavGraphBuilder.mainNavGraph(
             val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
             PaymentConfirmationScreen(
                 goBack = {navController.popBackStack()},
+                goToConfirmPayment = {navController.navigate(Screen.ConfirmPayment.route)},
                 viewModel = billsViewModel
+            )
+        }
+        composable(route = Screen.ConfirmPayment.route) {
+            ConfirmPaymentScreen(
+                goBack = {navController.popBackStack()}
             )
         }
     }
