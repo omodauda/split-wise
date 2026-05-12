@@ -43,6 +43,7 @@ fun DashBoard(
     data: GetBillsDashboardResponse?,
     paddingTop: Dp,
     onAddBill: () -> Unit,
+    pendingPaymentCount: Int,
     goToPaymentPendingConfirmations: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -75,6 +76,7 @@ fun DashBoard(
                 modifier = Modifier
                     .size(40.dp)
                     .background(color = emerald_700.copy(alpha = 0.9f), shape = RoundedCornerShape(40.dp))
+                    .clickable(enabled = true, onClick = {goToPaymentPendingConfirmations()})
             ) {
                 Icon(
                     painter = painterResource(R.drawable.pending_payment_icon),
@@ -85,21 +87,22 @@ fun DashBoard(
                         .align(Alignment.Center)
                 )
 
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 4.dp, y = (-4).dp)
-                        .background(color = MaterialTheme.colorScheme.error, shape = RoundedCornerShape(24.dp))
-                        .padding(vertical = 2.dp, horizontal = 6.dp)
-                        .clickable(enabled = true, onClick = {goToPaymentPendingConfirmations()})
+                if (pendingPaymentCount > 0) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 4.dp, y = (-4).dp)
+                            .background(color = MaterialTheme.colorScheme.error, shape = RoundedCornerShape(24.dp))
+                            .padding(vertical = 2.dp, horizontal = 6.dp)
 
-                ) {
-                    Text(
-                        text = "3",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.onError
-                    )
+                    ) {
+                        Text(
+                            text = pendingPaymentCount.toString(),
+                            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.onError
+                        )
+                    }
                 }
             }
         }

@@ -63,7 +63,10 @@ class AppMessagingService : FirebaseMessagingService() {
             when (action) {
                 FcmAction.NEW_BILL -> billsRepository.triggerRefreshOwingBills()
                 FcmAction.BILL_SETTLEMENT -> billsRepository.triggerRefreshOwingBills()
-                FcmAction.PAYMENT_RECEIVED -> billsRepository.triggerRefreshOwedBills()
+                FcmAction.PAYMENT_RECEIVED -> {
+                    billsRepository.triggerRefreshOwedBills()
+                    billsRepository.triggerRefreshPaymentPendingConfirmation()
+                }
                 FcmAction.UNKNOWN -> {}
             }
         }

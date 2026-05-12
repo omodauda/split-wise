@@ -54,7 +54,9 @@ import com.omodauda.splitwise.ui.features.main.home.components.RecordPaymentModa
 import com.omodauda.splitwise.ui.features.main.home.components.ReminderModal
 import com.omodauda.splitwise.ui.features.main.home.components.SettleUpModal
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendingConfirmationViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.theme.Spacing
 import com.omodauda.splitwise.ui.theme.SplitWiseTheme
 
@@ -71,6 +73,8 @@ fun HomeScreen(
     viewAllOwingBills: () -> Unit,
     onBillItemClicked: (billId: String) -> Unit,
     goToPaymentConfirmation: () -> Unit,
+    paymentPendingConfirmationViewModel: PaymentPendingConfirmationViewModel,
+    confirmPaymentViewModel: ConfirmPaymentViewModel,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -94,7 +98,15 @@ fun HomeScreen(
     var selectedOwingBill by rememberSaveable { mutableStateOf<OwingBill?>(null) }
 
     var pendingPaymentAlert by rememberSaveable { mutableStateOf(true) }
-    var showPendingPaymentConfirmationDialog by rememberSaveable { mutableStateOf(true) }
+    val showPendingPaymentConfirmationDialog by paymentPendingConfirmationViewModel.showDialog.collectAsStateWithLifecycle()
+    val firstPendingPayment by paymentPendingConfirmationViewModel.firstPendingPayment.collectAsStateWithLifecycle()
+    val pendingPaymentCount by paymentPendingConfirmationViewModel.totalCount.collectAsStateWithLifecycle()
+
+    LaunchedEffect(firstPendingPayment) {
+        firstPendingPayment?.let {
+            confirmPaymentViewModel.setPaymentId(it.id)
+        }
+    }
 
     LaunchedEffect(invites) {
         inviteViewModel.monitorLoadState(invites)
@@ -172,9 +184,10 @@ fun HomeScreen(
                 onAddBill = { goToAddBill() },
                 data = billsUiState.billDashboard,
                 isLoading = billsUiState.dashboardLoading,
-                goToPaymentPendingConfirmations = goToPaymentConfirmation
+                goToPaymentPendingConfirmations = goToPaymentConfirmation,
+                pendingPaymentCount = pendingPaymentCount
             )
-            if (pendingPaymentAlert) {
+            if (pendingPaymentAlert && pendingPaymentCount > 1) {
                 PaymentPendingConfirmationAlert(
                     onReview = {goToPaymentConfirmation()},
                     onDismiss = {pendingPaymentAlert = false},
@@ -258,8 +271,11 @@ fun HomeScreen(
                 )
             }
 
-            if (showPendingPaymentConfirmationDialog) {
-                PendingPaymentConfirmationDialog(onDismiss = {showPendingPaymentConfirmationDialog = false})
+            if (showPendingPaymentConfirmationDialog && !showInviteDialog && firstPendingPayment !== null) {
+                PendingPaymentConfirmationDialog(
+                    onDismiss = { paymentPendingConfirmationViewModel.onDialogDismissed() },
+                    pendingPayment = firstPendingPayment!!
+                )
             }
         }
     }

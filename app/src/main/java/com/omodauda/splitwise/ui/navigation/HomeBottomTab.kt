@@ -25,11 +25,13 @@ import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.activity.ActivityScreen
 import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendScreen
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.home.HomeScreen
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendingConfirmationViewModel
 import com.omodauda.splitwise.ui.features.main.profile.ProfileScreen
 import com.omodauda.splitwise.ui.theme.Elevation
 
@@ -41,6 +43,8 @@ fun HomeBottomTab(
     friendViewModel: FriendViewModel,
     billsViewModel: BillsViewModel,
     activityViewModel: ActivityViewModel,
+    pendingConfirmationViewModel: PaymentPendingConfirmationViewModel,
+    confirmPaymentViewModel: ConfirmPaymentViewModel,
     toastHostState: ToastHostState,
     startDestination: String = Screen.Home.route
 ) {
@@ -67,7 +71,9 @@ fun HomeBottomTab(
                     onBillItemClicked = { billId ->
                         navController.navigate(Screen.BillDetails.createRoute(billId))
                     },
-                    goToPaymentConfirmation = {navController.navigate(Screen.PaymentConfirmation.route)}
+                    goToPaymentConfirmation = {navController.navigate(Screen.PaymentConfirmation.route)},
+                    paymentPendingConfirmationViewModel = pendingConfirmationViewModel,
+                    confirmPaymentViewModel = confirmPaymentViewModel
                 )
 
             }

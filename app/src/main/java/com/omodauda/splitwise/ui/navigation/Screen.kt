@@ -24,5 +24,7 @@ sealed class Screen(val route: String) {
     }
 
     object PaymentConfirmation: Screen(route = "PaymentConfirmation")
-    object ConfirmPayment: Screen(route = "ConfirmPayment")
+    object ConfirmPayment: Screen(route = "ConfirmPayment/{paymentId}") {
+        fun createRoute(paymentId: String) = "ConfirmPayment/$paymentId"
+    }
 }

@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,18 +42,18 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.omodauda.splitwise.R
-import com.omodauda.splitwise.data.network.model.OwingBill
+import com.omodauda.splitwise.data.network.model.PendingPayment
 import com.omodauda.splitwise.ui.components.AppTextField
-import com.omodauda.splitwise.ui.features.main.billList.BillSortOption
-import com.omodauda.splitwise.ui.features.main.billList.EmptyBillSearchView
 import com.omodauda.splitwise.ui.features.main.billList.SortButton
 import com.omodauda.splitwise.ui.features.main.billList.SortDropdownMenu
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
+import com.omodauda.splitwise.ui.features.main.confirmPayment.PendingPaymentSortOption
 import com.omodauda.splitwise.ui.features.main.friends.FriendListPlaceholder
 import com.omodauda.splitwise.ui.features.main.friends.FriendPlaceholder
-import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.home.components.AvatarView
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
+import com.omodauda.splitwise.ui.theme.black
 import com.omodauda.splitwise.ui.theme.crystalPeak
 import com.omodauda.splitwise.utils.formatFromCents
 import java.text.SimpleDateFormat
@@ -60,15 +61,16 @@ import java.util.Date
 
 @Composable
 fun PaymentConfirmationScreen(
-    viewModel: BillsViewModel,
+    viewModel: PaymentPendingConfirmationViewModel,
+    confirmPaymentViewModel: ConfirmPaymentViewModel,
     goBack: () -> Unit,
-    goToConfirmPayment: () -> Unit,
+    goToConfirmPayment: (paymentId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bills = viewModel.paginatedOwingBills.collectAsLazyPagingItems()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchQuery by rememberSaveable {mutableStateOf("") }
-    val selectedSort by rememberSaveable {mutableStateOf(BillSortOption.MOST_RECENT) }
+    val payments = viewModel.pendingPaymentPagingData.collectAsLazyPagingItems()
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    val selectedSort by viewModel.sort.collectAsStateWithLifecycle()
+    val totalCount by viewModel.totalCount.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier
@@ -83,15 +85,19 @@ fun PaymentConfirmationScreen(
                 goBack = goBack,
                 paddingTop = innerPadding.calculateTopPadding(),
                 searchQuery = searchQuery,
-                onSearchChanged = {},
+                onSearchChanged = {viewModel.onSearchQueryChanged(it)},
                 selectedSort = selectedSort,
-                onSortChanged = {  }
+                onSortChanged = { viewModel.onSortChanged(it) },
+                totalCount = totalCount
             )
             PaymentConfirmationList(
-                bills,
-                onRefresh = {bills.refresh()},
+                payments,
+                onRefresh = {payments.refresh()},
                 searchQuery = searchQuery,
-                onClick = { goToConfirmPayment() }
+                onClick = { paymentId ->
+                    confirmPaymentViewModel.setPaymentId(paymentId)
+                    goToConfirmPayment(paymentId)
+                }
             )
         }
     }
@@ -100,14 +106,14 @@ fun PaymentConfirmationScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentConfirmationList(
-    bills: LazyPagingItems<OwingBill>,
+    payments: LazyPagingItems<PendingPayment>,
     onRefresh: () -> Unit,
     searchQuery: String?,
     onClick: (paymentId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val loadState = bills.loadState
-    val isRefreshing = bills.loadState.refresh is LoadState.Loading
+    val loadState = payments.loadState
+    val isRefreshing = payments.loadState.refresh is LoadState.Loading
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -115,8 +121,8 @@ fun PaymentConfirmationList(
         if (loadState.refresh is LoadState.Loading) {
             // handle refresh loading
             FriendListPlaceholder()
-        } else if (!searchQuery.isNullOrBlank() && bills.itemCount == 0) {
-            EmptyBillSearchView()
+        } else if (!searchQuery.isNullOrBlank() && payments.itemCount == 0) {
+            EmptyPaymentSearchView()
         } else {
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
@@ -136,18 +142,18 @@ fun PaymentConfirmationList(
                         .background(color = MaterialTheme.colorScheme.inverseOnSurface)
                 ) {
                     items(
-                        count = bills.itemCount,
-                        key = bills.itemKey { it.id }) { index ->
-                        val bill = bills[index]
-                        if (bill !== null) {
+                        count = payments.itemCount,
+                        key = payments.itemKey { it.id }) { index ->
+                        val payment = payments[index]
+                        if (payment !== null) {
                             PaymentConfirmationItem(
-                                fullName = "Sarah Johnson",
-                                amountPaid = 1680,
-                                datePaid = Date(),
-                                description = "Electricity",
-                                category = "Utilities",
+                                fullName = payment.payer.fullName,
+                                amountPaid = payment.amount,
+                                datePaid = payment.createdAt,
+                                description = payment.bill.description,
+                                category = payment.bill.category,
                                 modifier = Modifier
-                                    .clickable(onClick = {onClick(bill.id)})
+                                    .clickable(onClick = {onClick(payment.id)})
                             )
                         } else {
                             // TODO: show skeleton placeholder
@@ -166,9 +172,10 @@ fun PaymentConfirmationHeader(
     paddingTop: Dp,
     searchQuery: String?,
     onSearchChanged: (String?) -> Unit,
-    onSortChanged: (BillSortOption) -> Unit,
+    onSortChanged: (PendingPaymentSortOption) -> Unit,
+    totalCount: Int,
     modifier: Modifier = Modifier,
-    selectedSort: BillSortOption? = null,
+    selectedSort: PendingPaymentSortOption? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Column(
@@ -203,7 +210,7 @@ fun PaymentConfirmationHeader(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "3 ${stringResource(R.string.pending)}",
+                    text = "$totalCount ${stringResource(R.string.pending)}",
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -231,9 +238,11 @@ fun PaymentConfirmationHeader(
         }
         SortDropdownMenu(
             expanded = expanded,
+            options = PendingPaymentSortOption.entries,
             selectedSort = selectedSort,
             onSortChanged = {onSortChanged(it)},
-            onDismiss = {expanded = false}
+            onDismiss = {expanded = false},
+            labelProvider = { it.label }
         )
     }
 }
@@ -323,5 +332,45 @@ fun PaymentConfirmationItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun EmptyPaymentSearchView(
+    modifier: Modifier = Modifier
+){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background)
+            .padding(top = Spacing.massive)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(80.dp)
+                .background(color = MaterialTheme.colorScheme.surfaceVariant, shape = CircleShape)
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.arrow_down),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .size(40.dp)
+            )
+        }
+        Spacer(Modifier.height(Spacing.medium))
+        Text(
+            text = stringResource(R.string.no_pending_confirmations),
+            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+            color = black
+        )
+        Spacer(Modifier.height(Spacing.small))
+        Text(
+            text = stringResource(R.string.empty_search_bill_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = black
+        )
     }
 }

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.omodauda.splitwise.R
+import com.omodauda.splitwise.data.network.model.PendingPayment
 import com.omodauda.splitwise.ui.components.AppTextButton
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Shapes
@@ -42,6 +43,7 @@ import java.util.Locale
 
 @Composable
 fun PendingPaymentConfirmationDialog(
+    pendingPayment: PendingPayment,
     onDismiss: () -> Unit,
 ) {
     Dialog(
@@ -112,11 +114,11 @@ fun PendingPaymentConfirmationDialog(
                 )
                 Spacer(Modifier.height(Spacing.medium))
                 PaymentDetailView(
-                    fullName = "Sarah Johnson",
-                    amountPaid = 6138,
-                    description = "Dinner at Restaurant",
-                    category = "Food",
-                    datePaid = Date(),
+                    fullName = pendingPayment.payer.fullName,
+                    amountPaid = pendingPayment.amount,
+                    description = pendingPayment.bill.description,
+                    category = pendingPayment.bill.category,
+                    datePaid = pendingPayment.createdAt,
                 )
                 Spacer(Modifier.height(Spacing.medium))
                 AppTextButton(
