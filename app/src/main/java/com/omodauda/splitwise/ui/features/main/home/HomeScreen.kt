@@ -274,7 +274,8 @@ fun HomeScreen(
             if (showPendingPaymentConfirmationDialog && !showInviteDialog && firstPendingPayment !== null) {
                 PendingPaymentConfirmationDialog(
                     onDismiss = { paymentPendingConfirmationViewModel.onDialogDismissed() },
-                    pendingPayment = firstPendingPayment!!
+                    pendingPayment = firstPendingPayment!!,
+                    confirmPaymentViewModel = confirmPaymentViewModel
                 )
             }
         }

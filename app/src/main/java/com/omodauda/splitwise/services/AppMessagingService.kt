@@ -24,6 +24,7 @@ enum class FcmAction(val key: String) {
     NEW_BILL("NEW_BILL"),
     BILL_SETTLEMENT("BILL_SETTLEMENT"),
     PAYMENT_RECEIVED("PAYMENT_RECEIVED"),
+    PAYMENT_CONFIRMED("PAYMENT_CONFIRMED"),
     UNKNOWN("UNKNOWN");
 
     companion object {
@@ -67,6 +68,7 @@ class AppMessagingService : FirebaseMessagingService() {
                     billsRepository.triggerRefreshOwedBills()
                     billsRepository.triggerRefreshPaymentPendingConfirmation()
                 }
+                FcmAction.PAYMENT_CONFIRMED ->billsRepository.triggerRefreshOwingBills()
                 FcmAction.UNKNOWN -> {}
             }
         }

@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,10 +53,11 @@ import java.util.Date
 import java.util.Locale
 
 enum class PendingPaymentSortOption(val label: Int) {
-        AMOUNT_HIGH_TO_LOW(R.string.sort_high),
+    AMOUNT_HIGH_TO_LOW(R.string.sort_high),
     AMOUNT_LOW_TO_HIGH(R.string.sort_low),
     MOST_RECENT(R.string.sort_most_recent)
 }
+
 @Composable
 fun ConfirmPaymentScreen(
     goBack: () -> Unit,
@@ -63,47 +65,77 @@ fun ConfirmPaymentScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by confirmPaymentViewModel.uiState.collectAsStateWithLifecycle()
+    val confirmActionState by confirmPaymentViewModel.confirmActionState.collectAsStateWithLifecycle()
 
-    when (val state = uiState) {
-        is ConfirmPaymentUiState.Loading -> LoadingView()
-        is ConfirmPaymentUiState.Error -> ErrorView(message = state.message, onRetry = {confirmPaymentViewModel.fetchPaymentDetails()})
-        is ConfirmPaymentUiState.Success -> {
-            val payment = state.payment
+    LaunchedEffect(confirmActionState) {
+        if (confirmActionState is ConfirmActionState.Success) {
+            confirmPaymentViewModel.resetActionState()
+            goBack()
+        }
+    }
 
-            Scaffold(
-                topBar = {ConfirmPaymentHeader(goBack)},
-                bottomBar = {ConfirmPaymentFooter()},
-                modifier = modifier
-                    .fillMaxSize()
-            ) { innerPadding ->
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(Spacing.medium),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = MaterialTheme.colorScheme.background)
-                        .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding(), start = innerPadding.calculateStartPadding(
-                            LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(LayoutDirection.Ltr))
-                        .padding(top = Spacing.medium, start = Spacing.medium, end = Spacing.medium)
-                        .verticalScroll(state = rememberScrollState())
-                ) {
-                    BillDetailsView(
-                        category = payment.bill.category,
-                        description = payment.bill.description,
-                        totalBillAmount = payment.bill.totalAmount,
-                        splitAmount = payment.split.amount
-                    )
-                    PaymentInfo(
-                        fullName = payment.payer.fullName,
+    Box(modifier = modifier.fillMaxSize()) {
+        when (val state = uiState) {
+            is ConfirmPaymentUiState.Loading -> LoadingView()
+            is ConfirmPaymentUiState.Error -> ErrorView(
+                message = state.message,
+                onRetry = { confirmPaymentViewModel.fetchPaymentDetails() })
+
+            is ConfirmPaymentUiState.Success -> {
+                val payment = state.payment
+
+                Scaffold(
+                    topBar = { ConfirmPaymentHeader(goBack) },
+                    bottomBar = {
+                        ConfirmPaymentFooter(
+                            onConfirm = { confirmPaymentViewModel.confirmPayment() }
+                        )
+                    },
+                    modifier = Modifier.fillMaxSize()
+                ) { innerPadding ->
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = MaterialTheme.colorScheme.background)
+                            .padding(
+                                top = innerPadding.calculateTopPadding(),
+                                bottom = innerPadding.calculateBottomPadding(),
+                                start = innerPadding.calculateStartPadding(
+                                    LayoutDirection.Ltr
+                                ),
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                            )
+                            .padding(
+                                top = Spacing.medium,
+                                start = Spacing.medium,
+                                end = Spacing.medium
+                            )
+                            .verticalScroll(state = rememberScrollState())
+                    ) {
+                        BillDetailsView(
+                            category = payment.bill.category,
+                            description = payment.bill.description,
+                            totalBillAmount = payment.bill.totalAmount,
+                            splitAmount = payment.split.amount
+                        )
+                        PaymentInfo(
+                            fullName = payment.payer.fullName,
 //                        email = payment.payer,
-                        amountPaid = payment.amount,
-                        datePaid = payment.createdAt
-                    )
-                    ConfirmationNote(
-                        fullName = payment.payer.fullName,
-                        paidAmount = formatFromCents(payment.amount)
-                    )
+                            amountPaid = payment.amount,
+                            datePaid = payment.createdAt
+                        )
+                        ConfirmationNote(
+                            fullName = payment.payer.fullName,
+                            paidAmount = formatFromCents(payment.amount)
+                        )
+                    }
                 }
             }
+        }
+
+        if (confirmActionState is ConfirmActionState.Loading) {
+            LoadingView()
         }
     }
 }
@@ -151,7 +183,10 @@ fun BillDetailsView(
         modifier = modifier
             .fillMaxWidth()
             .shadow(1.dp, shape = MaterialTheme.shapes.large)
-            .background(color = MaterialTheme.colorScheme.background, shape = MaterialTheme.shapes.large)
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.large
+            )
             .padding(Spacing.extraMedium)
     ) {
         Row(
@@ -175,7 +210,10 @@ fun BillDetailsView(
                     style = MaterialTheme.typography.labelMedium,
                     color = spectrumBlue,
                     modifier = Modifier
-                        .padding(vertical = Spacing.extraSmall, horizontal = ScreenDimensions.itemSpacing)
+                        .padding(
+                            vertical = Spacing.extraSmall,
+                            horizontal = ScreenDimensions.itemSpacing
+                        )
                 )
             }
         }
@@ -240,7 +278,10 @@ fun PaymentInfo(
         modifier = modifier
             .fillMaxWidth()
             .shadow(1.dp, shape = MaterialTheme.shapes.large)
-            .background(color = MaterialTheme.colorScheme.background, shape = MaterialTheme.shapes.large)
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.large
+            )
             .padding(Spacing.extraMedium)
     ) {
         Text(
@@ -348,6 +389,7 @@ fun ConfirmationNote(
 
 @Composable
 fun ConfirmPaymentFooter(
+    onConfirm: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -360,25 +402,8 @@ fun ConfirmPaymentFooter(
     ) {
         AppIconTextButton(
             title = stringResource(R.string.confirm_payment),
-            onClick = {},
+            onClick = onConfirm,
             leadingIcon = R.drawable.check_circle_icon
         )
     }
 }
-
-//@Composable
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    uiMode = Configuration.UI_MODE_NIGHT_NO
-//)
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    uiMode = Configuration.UI_MODE_NIGHT_YES
-//)
-//fun ConfirmPaymentPreview() {
-//    SplitWiseTheme {
-//        ConfirmPaymentScreen(goBack = {}, p)
-//    }
-//}

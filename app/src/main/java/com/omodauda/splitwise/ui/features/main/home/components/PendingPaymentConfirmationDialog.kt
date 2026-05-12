@@ -18,6 +18,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,9 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.PendingPayment
 import com.omodauda.splitwise.ui.components.AppTextButton
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmActionState
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Shapes
 import com.omodauda.splitwise.ui.theme.Spacing
@@ -44,8 +49,19 @@ import java.util.Locale
 @Composable
 fun PendingPaymentConfirmationDialog(
     pendingPayment: PendingPayment,
+    confirmPaymentViewModel: ConfirmPaymentViewModel,
     onDismiss: () -> Unit,
 ) {
+    val confirmActionState by confirmPaymentViewModel.confirmActionState.collectAsStateWithLifecycle()
+    val isLoading = confirmActionState is ConfirmActionState.Loading
+
+    LaunchedEffect(confirmActionState) {
+        if (confirmActionState is ConfirmActionState.Success) {
+            confirmPaymentViewModel.resetActionState()
+            onDismiss()
+        }
+    }
+
     Dialog(
         onDismissRequest = { },
         properties = DialogProperties(
@@ -72,6 +88,7 @@ fun PendingPaymentConfirmationDialog(
             ) {
                 IconButton(
                     onClick = { onDismiss() },
+                    enabled = !isLoading,
                     modifier = Modifier
                         .align(Alignment.End)
                 ) {
@@ -123,12 +140,14 @@ fun PendingPaymentConfirmationDialog(
                 Spacer(Modifier.height(Spacing.medium))
                 AppTextButton(
                     title = stringResource(R.string.review),
-                    onClick = {}
+                    isLoading = isLoading,
+                    onClick = { confirmPaymentViewModel.confirmPayment() }
                 )
                 Spacer(Modifier.height(ScreenDimensions.itemSpacing))
                 AppTextButton(
                     title = stringResource(R.string.review_later),
                     onClick = { onDismiss() },
+                    enabled = !isLoading,
                     containerColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier
