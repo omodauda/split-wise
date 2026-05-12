@@ -1,11 +1,14 @@
 package com.omodauda.splitwise.data.network.api
 
+import com.omodauda.splitwise.data.network.model.ConfirmPaymentResponse
 import com.omodauda.splitwise.data.network.model.CreateBillRequest
 import com.omodauda.splitwise.data.network.model.CreateBillResponse
 import com.omodauda.splitwise.data.network.model.GetBillDetailsResponse
 import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
 import com.omodauda.splitwise.data.network.model.GetOwedBillsResponse
 import com.omodauda.splitwise.data.network.model.GetOwingBillsResponse
+import com.omodauda.splitwise.data.network.model.GetPaymentDetailsResponse
+import com.omodauda.splitwise.data.network.model.GetPaymentPendingConfirmationResponse
 import com.omodauda.splitwise.data.network.model.PayBillRequest
 import com.omodauda.splitwise.data.network.model.PayBillResponse
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
@@ -13,6 +16,7 @@ import com.omodauda.splitwise.data.network.model.SendBillReminderResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -58,4 +62,17 @@ interface BillApi {
     @GET("bill/{billId}")
     suspend fun getBillDetails(@Path("billId") billId: String): Response<GetBillDetailsResponse>
 
+    @GET("bill/pending-confirmation")
+    suspend fun getPaymentPendingConfirmation(
+        @Query("cursorId") cursorId: String?,
+        @Query("limit") limit: Int?,
+        @Query("search") search: String?,
+        @Query("sortBy") sort: String?,
+    ): Response<GetPaymentPendingConfirmationResponse>
+
+    @GET("bill/payment/{paymentId}")
+    suspend fun getPaymentDetails(@Path("paymentId") paymentId: String): Response<GetPaymentDetailsResponse>
+
+    @PATCH("bill/confirm-payment/{paymentId}")
+    suspend fun confirmPayment(@Path("paymentId") paymentId: String): Response<ConfirmPaymentResponse>
 }

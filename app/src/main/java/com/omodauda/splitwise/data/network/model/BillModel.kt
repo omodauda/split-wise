@@ -106,3 +106,34 @@ data class GetBillDetailsResponse(
     val message: String,
     val data: BillDetails
 )
+
+data class GetPaymentPendingConfirmationResponse(
+    val data: List<PendingPayment>,
+    val totalCount: Int,
+    val meta: PaginationMetaData
+)
+data class PendingPayment(
+    val amount: Int,
+    val bill: Bill,
+    val createdAt: Date,
+    val id: String,
+    val payer: User,
+    val split: SplitShare
+)
+data class Bill(
+    val category: String,
+    val description: String,
+    val totalAmount: Int
+)
+data class SplitShare(
+    val amount: Int
+)
+
+data class GetPaymentDetailsResponse (
+    val data: PendingPayment,
+    val message: String
+)
+
+data class ConfirmPaymentResponse (
+    val message: String
+)

@@ -1,23 +1,26 @@
 package com.omodauda.splitwise.data.repository
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.google.gson.Gson
 import com.omodauda.splitwise.data.network.OwedBillsPagingSource
 import com.omodauda.splitwise.data.network.OwingBillsPagingSource
+import com.omodauda.splitwise.data.network.PendingPaymentPagingSource
 import com.omodauda.splitwise.data.network.api.BillApi
 import com.omodauda.splitwise.data.network.model.ApiError
 import com.omodauda.splitwise.data.network.model.BillDetails
+import com.omodauda.splitwise.data.network.model.ConfirmPaymentResponse
 import com.omodauda.splitwise.data.network.model.CreateBillRequest
 import com.omodauda.splitwise.data.network.model.CreateBillResponse
 import com.omodauda.splitwise.data.network.model.GetBillDetailsRequest
-import com.omodauda.splitwise.data.network.model.GetBillDetailsResponse
 import com.omodauda.splitwise.data.network.model.GetBillsDashboardResponse
+import com.omodauda.splitwise.data.network.model.GetPaymentDetailsResponse
+import com.omodauda.splitwise.data.network.model.GetPaymentPendingConfirmationResponse
 import com.omodauda.splitwise.data.network.model.OwedBill
 import com.omodauda.splitwise.data.network.model.OwingBill
 import com.omodauda.splitwise.data.network.model.PayBillRequest
+import com.omodauda.splitwise.data.network.model.PendingPayment
 import com.omodauda.splitwise.data.network.model.SendBillReminderRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -34,12 +37,18 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
     private val _refreshOwingBillsSignal = MutableSharedFlow<Unit>(replay = 0)
     val refreshOwingBillSignal = _refreshOwingBillsSignal.asSharedFlow()
 
+    private val _paymentPendingConfirmationTrigger = MutableSharedFlow<Unit>(replay = 0)
+    val paymentPendingConfirmationSignal = _paymentPendingConfirmationTrigger.asSharedFlow()
+
     suspend fun triggerRefreshOwedBills() {
         _refreshOwedBillsSignal.emit(Unit)
     }
 
     suspend fun triggerRefreshOwingBills() {
         _refreshOwingBillsSignal.emit(Unit)
+    }
+    suspend fun triggerRefreshPaymentPendingConfirmation() {
+        _paymentPendingConfirmationTrigger.emit(Unit)
     }
 
     suspend fun addBill(data: CreateBillRequest): Result<CreateBillResponse> {
@@ -211,6 +220,77 @@ class BillsRepository @Inject constructor(private val billApi: BillApi) {
             val body = response.body()
             if (response.isSuccessful && body !== null) {
                 Result.success(body.data)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    fun getPaymentPendingConfirmationStream(searchQuery: String?, sort: String?): Flow<PagingData<PendingPayment>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 10,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                PendingPaymentPagingSource(billApi, searchQuery, sort)
+            }
+        ).flow
+    }
+
+    suspend fun getPaymentPendingConfirmationFirstPage(): Result<GetPaymentPendingConfirmationResponse> {
+        return try {
+            val response = billApi.getPaymentPendingConfirmation(
+                limit = 5, // Or whatever initial amount you need
+                cursorId = null,
+                search = null,
+                sort = null
+            )
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getPaymentDetails(paymentId: String): Result<GetPaymentDetailsResponse> {
+        return try {
+            val response = billApi.getPaymentDetails(paymentId)
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body)
+            } else {
+                val errorBody = response.errorBody()?.string()
+                val apiError = Gson().fromJson(errorBody, ApiError::class.java)
+                Result.failure(Exception(apiError.message))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun confirmPayment(paymentId: String): Result<ConfirmPaymentResponse> {
+        return try {
+            val response = billApi.confirmPayment(paymentId)
+            val body = response.body()
+            if (response.isSuccessful && body !== null) {
+                Result.success(body)
             } else {
                 val errorBody = response.errorBody()?.string()
                 val apiError = Gson().fromJson(errorBody, ApiError::class.java)

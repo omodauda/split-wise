@@ -20,9 +20,13 @@ import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScre
 import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwedBillListScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwingBillListScreen
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentScreen
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentConfirmationScreen
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendingConfirmationViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
@@ -46,14 +50,20 @@ fun NavGraphBuilder.mainNavGraph(
 
             val activityViewModel: ActivityViewModel = hiltViewModel(parentEntry)
 
+            val paymentPendingConfirmationVM: PaymentPendingConfirmationViewModel = hiltViewModel(parentEntry)
+
+            val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
+
             HomeBottomTab(
-                navController,
-                authViewModel,
-                inviteViewModel,
-                friendViewModel,
-                billsViewModel,
-                activityViewModel,
-                toastHostState
+                navController = navController,
+                authViewModel = authViewModel,
+                inviteViewModel = inviteViewModel,
+                friendViewModel = friendViewModel,
+                billsViewModel = billsViewModel,
+                activityViewModel = activityViewModel,
+                pendingConfirmationViewModel = paymentPendingConfirmationVM,
+                confirmPaymentViewModel = confirmPaymentViewModel,
+                toastHostState = toastHostState
             )
         }
         composable(route = Screen.AddBill.route){
@@ -139,6 +149,31 @@ fun NavGraphBuilder.mainNavGraph(
             BillDetailsScreen(
                 currentUserId = currentUser?.id ?: "",
                 onBackClick = {navController.popBackStack()}
+            )
+        }
+        composable(route = Screen.PaymentConfirmation.route) {
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry("main_graph")
+            }
+            val paymentPendingConfirmationVM: PaymentPendingConfirmationViewModel = hiltViewModel(parentEntry)
+            val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
+            PaymentConfirmationScreen(
+                goBack = {navController.popBackStack()},
+                goToConfirmPayment = {paymentId ->
+                    navController.navigate(Screen.ConfirmPayment.createRoute(paymentId))
+                                     },
+                viewModel = paymentPendingConfirmationVM,
+                confirmPaymentViewModel = confirmPaymentViewModel
+            )
+        }
+        composable(route = Screen.ConfirmPayment.route) {
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry("main_graph")
+            }
+            val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
+            ConfirmPaymentScreen(
+                goBack = {navController.popBackStack()},
+                confirmPaymentViewModel
             )
         }
     }

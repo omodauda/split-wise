@@ -274,9 +274,11 @@ fun BillListHeader(
         }
         SortDropdownMenu(
             expanded = expanded,
+            options = BillSortOption.entries,
             selectedSort = selectedSort,
             onSortChanged = {onSortChanged(it)},
-            onDismiss = {expanded = false}
+            onDismiss = {expanded = false},
+            labelProvider = {it.label}
         )
     }
 }
@@ -362,11 +364,13 @@ fun SortButton(
 }
 
 @Composable
-fun SortDropdownMenu(
+fun <T>SortDropdownMenu(
     expanded: Boolean,
-    selectedSort: BillSortOption?,
-    onSortChanged: (BillSortOption) -> Unit,
+    options: List<T>,
+    selectedSort: T?,
+    onSortChanged: (T) -> Unit,
     onDismiss: () -> Unit,
+    labelProvider: (T) -> Int,
     modifier: Modifier = Modifier
 ) {
     DropdownMenu(
@@ -377,10 +381,10 @@ fun SortDropdownMenu(
             .fillMaxWidth()
             .padding(Spacing.small)
     ) {
-        BillSortOption.entries.forEach { option ->
+        options.forEach { option ->
             val isSelected = option == selectedSort
             DropdownMenuItem(
-                text = { Text(text = stringResource(option.label), style = MaterialTheme.typography.bodyMedium)},
+                text = { Text(text = stringResource(labelProvider(option)), style = MaterialTheme.typography.bodyMedium)},
                 colors = MenuDefaults.itemColors(
                     textColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground,
                     trailingIconColor = MaterialTheme.colorScheme.primary
