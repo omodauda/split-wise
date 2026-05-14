@@ -25,8 +25,8 @@ android {
         applicationId = "com.omodauda.splitwise"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,7 +49,6 @@ android {
 
         getByName("debug") {
             isMinifyEnabled = false
-            isShrinkResources = false
             // DEBUG BASE URL
             val baseUrl = properties.getProperty("BASE_URL")
             buildConfigField("String", "BASE_URL", baseUrl)
