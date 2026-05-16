@@ -70,22 +70,29 @@ fun ChangePasswordModal(
                     color = MaterialTheme.colorScheme.background,
                     shape = SplitWiseShapes.bottomSheet
                 )
+
         ) {
             ChangePasswordModalHeader(onDismiss = {onDismissRequest()}, title = R.string.change_password)
-            ChangePasswordModalContent(
-                uiState = uiState,
-                onCurrentPasswordChange = {onCurrentPasswordChange(it)},
-                onNewPasswordChange = {onNewPasswordChange(it)},
-                onConfirmNewPasswordChange = {onConfirmNewPasswordChange(it)}
-            )
-            ChangePasswordModalFooter(
-                isValid = uiState.isFormValid,
-                isLoading = uiState.submissionState === AuthSubmissionState.Loading,
-                onChangePassword = {
-                   onChangePassword()
-                },
-                onDismiss = {onDismissRequest()}
-            )
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+            ) {
+                ChangePasswordModalContent(
+                    uiState = uiState,
+                    onCurrentPasswordChange = {onCurrentPasswordChange(it)},
+                    onNewPasswordChange = {onNewPasswordChange(it)},
+                    onConfirmNewPasswordChange = {onConfirmNewPasswordChange(it)}
+                )
+                ChangePasswordModalFooter(
+                    isValid = uiState.isFormValid,
+                    isLoading = uiState.submissionState === AuthSubmissionState.Loading,
+                    onChangePassword = {
+                        onChangePassword()
+                    },
+                    onDismiss = {onDismissRequest()}
+                )
+            }
+
         }
     }
 }
@@ -150,7 +157,7 @@ fun ChangePasswordModalContent(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background)
             .padding(start = Spacing.large, end = Spacing.large, top = Spacing.large)
-            .verticalScroll(rememberScrollState())
+//            .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = stringResource(R.string.change_password_desc),
