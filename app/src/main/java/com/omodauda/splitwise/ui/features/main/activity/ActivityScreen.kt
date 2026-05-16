@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,6 +32,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -58,74 +63,91 @@ fun ActivityScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize(),
-        topBar = {ActivityHeader()}
     ) { innerPadding ->
 
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
+                .background(color = MaterialTheme.colorScheme.background)
+                .padding(
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(
+                        LayoutDirection.Ltr
+                    )
+                )
         ) {
-            if (loadState.refresh is LoadState.Loading) {
-                // handle refresh loading
-                FriendListPlaceholder()
-            }  else if (activities.itemCount == 0) {
-                EmptyActivity()
-            } else {
-                PullToRefreshBox(
-                    isRefreshing = isRefreshing,
-                    onRefresh = {activities.refresh()},
-                    modifier = modifier.fillMaxSize()
-                ){
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(Spacing.large),
-                        contentPadding = PaddingValues(bottom = Spacing.large, top = Spacing.large),
-                        modifier = Modifier
-                            .fillMaxSize()
+            ActivityHeader(paddingTop = innerPadding.calculateTopPadding())
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                if (loadState.refresh is LoadState.Loading) {
+                    // handle refresh loading
+                    FriendListPlaceholder()
+                } else if (activities.itemCount == 0) {
+                    EmptyActivity()
+                } else {
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = { activities.refresh() },
+                        modifier = modifier.fillMaxSize()
                     ) {
-                        items(
-                            count = activities.itemCount,
-                            key = activities.itemKey { it.id }) { index ->
-                            val activity = activities[index]
-                            if (activity !== null) {
-                                ActivityItemView(item = activity)
-                                HorizontalDivider(
-                                    color = MaterialTheme.colorScheme.surfaceVariant
-                                )
-                            } else {
-                                FriendPlaceholder()
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(Spacing.large),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            contentPadding = PaddingValues(bottom = Spacing.large),
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            items(
+                                count = activities.itemCount,
+                                key = activities.itemKey { it.id }) { index ->
+                                val activity = activities[index]
+                                if (activity !== null) {
+                                    ActivityItemView(item = activity, modifier = Modifier.widthIn(max = 500.dp))
+                                    HorizontalDivider(
+                                        color = MaterialTheme.colorScheme.surfaceVariant
+                                    )
+                                } else {
+                                    FriendPlaceholder()
+                                }
                             }
-                        }
 
-                        // Auto show loading states at the bottom of list
-                        item {
-                            when (loadState.append) {
-                                is LoadState.Loading -> {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        CircularProgressIndicator()
+                            // Auto show loading states at the bottom of list
+                            item {
+                                when (loadState.append) {
+                                    is LoadState.Loading -> {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            CircularProgressIndicator()
+                                        }
                                     }
+
+                                    is LoadState.Error -> {
+
+                                    }
+
+                                    else -> {}
                                 }
-
-                                is LoadState.Error -> {
-
-                                }
-
-                                else -> {}
                             }
                         }
                     }
                 }
+            }
+
+
         }
-    }
 
     }
 }
 
 @Composable
 fun ActivityHeader(
+    paddingTop: Dp,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -133,7 +155,12 @@ fun ActivityHeader(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background)
             .shadow(elevation = 1.dp)
-            .padding(ScreenDimensions.sectionSpacing)
+            .padding(
+                ScreenDimensions.sectionSpacing,
+                end = ScreenDimensions.sectionSpacing,
+                top = paddingTop + ScreenDimensions.sectionSpacing,
+                bottom = ScreenDimensions.sectionSpacing,
+            )
     ) {
         Text(
             text = stringResource(R.string.activity),
@@ -149,28 +176,6 @@ fun ActivityHeader(
     }
 }
 
-//@Composable
-//fun ActivitySectionHeader(
-//    title: String,
-//    modifier: Modifier = Modifier
-//) {
-//    Row(
-//        horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-//        modifier = modifier
-//            .fillMaxWidth()
-//    ) {
-//        Icon(
-//            painter = painterResource(R.drawable.calendar_icon),
-//            contentDescription = "calendar icon"
-//        )
-//        Text(
-//            text = title,
-//            style = MaterialTheme.typography.bodyMedium,
-//            color = MaterialTheme.colorScheme.onSurface
-//        )
-//    }
-//}
-
 @Composable
 fun ActivityItemView(
     item: Activity,
@@ -179,7 +184,6 @@ fun ActivityItemView(
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
-            .fillMaxWidth()
             .padding(Spacing.medium)
     ) {
         Row(
@@ -191,7 +195,10 @@ fun ActivityItemView(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(40.dp)
-                    .background(color = MaterialTheme.colorScheme.surfaceContainer, shape = CircleShape)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                        shape = CircleShape
+                    )
             ) {
                 Icon(
                     painter = painterResource(R.drawable.activity_icon),
