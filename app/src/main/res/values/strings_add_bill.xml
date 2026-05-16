@@ -53,7 +53,7 @@
     <string-array name="next_items">
         <item>All participants will be notified</item>
         <item>Balances will update automatically</item>
-        <item>You can edit or delete anytime</item>
+<!--        <item>You can edit or delete anytime</item>-->
     </string-array>
     <string-array name="enter_each_amount_desc">Enter exact amount for each person</string-array>
     <string name="bill_added">Bill Added Successfully!</string>
