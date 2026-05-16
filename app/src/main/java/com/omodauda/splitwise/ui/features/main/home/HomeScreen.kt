@@ -7,6 +7,8 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,12 +22,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,6 +43,7 @@ import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.components.toast.ToastState
 import com.omodauda.splitwise.ui.components.toast.ToastType
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
+import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.components.BillSectionShimmer
 import com.omodauda.splitwise.ui.features.main.home.components.DashBoard
@@ -56,7 +59,6 @@ import com.omodauda.splitwise.ui.features.main.home.components.SettleUpModal
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
 import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendingConfirmationViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
-import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.theme.Spacing
 import com.omodauda.splitwise.ui.theme.SplitWiseTheme
 
@@ -86,14 +88,14 @@ fun HomeScreen(
 
     val showInviteDialog by inviteViewModel.showDialog.collectAsStateWithLifecycle()
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    val recordPaymentModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val recordPaymentModalState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var showRecordPaymentModal by rememberSaveable { mutableStateOf(false) }
     var selectedOwedBill by rememberSaveable { mutableStateOf<OwedBill?>(null) }
 
-    val settleUpModalState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val settleUpModalState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var showSettleUpModal by rememberSaveable { mutableStateOf(false) }
     var selectedOwingBill by rememberSaveable { mutableStateOf<OwingBill?>(null) }
 
@@ -178,6 +180,9 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr))
+                .verticalScroll(rememberScrollState())
         ) {
             DashBoard(
                 paddingTop = innerPadding.calculateTopPadding(),
@@ -214,9 +219,7 @@ fun HomeScreen(
                 },
                 viewAllOwedBills = viewAllOwedBills,
                 viewAllOwingBills = viewAllOwingBills,
-                onBillItemClicked = onBillItemClicked,
-                modifier = Modifier
-                    .weight(1f)
+                onBillItemClicked = onBillItemClicked
             )
             if (showBottomSheet) {
                 ReminderModal(
@@ -301,11 +304,9 @@ fun ContentView(
 
     Column(
         modifier = modifier
-            .verticalScroll(rememberScrollState())
             .padding(
                 start = ScreenDimensions.sectionSpacing,
                 end = ScreenDimensions.sectionSpacing,
-//                top = ScreenDimensions.verticalPadding
             )
     ) {
         Spacer(Modifier.height(Spacing.medium))
