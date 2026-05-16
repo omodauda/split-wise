@@ -170,7 +170,7 @@ fun AddBillScreen(
                     currentUserId
                 )
                 4 -> StepFour(
-                    billAmount = uiState.billAmountAsDouble,
+//                    billAmount = uiState.billAmountAsDouble,
                     payerId = uiState.paidByUserId,
                     onPayerSelected = {addBillViewModel.onPayerSelected(it)},
                     participants = uiState.participants,
