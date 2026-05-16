@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -51,9 +52,10 @@ fun StepSeven(
     modifier: Modifier = Modifier
 ) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large, bottom = Spacing.large)
+            .padding(start = Spacing.large, end = Spacing.large)
             .verticalScroll(rememberScrollState())
     ) {
         ReviewHeader()
@@ -66,12 +68,14 @@ fun StepSeven(
             paidBy = uiState.participants.find { it.userId == uiState.paidByUserId }?.let {
                 if (it.userId == currentUserId) "You" else it.fullName
             } ?: "",
-            splitMethod = uiState.splitMethod
+            splitMethod = uiState.splitMethod,
+            modifier = Modifier
+                .widthIn(max = 500.dp)
         )
         Spacer(Modifier.height(Spacing.medium))
-        ReviewBreakDown(breakDowns = uiState.splitEntries, currentUserId = currentUserId)
+        ReviewBreakDown(breakDowns = uiState.splitEntries, currentUserId = currentUserId, modifier = Modifier.widthIn(max = 500.dp))
         Spacer(Modifier.height(Spacing.medium))
-        NextStepView()
+        NextStepView(modifier = Modifier.widthIn(max = 500.dp))
     }
 }
 
@@ -114,7 +118,7 @@ fun ReviewDetail(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
+//            .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background, shape = SplitWiseShapes.dialog)
             .border(width = ComponentDimensions.borderWidthMedium, color = MaterialTheme.colorScheme.surfaceVariant, shape = SplitWiseShapes.dialog)
     ) {
@@ -273,7 +277,7 @@ fun NextStepView(
     val nextSteps = stringArrayResource(R.array.next_items)
     Column(
         modifier = modifier
-            .fillMaxWidth()
+//            .fillMaxWidth()
             .background(color = zumthor, shape = SplitWiseShapes.card)
             .border(width = ComponentDimensions.borderWidthMedium, color = crystalPeak, shape = SplitWiseShapes.card)
             .padding(ScreenDimensions.contentPadding)
