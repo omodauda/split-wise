@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.google.crashlytics)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 val properties = Properties().apply {
