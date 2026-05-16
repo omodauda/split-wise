@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +34,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.omodauda.splitwise.R
@@ -136,9 +140,10 @@ fun AddBillScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(innerPadding)
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr), bottom = innerPadding.calculateBottomPadding())
         ) {
-            AddBillHeader(splitMethod = uiState.splitMethod, currentStep = currentStep, totalSteps = totalSteps, goToPrevStep = {goToPrevStep()})
+            AddBillHeader(splitMethod = uiState.splitMethod, currentStep = currentStep, totalSteps = totalSteps, goToPrevStep = {goToPrevStep()}, paddingTop = innerPadding.calculateTopPadding())
             when (currentStep) {
                 1 -> StepOne(
                     uiState,
@@ -165,7 +170,7 @@ fun AddBillScreen(
                     currentUserId
                 )
                 4 -> StepFour(
-                    billAmount = uiState.billAmountAsDouble,
+//                    billAmount = uiState.billAmountAsDouble,
                     payerId = uiState.paidByUserId,
                     onPayerSelected = {addBillViewModel.onPayerSelected(it)},
                     participants = uiState.participants,
@@ -203,6 +208,7 @@ fun AddBillHeader(
     currentStep: Int,
     totalSteps: Int,
     goToPrevStep: () -> Unit,
+    paddingTop: Dp,
     modifier: Modifier = Modifier
 ) {
     val currentProgress = currentStep.toFloat() / totalSteps.toFloat()
@@ -219,7 +225,7 @@ fun AddBillHeader(
 
     Column(
         modifier = modifier
-            .padding( horizontal = Spacing.large, vertical = ScreenDimensions.verticalPadding)
+            .padding( start = Spacing.large, end = Spacing.large, top = ScreenDimensions.verticalPadding + paddingTop, bottom = ScreenDimensions.verticalPadding)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

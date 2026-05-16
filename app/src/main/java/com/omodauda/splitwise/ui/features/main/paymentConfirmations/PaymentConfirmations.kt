@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +37,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -80,6 +84,8 @@ fun PaymentConfirmationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr))
         ) {
             PaymentConfirmationHeader(
                 goBack = goBack,
@@ -131,6 +137,7 @@ fun PaymentConfirmationList(
             ) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(
                         bottom = Spacing.large,
                         start = Spacing.medium,
@@ -153,6 +160,7 @@ fun PaymentConfirmationList(
                                 description = payment.bill.description,
                                 category = payment.bill.category,
                                 modifier = Modifier
+                                    .widthIn(max= 500.dp)
                                     .clickable(onClick = {onClick(payment.id)})
                             )
                         } else {
@@ -258,7 +266,6 @@ fun PaymentConfirmationItem(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .shadow(2.dp, shape = RoundedCornerShape(14.dp))
             .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(14.dp))
             .padding(Spacing.medium)

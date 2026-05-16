@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -32,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -70,6 +74,8 @@ fun BillDetailsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.background)
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr))
         ) {
             BillDetailsHeader(
                 goBack = onBackClick,
@@ -129,25 +135,32 @@ fun BillDetailsContent(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
-            .padding(top = Spacing.medium, start = Spacing.medium, end = Spacing.medium)
+            .padding(start = Spacing.medium, end = Spacing.medium)
     ) {
+
         item {
+            Spacer(Modifier.height(Spacing.medium))
             BillDetailView(
                 description = bill.description,
                 category = bill.category,
                 date = bill.date,
                 totalAmount = bill.totalAmount,
                 splitMethod = bill.splitMethod,
+                modifier = Modifier
+                    .widthIn(max = 500.dp)
             )
             Spacer(Modifier.height(Spacing.medium))
         }
         item {
             BillPayerView(
                 currentUserId = currentUserId,
-                paidBy = bill.paidBy
+                paidBy = bill.paidBy,
+                modifier = Modifier
+                    .widthIn(max = 500.dp)
             )
             Spacer(Modifier.height(Spacing.medium))
         }
@@ -155,7 +168,9 @@ fun BillDetailsContent(
             BillSplitBreakDownView(
                 paddingBottom = paddingBottom,
                 currentUserId = currentUserId,
-                splits = bill.splits
+                splits = bill.splits,
+                modifier = Modifier
+                    .widthIn(max = 500.dp)
             )
         }
     }
@@ -172,7 +187,7 @@ fun BillDetailView(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
+//            .fillMaxWidth()
             .shadow(elevation = 1.dp, shape = RoundedCornerShape(24.dp))
             .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(24.dp))
             .padding(Spacing.large)
@@ -269,7 +284,7 @@ fun BillPayerView(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
         modifier = modifier
-            .fillMaxWidth()
+//            .fillMaxWidth()
             .shadow(elevation = 1.dp, shape = RoundedCornerShape(24.dp))
             .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(24.dp))
             .padding(Spacing.large)
@@ -307,7 +322,7 @@ fun BillSplitBreakDownView(
     splits: List<com.omodauda.splitwise.data.network.model.Split>,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.fillMaxWidth().padding(bottom = paddingBottom + Spacing.medium)) {
+    Column(modifier = modifier.padding(bottom = paddingBottom + Spacing.medium)) {
         Text(
             text = "SPLIT BREAKDOWN",
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),

@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -42,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -96,6 +100,8 @@ fun OwedBillListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr))
         ) {
             BillListHeader(
                 title = title,
@@ -145,6 +151,7 @@ fun OwedBillList(
                 modifier = modifier.fillMaxSize()
             ) {
                 LazyColumn(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(
                         bottom = Spacing.large,
                         top = Spacing.medium
@@ -165,6 +172,7 @@ fun OwedBillList(
                                 descriptionText = bill.bill.description,
                                 date = bill.createdAt,
                                 modifier = Modifier
+                                    .widthIn(max = 500.dp)
                                     .clickable(enabled = true, onClick = {onClick(bill.bill.id)}),
 
                             )
@@ -252,25 +260,6 @@ fun BillListHeader(
                 modifier = Modifier
                     .weight(1f)
             )
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.spacedBy(Spacing.small),
-//                modifier = Modifier
-//                    .border(width = 1.5.dp, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), shape = MaterialTheme.shapes.large)
-//                    .background(emerald_50)
-//                    .padding(vertical = 12.dp, horizontal = 16.dp)
-//            ) {
-//                Icon(
-//                    painter = painterResource(R.drawable.arrow_down),
-//                    contentDescription = null,
-//                    tint = MaterialTheme.colorScheme.primary
-//                )
-//                Text(
-//                    text = "0",
-//                    style = MaterialTheme.typography.titleSmall,
-//                    color = MaterialTheme.colorScheme.primary
-//                )
-//            }
         }
         SortDropdownMenu(
             expanded = expanded,
@@ -424,7 +413,6 @@ private fun OwedBillListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
-            .fillMaxWidth()
             .padding(ScreenDimensions.contentPadding)
     ) {
         Row(

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.google.crashlytics)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 val properties = Properties().apply {
@@ -25,8 +26,8 @@ android {
         applicationId = "com.omodauda.splitwise"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "1.1.1"
+        versionCode = 5
+        versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

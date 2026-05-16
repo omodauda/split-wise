@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -31,14 +33,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
-import com.omodauda.splitwise.ui.theme.SplitWiseTheme
 import com.omodauda.splitwise.ui.theme.crystalPeak
 import com.omodauda.splitwise.ui.theme.emerald_50
 import com.omodauda.splitwise.utils.formatAsCurrency
@@ -58,8 +58,10 @@ fun AddBillSuccessScreen(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large)
+            .padding(start = Spacing.large, end = Spacing.large)
+            .verticalScroll(rememberScrollState())
     ) {
+        Spacer(Modifier.height(Spacing.large))
         Image(
             painter = painterResource(R.drawable.review_logo),
             contentDescription = null,
@@ -89,14 +91,18 @@ fun AddBillSuccessScreen(
             logo = R.drawable.check_circle_icon,
             title = R.string.balances_update,
             desc = R.string.account_synced,
-            color = emerald_50
+            color = emerald_50,
+            modifier = Modifier
+                .widthIn(max = 600.dp)
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         SuccessItem(
             logo = R.drawable.group_icon,
             title = R.string.notifications_sent,
             desc = R.string.everyone_notified,
-            color = crystalPeak
+            color = crystalPeak,
+            modifier = Modifier
+                .widthIn(max = 600.dp)
         )
         Spacer(Modifier.height(Spacing.extraLarge))
         Button(
@@ -107,7 +113,6 @@ fun AddBillSuccessScreen(
                 contentColor = MaterialTheme.colorScheme.onBackground,
             ),
             modifier = Modifier
-                .fillMaxWidth()
                 .border(width = 1.dp, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.outlineVariant)
         ) {
             Icon(
@@ -122,6 +127,7 @@ fun AddBillSuccessScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
+        Spacer(Modifier.height(Spacing.large))
     }
 }
 
@@ -137,7 +143,6 @@ fun SuccessItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
         modifier = modifier
-            .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background, shape = MaterialTheme.shapes.large)
             .border(width = 1.dp, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.outlineVariant)
             .padding(Spacing.extraMedium)
@@ -166,17 +171,5 @@ fun SuccessItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
-@Composable
-fun AddBillSuccessPreview() {
-
-    SplitWiseTheme {
-//        AddBillSuccessScreen(goHome = {}, addBillViewModel = vm)
     }
 }

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,7 +30,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +41,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -69,8 +73,8 @@ fun FriendScreen(
 ) {
     val inviteUiState by inviteViewModel.uiState.collectAsStateWithLifecycle()
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showInviteModal by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    var showInviteModal by rememberSaveable { mutableStateOf(false) }
 
     val friends = viewModel.friendsPagingData.collectAsLazyPagingItems()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -97,13 +101,6 @@ fun FriendScreen(
     }
 
     Scaffold(
-        topBar = {
-            FriendHeader(
-                onSendInvite = {openInviteModal()},
-                searchQuery = searchQuery,
-                onSearchChanged = {
-                    viewModel.onSearchQueryChanged(it)}
-            )},
         modifier = modifier
             .fillMaxSize()
     ) { innerPadding ->
@@ -111,8 +108,16 @@ fun FriendScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.inverseOnSurface)
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr))
         ) {
+            FriendHeader(
+                onSendInvite = {openInviteModal()},
+                searchQuery = searchQuery,
+                paddingTop = innerPadding.calculateTopPadding(),
+                onSearchChanged = {
+                    viewModel.onSearchQueryChanged(it)}
+            )
             FriendsList(
                 friends = friends, sendInvite = { openInviteModal() }, searchQuery = searchQuery,
                 onRefresh = { friends.refresh() },
@@ -263,6 +268,7 @@ fun FriendView(
 @Composable
 fun FriendHeader(
     searchQuery: String?,
+    paddingTop: Dp,
     onSearchChanged: (String?) -> Unit,
     onSendInvite: () -> Unit,
     modifier: Modifier = Modifier
@@ -272,7 +278,7 @@ fun FriendHeader(
             .fillMaxWidth()
             .shadow(elevation = 1.dp)
             .background(color = MaterialTheme.colorScheme.background)
-            .padding(Spacing.large)
+            .padding(top = paddingTop + Spacing.medium, start = Spacing.large, end = Spacing.large, bottom = Spacing.medium)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

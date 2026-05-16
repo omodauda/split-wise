@@ -72,3 +72,4 @@ google-services = {id = "com.google.gms.google-services", version.ref = "googleS
 google-crashlytics = {id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle"}
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,13 +21,10 @@ import com.omodauda.splitwise.data.network.model.Friend
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepTwo.components.Friend
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
-import com.omodauda.splitwise.ui.theme.SplitWiseShapes
 import com.omodauda.splitwise.ui.theme.SplitWiseTheme
-import com.omodauda.splitwise.utils.formatAsCurrency
 
 @Composable
 fun StepFour(
-    billAmount: Double,
     onPayerSelected: (String) -> Unit,
     participants: List<Friend>,
     currentUserId: String?,
@@ -40,24 +36,6 @@ fun StepFour(
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = Spacing.large)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primary, shape = SplitWiseShapes.dialog)
-                .padding(Spacing.large)
-        ) {
-            Text(
-                text = stringResource(R.string.bill_amount),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-            Spacer(Modifier.height(Spacing.extraSmall))
-            Text(
-                text = formatAsCurrency(billAmount),
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onPrimary
-            )
-        }
         Spacer(Modifier.height(Spacing.medium))
         Text(
             text = stringResource(R.string.who_paid_bill),
@@ -91,7 +69,6 @@ fun StepFour(
 fun StepFourPreview() {
     SplitWiseTheme {
         StepFour(
-            billAmount = 0.00,
             payerId = null,
             onPayerSelected = {},
             participants = emptyList(),

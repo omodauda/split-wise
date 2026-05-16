@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -84,7 +85,9 @@ fun PendingInvites(
                         top = Spacing.large,
                         bottom = innerPadding.calculateBottomPadding() + Spacing.medium
                     ),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.medium)
+                    verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     items(
                         count = invites.itemCount,
@@ -95,7 +98,9 @@ fun PendingInvites(
                             PendingInviteCard(
                                 invite = invite,
                                 onAccept = onAccept,
-                                onDecline = onDecline
+                                onDecline = onDecline,
+                                modifier = Modifier
+                                    .widthIn(max = 500.dp)
                             )
                         }
                     }
@@ -157,15 +162,12 @@ fun PendingInviteCard(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .shadow(elevation = 1.dp, shape = SplitWiseShapes.card)
             .background(color = MaterialTheme.colorScheme.background, shape = SplitWiseShapes.card)
             .padding(top = Spacing.large, start = Spacing.large, end = Spacing.large, bottom = Spacing.medium)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
-            modifier = Modifier
-                .fillMaxWidth()
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium)
         ) {
             UserAvatar(
                 fullName = invite.sender.fullName,
@@ -193,9 +195,7 @@ fun PendingInviteCard(
         }
         Spacer(Modifier.height(Spacing.medium))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
-            modifier = Modifier
-                .fillMaxWidth()
+            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing)
         ) {
             AppIconTextButton(
                 leadingIcon = R.drawable.check_icon,

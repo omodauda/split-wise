@@ -78,21 +78,28 @@ fun DeleteAccountModal(
                     color = MaterialTheme.colorScheme.background,
                     shape = SplitWiseShapes.bottomSheet
                 )
+
         ) {
             DeletePasswordModalHeader(onDismiss = {onDismissRequest()}, title = if (uiState.step == 1) R.string.delete_account else R.string.confirm_deletion)
-            DeletePasswordModalContent(
-                uiState = uiState,
-                onDeleteTextChange = viewModel::onDeleteTextChanged,
-                onPasswordChange = viewModel::onPasswordChanged,
+            Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+            ) {
+                DeletePasswordModalContent(
+                    uiState = uiState,
+                    onDeleteTextChange = viewModel::onDeleteTextChanged,
+                    onPasswordChange = viewModel::onPasswordChanged,
 
-            )
-            DeletePasswordModalFooter(
-                step = uiState.step,
-                isValid = uiState.isFormValid,
-                isLoading = uiState.submissionState === AuthSubmissionState.Loading,
-                goToNextStep = {viewModel.onGoToNextStep()},
-                goToPrevStep = {viewModel.onGoToPrevStep()}
-            )
+                    )
+                DeletePasswordModalFooter(
+                    step = uiState.step,
+                    isValid = uiState.isFormValid,
+                    isLoading = uiState.submissionState === AuthSubmissionState.Loading,
+                    goToNextStep = {viewModel.onGoToNextStep()},
+                    goToPrevStep = { if (uiState.step == 1) onDismissRequest() else viewModel.onGoToPrevStep()}
+                )
+            }
+
         }
     }
 }
@@ -156,7 +163,6 @@ fun DeletePasswordModalContent(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background)
             .padding(Spacing.large)
-            .verticalScroll(rememberScrollState())
     ) {
         if (uiState.step == 1) {
             DeleteStepOne()
@@ -383,15 +389,6 @@ fun DeletePasswordModalFooter(
             modifier = Modifier
                 .weight(1f)
         )
-//        AppTextButton(
-//            title = stringResource(if (step == 1) R.string.continue_delete else R.string.delete_my_account),
-//            onClick = {goToNextStep()},
-//            containerColor = MaterialTheme.colorScheme.error,
-//            contentColor = MaterialTheme.colorScheme.onError,
-//            enabled = isValid,
-//            modifier = Modifier
-//                .weight(1f)
-//        )
         TextButton(
             onClick = {goToNextStep()},
             modifier = Modifier

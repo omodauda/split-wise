@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -55,7 +57,7 @@ fun RecordPaymentModal(
     settleBill: (PayBillRequest) -> Unit,
 ) {
     ModalBottomSheet(
-        onDismissRequest = {onDismissRequest()},
+        onDismissRequest = { onDismissRequest() },
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.background
     ) {
@@ -66,8 +68,15 @@ fun RecordPaymentModal(
                     shape = SplitWiseShapes.bottomSheet
                 )
         ) {
-            RecordPaymentModalHeader(onDismiss = {onDismissRequest()}, title = R.string.record_payment)
-            RecordPaymentModalContent(bill, settleBill)
+            RecordPaymentModalHeader(
+                onDismiss = { onDismissRequest() },
+                title = R.string.record_payment
+            )
+            RecordPaymentModalContent(
+                bill, settleBill, modifier = Modifier.verticalScroll(
+                    rememberScrollState()
+                )
+            )
         }
     }
 }
@@ -91,7 +100,7 @@ fun RecordPaymentModalHeader(
             color = MaterialTheme.colorScheme.onBackground
         )
         IconButton(
-            onClick = {onDismiss()}
+            onClick = { onDismiss() }
         ) {
             Icon(
                 painter = painterResource(R.drawable.close_icon),
@@ -162,7 +171,7 @@ fun RecordPaymentModalContent(
         Spacer(Modifier.height(ScreenDimensions.sectionSpacing))
         AppTextButton(
             title = stringResource(R.string.record_payment_received),
-            onClick = {handleSettleBill()}
+            onClick = { handleSettleBill() }
         )
     }
 }

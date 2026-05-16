@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -121,9 +120,9 @@ fun StepOne(
 
 @Composable
 fun Categories(
-    selectedCategory: String? = null,
     onSelect: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedCategory: String? = null,
 ) {
     val categories = listOf(
         BillCategory(
@@ -151,7 +150,6 @@ fun Categories(
             name = R.string.other
         ),
     )
-    val context = LocalContext.current
     Column(modifier) {
         Text(
             text = stringResource(R.string.category),
@@ -160,14 +158,14 @@ fun Categories(
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
             modifier = Modifier
                 .fillMaxWidth()
 
         ) {
             categories.forEach { category ->
-                val categoryName = context.getString(category.name)
+                val categoryName = stringResource(category.name)
                 Category(
                     category = category,
                     selectedCategory = selectedCategory,
@@ -181,12 +179,11 @@ fun Categories(
 
 @Composable
 fun Category(
-    selectedCategory: String? = null,
     category: BillCategory,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedCategory: String? = null,
 ) {
-    val context = LocalContext.current
-    val categoryName = context.getString(category.name)
+    val categoryName = stringResource(category.name)
     val isSelected = selectedCategory == categoryName
     Column(
         verticalArrangement = Arrangement.Center,

@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -71,6 +74,8 @@ fun OwingBillListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
+                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr))
         ) {
             BillListHeader(
                 title = title,
@@ -120,6 +125,7 @@ fun OwingBillList(
                 modifier = modifier.fillMaxSize()
             ) {
                 LazyColumn(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(
                         bottom = Spacing.large,
                         top = Spacing.medium
@@ -140,6 +146,7 @@ fun OwingBillList(
                                 descriptionText = bill.bill.description,
                                 date = bill.createdAt,
                                 modifier = Modifier
+                                    .widthIn(max = 500.dp)
                                     .clickable(enabled = true, onClick = {onClick(bill.bill.id)}),
 
                                 )
@@ -170,7 +177,6 @@ private fun OwingBillListItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier
-            .fillMaxWidth()
             .padding(ScreenDimensions.contentPadding)
     ) {
         Row(

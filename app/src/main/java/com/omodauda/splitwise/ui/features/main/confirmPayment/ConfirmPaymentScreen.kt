@@ -85,7 +85,6 @@ fun ConfirmPaymentScreen(
                 val payment = state.payment
 
                 Scaffold(
-                    topBar = { ConfirmPaymentHeader(goBack) },
                     bottomBar = {
                         ConfirmPaymentFooter(
                             onConfirm = { confirmPaymentViewModel.confirmPayment() }
@@ -94,41 +93,48 @@ fun ConfirmPaymentScreen(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(Spacing.medium),
                         modifier = Modifier
                             .fillMaxSize()
                             .background(color = MaterialTheme.colorScheme.background)
                             .padding(
-                                top = innerPadding.calculateTopPadding(),
                                 bottom = innerPadding.calculateBottomPadding(),
                                 start = innerPadding.calculateStartPadding(
                                     LayoutDirection.Ltr
                                 ),
                                 end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                             )
-                            .padding(
-                                top = Spacing.medium,
-                                start = Spacing.medium,
-                                end = Spacing.medium
-                            )
-                            .verticalScroll(state = rememberScrollState())
                     ) {
-                        BillDetailsView(
-                            category = payment.bill.category,
-                            description = payment.bill.description,
-                            totalBillAmount = payment.bill.totalAmount,
-                            splitAmount = payment.split.amount
-                        )
-                        PaymentInfo(
-                            fullName = payment.payer.fullName,
+                        ConfirmPaymentHeader(goBack)
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    start = Spacing.medium,
+                                    end = Spacing.medium
+                                )
+                                .verticalScroll(state = rememberScrollState())
+                        ) {
+                            Spacer(Modifier.height(Spacing.medium))
+                            BillDetailsView(
+                                category = payment.bill.category,
+                                description = payment.bill.description,
+                                totalBillAmount = payment.bill.totalAmount,
+                                splitAmount = payment.split.amount
+                            )
+                            PaymentInfo(
+                                fullName = payment.payer.fullName,
 //                        email = payment.payer,
-                            amountPaid = payment.amount,
-                            datePaid = payment.createdAt
-                        )
-                        ConfirmationNote(
-                            fullName = payment.payer.fullName,
-                            paidAmount = formatFromCents(payment.amount)
-                        )
+                                amountPaid = payment.amount,
+                                datePaid = payment.createdAt
+                            )
+                            ConfirmationNote(
+                                fullName = payment.payer.fullName,
+                                paidAmount = formatFromCents(payment.amount)
+                            )
+                            Spacer(Modifier.height(Spacing.medium))
+                        }
+
                     }
                 }
             }
