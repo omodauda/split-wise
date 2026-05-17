@@ -1,6 +1,17 @@
 package com.omodauda.splitwise.ui.navigation
 
 //import com.example.splitwise.ui.features.main.groups.GroupScreen
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -16,8 +27,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.window.core.layout.WindowSizeClass
 import com.omodauda.splitwise.R
@@ -74,14 +89,14 @@ fun HomeBottomTab(
         isCompactLandscape ->
             NavigationSuiteType.NavigationBar
         isExpandedWidth ->
-            NavigationSuiteType.WideNavigationRailExpanded
+            NavigationSuiteType.NavigationDrawer
         isMediumWidth ->
             NavigationSuiteType.NavigationRail
         else -> NavigationSuiteType.NavigationBar
     }
 
     val showLabel =
-        layoutType == NavigationSuiteType.NavigationBar || layoutType == NavigationSuiteType.WideNavigationRailExpanded
+        layoutType == NavigationSuiteType.NavigationBar || layoutType == NavigationSuiteType.NavigationDrawer
 
     val myNavigationSuiteItemColors = NavigationSuiteDefaults.itemColors(
         navigationBarItemColors = NavigationBarItemDefaults.colors(
@@ -109,6 +124,49 @@ fun HomeBottomTab(
     NavigationSuiteScaffold(
         layoutType = layoutType,
         navigationSuiteItems = {
+            if (layoutType == NavigationSuiteType.NavigationDrawer) {
+                item(
+                    selected = false,
+                    onClick = { },
+                    icon = {},
+                    label = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.size(40.dp).background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp))
+                            ) {
+                                Text(
+                                    text = "\uD83D\uDCB0",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                            }
+                            Column {
+                                Text(
+                                    text = "Split Wise",
+                                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                                Text(
+                                    text = "Bill Splitting App",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                )
+                item(
+                    selected = false,
+                    onClick = { },
+                    icon = {},
+                    label = { Spacer(Modifier.height(32.dp)) }
+                )
+            }
+
             items.forEach { screen ->
                 val selected = currentTab == screen.route
                 item(
@@ -125,13 +183,15 @@ fun HomeBottomTab(
                         Icon(
                             painter = painterResource(iconRes),
                             contentDescription = null,
-                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+//                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
                     colors = myNavigationSuiteItemColors,
                     label = if (showLabel) {
                         { Text(text = screen.route.replaceFirstChar { it.uppercase() }) }
-                    } else null
+                    } else null,
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
                 )
             }
         },
