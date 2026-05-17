@@ -8,14 +8,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.Friend
 import com.omodauda.splitwise.ui.features.main.addBill.components.stepTwo.components.Friend
@@ -43,11 +45,13 @@ fun StepFour(
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(Spacing.medium))
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 300.dp),
             verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
-            items(participants) {user ->
+            items(participants) { user ->
                 val isSelected = user.userId == payerId
                 val isMe = currentUserId == user.userId
                 Friend(
