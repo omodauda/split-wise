@@ -38,7 +38,7 @@ import java.util.Locale
 // Utility function to format the date from milliseconds to a readable string
 fun convertMillisToDateString(millis: Long?): String {
     if (millis == null) return ""
-    val formatter = SimpleDateFormat("dd-MM-YYYY", Locale.getDefault())
+    val formatter = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
     return formatter.format(Date(millis))
 }
 
