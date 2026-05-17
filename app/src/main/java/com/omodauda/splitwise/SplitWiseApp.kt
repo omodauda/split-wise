@@ -1,7 +1,8 @@
 package com.omodauda.splitwise
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,12 +23,12 @@ fun SplitWiseApp(
     val isAuthenticated by authViewModel.isAuthenticated.collectAsState()
     val navController = rememberNavController()
     val toastHostState = rememberToastHostState()
+    val adaptiveInfo = currentWindowAdaptiveInfo()
 
-
-    Scaffold(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-    ) { innerPadding ->
+    ) {
         if (isAuthenticated !== null) {
             val startDestination = if (isAuthenticated as Boolean) "main_graph" else "auth_graph"
 
@@ -36,7 +37,7 @@ fun SplitWiseApp(
                 startDestination = startDestination
             ) {
                 authNavGraph(navController, authViewModel, toastHostState)
-                mainNavGraph(navController, authViewModel, toastHostState)
+                mainNavGraph(navController, authViewModel, toastHostState, adaptiveInfo)
             }
             ToastHost(
                 hostState = toastHostState
