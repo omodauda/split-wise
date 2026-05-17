@@ -224,6 +224,7 @@ fun HomeBottomTab(
             Screen.Activity.route -> ActivityScreen(viewModel = activityViewModel)
             Screen.Friends.route -> FriendScreen(viewModel = friendViewModel, inviteViewModel)
             Screen.Profile.route -> ProfileScreen(
+                adaptiveInfo = adaptiveInfo,
                 authViewModel = authViewModel,
                 goToAccountSettings = { navController.navigate(Screen.AccountSettings.route) }
             )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -21,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -37,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
@@ -48,11 +51,13 @@ import java.time.Year
 
 @Composable
 fun ProfileScreen(
-    modifier: Modifier = Modifier,
+    adaptiveInfo: WindowAdaptiveInfo,
     authViewModel: AuthViewModel,
-    goToAccountSettings: () -> Unit
+    goToAccountSettings: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val user by authViewModel.user.collectAsStateWithLifecycle()
+    val isExpandedWidth = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
     Scaffold(
         modifier = modifier
@@ -63,7 +68,7 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.inverseOnSurface)
                 .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
-                    LayoutDirection.Ltr))
+                    LayoutDirection.Ltr), bottom = innerPadding.calculateBottomPadding())
                 .verticalScroll(rememberScrollState())
         ) {
             ProfileHeader(
@@ -72,6 +77,7 @@ fun ProfileScreen(
                 email = user?.email
             )
             ProfileContent(
+                isExpandedWidth = isExpandedWidth,
                 onLogout = {authViewModel.logout()},
                 goToAccountSettings = goToAccountSettings
             )
@@ -137,6 +143,7 @@ fun ProfileHeader(
 
 @Composable
 fun ProfileContent(
+    isExpandedWidth: Boolean,
     goToAccountSettings: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
@@ -156,32 +163,67 @@ fun ProfileContent(
             .fillMaxSize()
             .padding(vertical = ScreenDimensions.verticalPadding, horizontal = ScreenDimensions.contentPadding)
     ) {
-        ProfileItem(
-            title = R.string.account_settings,
-            subTitle = R.string.account_settings_desc,
-            icon = R.drawable.settings_icon,
-            modifier = Modifier
-                .clickable(enabled = true, onClick = {goToAccountSettings()})
-        )
-        Spacer(Modifier.height(Spacing.medium))
-        Spacer(Modifier.height(Spacing.medium))
-        ProfileItem(
-            title = R.string.help_support,
-            subTitle = R.string.help_desc,
-            icon = R.drawable.help_icon,
-
-        )
-        Spacer(Modifier.height(Spacing.medium))
-        ProfileItem(
-            title = R.string.logout,
-            icon = R.drawable.logout_icon,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier
-                .clickable(
-                    enabled = true,
-                    onClick = {onLogout()}
+        if (!isExpandedWidth) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                ProfileItem(
+                    title = R.string.account_settings,
+                    subTitle = R.string.account_settings_desc,
+                    icon = R.drawable.settings_icon,
+                    modifier = Modifier
+                        .clickable(enabled = true, onClick = {goToAccountSettings()})
                 )
-        )
+                Spacer(Modifier.height(Spacing.medium))
+//                ProfileItem(
+//                    title = R.string.help_support,
+//                    subTitle = R.string.help_desc,
+//                    icon = R.drawable.help_icon,
+//
+//                    )
+                Spacer(Modifier.height(Spacing.medium))
+                ProfileItem(
+                    title = R.string.logout,
+                    icon = R.drawable.logout_icon,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .clickable(
+                            enabled = true,
+                            onClick = {onLogout()}
+                        )
+                )
+            }
+        } else {
+            FlowRow(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
+                verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+                maxItemsInEachRow = 2
+            ) {
+                ProfileItem(
+                    title = R.string.account_settings,
+                    subTitle = R.string.account_settings_desc,
+                    icon = R.drawable.settings_icon,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(enabled = true, onClick = { goToAccountSettings() })
+                )
+//                ProfileItem(
+//                    title = R.string.help_support,
+//                    subTitle = R.string.help_desc,
+//                    icon = R.drawable.help_icon,
+//                    modifier = Modifier.weight(1f)
+//                )
+                ProfileItem(
+                    title = R.string.logout,
+                    icon = R.drawable.logout_icon,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(enabled = true, onClick = { onLogout() })
+                )
+//                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+
         Spacer(Modifier.height(Spacing.extraLarge))
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
