@@ -1,5 +1,6 @@
 package com.omodauda.splitwise.ui.navigation
 
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,7 +32,8 @@ import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendi
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel,
-    toastHostState: ToastHostState
+    toastHostState: ToastHostState,
+    adaptiveInfo: WindowAdaptiveInfo
 ) {
     navigation(
         startDestination = Screen.Home.route,
@@ -56,6 +58,7 @@ fun NavGraphBuilder.mainNavGraph(
 
             HomeBottomTab(
                 navController = navController,
+                adaptiveInfo = adaptiveInfo,
                 authViewModel = authViewModel,
                 inviteViewModel = inviteViewModel,
                 friendViewModel = friendViewModel,
