@@ -108,8 +108,12 @@ fun FriendScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.inverseOnSurface)
-                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
-                    LayoutDirection.Ltr))
+                .padding(
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(
+                    LayoutDirection.Ltr),
+                    bottom = innerPadding.calculateBottomPadding()
+                )
         ) {
             FriendHeader(
                 onSendInvite = {openInviteModal()},

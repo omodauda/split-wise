@@ -73,7 +73,8 @@ fun ActivityScreen(
                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                     end = innerPadding.calculateEndPadding(
                         LayoutDirection.Ltr
-                    )
+                    ),
+                    bottom = innerPadding.calculateBottomPadding()
                 )
         ) {
             ActivityHeader(paddingTop = innerPadding.calculateTopPadding())
