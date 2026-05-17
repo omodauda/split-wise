@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -48,7 +51,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.Friend
 import com.omodauda.splitwise.model.InviteSubmissionState
@@ -174,7 +176,10 @@ fun FriendsList(
                 onRefresh = { onRefresh()},
                 modifier = modifier.fillMaxSize()
             ) {
-                LazyColumn(
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 250.dp),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.medium),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
                     contentPadding = PaddingValues(
                         start = Spacing.large,
                         end = Spacing.large,
@@ -199,13 +204,10 @@ fun FriendsList(
 
                     items(
                         count = friends.itemCount,
-                        key = friends.itemKey { it.friendshipId }) { index ->
+                        ) { index ->
                         val friend = friends[index]
                         if (friend !== null) {
                             FriendView(user = friend)
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.surfaceVariant
-                            )
                         } else {
                             // TODO: show skeleton placeholder
                             FriendPlaceholder()
@@ -247,7 +249,10 @@ fun FriendView(
         horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
         modifier = modifier
             .fillMaxWidth()
+            .shadow(2.dp, shape = RoundedCornerShape(14.dp))
+            .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(14.dp))
             .padding(Spacing.medium)
+
     ) {
         UserAvatar(
             fullName = user.fullName,
