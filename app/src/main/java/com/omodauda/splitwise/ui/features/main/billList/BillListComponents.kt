@@ -76,6 +76,7 @@ enum class BillSortOption(val label: Int) {
 @Composable
 fun OwedBillList(
     bills: LazyPagingItems<OwedBill>,
+    selectedBillId: String?,
     onRefresh: () -> Unit,
     searchQuery: String?,
     onClick: (billId: String) -> Unit,
@@ -120,8 +121,8 @@ fun OwedBillList(
                                 date = bill.createdAt,
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
-                                    .clickable(enabled = true, onClick = { onClick(bill.bill.id) }),
-
+                                    .clickable(enabled = true, onClick = { onClick(bill.bill.id) })
+                                    .background(color = if (selectedBillId == bill.bill.id) emerald_50 else Color.Transparent)
                                 )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -140,6 +141,7 @@ fun OwedBillList(
 @Composable
 fun OwingBillList(
     bills: LazyPagingItems<OwingBill>,
+    selectedBillId: String?,
     onRefresh: () -> Unit,
     searchQuery: String?,
     onClick: (billId: String) -> Unit,
@@ -184,8 +186,8 @@ fun OwingBillList(
                                 date = bill.createdAt,
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
-                                    .clickable(enabled = true, onClick = { onClick(bill.bill.id) }),
-
+                                    .clickable(enabled = true, onClick = { onClick(bill.bill.id) })
+                                    .background(color = if (selectedBillId == bill.bill.id) emerald_50 else Color.Transparent)
                                 )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
