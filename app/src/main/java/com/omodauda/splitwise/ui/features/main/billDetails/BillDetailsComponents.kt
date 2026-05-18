@@ -1,14 +1,11 @@
 package com.omodauda.splitwise.ui.features.main.billDetails
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,25 +19,20 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.BillDetails
+import com.omodauda.splitwise.data.network.model.Split
 import com.omodauda.splitwise.data.network.model.User
 import com.omodauda.splitwise.ui.features.main.home.components.AvatarView
 import com.omodauda.splitwise.ui.theme.BalanceNegative
@@ -48,7 +40,6 @@ import com.omodauda.splitwise.ui.theme.BalancePositive
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Shapes
 import com.omodauda.splitwise.ui.theme.Spacing
-import com.omodauda.splitwise.ui.theme.SplitWiseTheme
 import com.omodauda.splitwise.ui.theme.emerald_200
 import com.omodauda.splitwise.ui.theme.emerald_50
 import com.omodauda.splitwise.ui.theme.hotOrange
@@ -58,45 +49,11 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun BillDetailsScreen(
-    currentUserId: String,
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: BillDetailsViewModel = hiltViewModel(),
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.background)
-                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
-                    LayoutDirection.Ltr))
-        ) {
-            BillDetailsHeader(
-                goBack = onBackClick,
-                paddingTop = innerPadding.calculateTopPadding()
-            )
-            when (val state = uiState) {
-                is BillDetailsUiState.Loading -> LoadingView()
-                is BillDetailsUiState.Error -> ErrorView(state.message, onRetry = { viewModel.fetchBillDetails() })
-                is BillDetailsUiState.Success -> {
-                    BillDetailsContent(currentUserId = currentUserId, bill = state.bill, paddingBottom = innerPadding.calculateBottomPadding())
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun BillDetailsHeader(
     goBack: () -> Unit,
     paddingTop: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showBackButton: Boolean = true
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -112,12 +69,14 @@ fun BillDetailsHeader(
                 bottom = Spacing.medium
             )
     ) {
-        IconButton(onClick = {goBack()}) {
-            Icon(
-                painter = painterResource(R.drawable.back_icon),
-                contentDescription = "back icon",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
+        if (showBackButton) {
+            IconButton(onClick = {goBack()}) {
+                Icon(
+                    painter = painterResource(R.drawable.back_icon),
+                    contentDescription = "back icon",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
         Text(
             text = "Bill Details",
@@ -187,7 +146,6 @@ fun BillDetailView(
 ) {
     Column(
         modifier = modifier
-//            .fillMaxWidth()
             .shadow(elevation = 1.dp, shape = RoundedCornerShape(24.dp))
             .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(24.dp))
             .padding(Spacing.large)
@@ -284,7 +242,6 @@ fun BillPayerView(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
         modifier = modifier
-//            .fillMaxWidth()
             .shadow(elevation = 1.dp, shape = RoundedCornerShape(24.dp))
             .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(24.dp))
             .padding(Spacing.large)
@@ -319,7 +276,7 @@ fun BillPayerView(
 fun BillSplitBreakDownView(
     paddingBottom: Dp,
     currentUserId: String,
-    splits: List<com.omodauda.splitwise.data.network.model.Split>,
+    splits: List<Split>,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.padding(bottom = paddingBottom + Spacing.medium)) {
@@ -345,14 +302,12 @@ fun BillSplitBreakDownView(
             }
         }
     }
-
-
 }
 
 @Composable
 fun BillSplitBreakDown(
     currentUserId: String,
-    split: com.omodauda.splitwise.data.network.model.Split,
+    split: Split,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -381,7 +336,6 @@ fun BillSplitBreakDown(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     val isSettled = split.settled
-//                    val isSettled = if (paidById === split.user.id && split.settled) true else (split.paidAmount >= split.amount)
                     Text(
                         text = if (isSettled) "Paid in full" else "Payment Pending",
                         style = MaterialTheme.typography.labelMedium,
@@ -439,7 +393,6 @@ fun BillSplitBreakDown(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 val balance = if (split.settled) 0 else (split.amount - split.paidAmount)
-//                val isSplitSettled = split.paidAmount >= split.amount
                 Text(
                     text = formatFromCents(balance),
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
@@ -483,24 +436,5 @@ fun ErrorView(
         Button(onClick = onRetry) {
             Text(text = "Retry")
         }
-    }
-}
-
-@Preview(
-    name = "Light mode",
-    showBackground = true,
-    showSystemUi = true,
-    uiMode = Configuration.UI_MODE_NIGHT_NO
-)
-@Preview(
-    name = "Dark mode",
-    showBackground = true,
-    showSystemUi = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
-@Composable
-fun BillDetailsScreenPreview() {
-    SplitWiseTheme {
-        BillDetailsScreen(currentUserId = "1", onBackClick = {})
     }
 }
