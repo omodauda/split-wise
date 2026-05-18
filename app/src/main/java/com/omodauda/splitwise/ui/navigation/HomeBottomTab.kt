@@ -182,8 +182,7 @@ fun HomeBottomTab(
                         }
                         Icon(
                             painter = painterResource(iconRes),
-                            contentDescription = null,
-//                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            contentDescription = null
                         )
                     },
                     colors = myNavigationSuiteItemColors,
@@ -211,10 +210,13 @@ fun HomeBottomTab(
                 billsViewModel,
                 authViewModel,
                 toastHostState,
-                viewAllOwedBills = { navController.navigate(Screen.OwedBillList.route) },
-                viewAllOwingBills = { navController.navigate(Screen.OwingBillList.route) },
-                onBillItemClicked = { billId ->
-                    navController.navigate(Screen.BillDetails.createRoute(billId))
+                viewAllOwedBills = { navController.navigate(Screen.OwedBillListDetail.createRoute()) },
+                viewAllOwingBills = { navController.navigate(Screen.OwingBillListDetail.createRoute()) },
+                onOwedBillClicked = { billId ->
+                    navController.navigate(Screen.OwedBillListDetail.createRoute(billId))
+                },
+                onOwingBillClicked = { billId ->
+                    navController.navigate(Screen.OwingBillListDetail.createRoute(billId))
                 },
                 goToPaymentConfirmation = { navController.navigate(Screen.PaymentConfirmation.route) },
                 paymentPendingConfirmationViewModel = pendingConfirmationViewModel,

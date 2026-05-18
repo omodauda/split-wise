@@ -7,8 +7,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.accountSettings.AccountSettingScreen
@@ -18,9 +20,9 @@ import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillScreen
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
-import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsScreen
-import com.omodauda.splitwise.ui.features.main.billList.OwedBillListScreen
-import com.omodauda.splitwise.ui.features.main.billList.OwingBillListScreen
+import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsViewModel
+import com.omodauda.splitwise.ui.features.main.billList.OwedBillListDetailScreen
+import com.omodauda.splitwise.ui.features.main.billList.OwingBillListDetailScreen
 import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentScreen
 import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
@@ -121,37 +123,52 @@ fun NavGraphBuilder.mainNavGraph(
                 toastHostState
             )
         }
-        composable(route = Screen.OwedBillList.route) {
-            val parentEntry = remember(it) {
-                navController.getBackStackEntry("main_graph")
-            }
-            val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
-            OwedBillListScreen(
-                viewModel = billsViewModel,
-                goBack = {navController.popBackStack()},
-                goToBillDetails = {billId ->
-                    navController.navigate(Screen.BillDetails.createRoute(billId))
+        composable(
+            route = Screen.OwedBillListDetail.route,
+            arguments = listOf(
+                navArgument("billId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
                 }
             )
-        }
-        composable(route = Screen.OwingBillList.route) {
-            val parentEntry = remember(it) {
-                navController.getBackStackEntry("main_graph")
-            }
+        ) {
+            val parentEntry = remember(it) { navController.getBackStackEntry("main_graph") }
             val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
-            OwingBillListScreen(
-                viewModel = billsViewModel,
-                goBack = {navController.popBackStack()},
-                goToBillDetails = {billId ->
-                    navController.navigate(Screen.BillDetails.createRoute(billId))
-                }
-            )
-        }
-        composable(route = Screen.BillDetails.route) {
+            val detailsViewModel: BillDetailsViewModel = hiltViewModel()
             val currentUser by authViewModel.user.collectAsStateWithLifecycle()
-            BillDetailsScreen(
+            val billId = it.arguments?.getString("billId")
+
+            OwedBillListDetailScreen(
+                billsViewModel = billsViewModel,
+                detailsViewModel = detailsViewModel,
+                goBack = { navController.popBackStack() },
                 currentUserId = currentUser?.id ?: "",
-                onBackClick = {navController.popBackStack()}
+                initialBillId = billId
+            )
+        }
+        composable(
+            route = Screen.OwingBillListDetail.route,
+            arguments = listOf(
+                navArgument("billId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+            val parentEntry = remember(it) { navController.getBackStackEntry("main_graph") }
+            val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
+            val detailsViewModel: BillDetailsViewModel = hiltViewModel()
+            val currentUser by authViewModel.user.collectAsStateWithLifecycle()
+            val billId = it.arguments?.getString("billId")
+
+            OwingBillListDetailScreen(
+                billsViewModel = billsViewModel,
+                detailsViewModel = detailsViewModel,
+                goBack = { navController.popBackStack() },
+                currentUserId = currentUser?.id ?: "",
+                initialBillId = billId
             )
         }
         composable(route = Screen.PaymentConfirmation.route) {
