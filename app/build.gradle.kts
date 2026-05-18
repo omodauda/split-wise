@@ -77,6 +77,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.adaptive.navigation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -113,6 +114,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
 
     // Hilt
     implementation(libs.hilt.android)
