@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsContent
@@ -60,8 +61,10 @@ fun OwedBillListDetailScreen(
     val selectedSort by billsViewModel.owedSort.collectAsStateWithLifecycle()
 
     val billDetailsUiState by detailsViewModel.uiState.collectAsStateWithLifecycle()
+    val selectedBillId by detailsViewModel.billId.collectAsStateWithLifecycle()
 
-    LaunchedEffect(bills.itemCount) {
+    LaunchedEffect(bills.itemCount, searchQuery) {
+        // 1. Handle auto-selection for large screens
         if (initialBillId == null &&
             bills.itemCount > 0 &&
             navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded &&
@@ -73,6 +76,19 @@ fun OwedBillListDetailScreen(
                 scope.launch {
                     navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, firstBillId)
                 }
+            }
+        }
+
+        // 2. Handle search-driven clearing
+        if (searchQuery?.isNotEmpty() == true &&
+            selectedBillId != null &&
+            bills.loadState.refresh is LoadState.NotLoading
+        ) {
+            val items = (0 until bills.itemCount).mapNotNull { bills.peek(it) }
+            val isPresent = items.any { it.bill.id == selectedBillId }
+
+            if (!isPresent) {
+                detailsViewModel.clearSelection()
             }
         }
     }
@@ -97,6 +113,7 @@ fun OwedBillListDetailScreen(
                     )
                     OwedBillList(
                         bills = bills,
+                        selectedBillId = selectedBillId,
                         onRefresh = { bills.refresh() },
                         searchQuery = searchQuery,
                         onClick = { billId ->
