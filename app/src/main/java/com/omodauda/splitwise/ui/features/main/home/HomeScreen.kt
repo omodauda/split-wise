@@ -73,7 +73,8 @@ fun HomeScreen(
     toastHostState: ToastHostState,
     viewAllOwedBills: () -> Unit,
     viewAllOwingBills: () -> Unit,
-    onBillItemClicked: (billId: String) -> Unit,
+    onOwedBillClicked: (billId: String) -> Unit,
+    onOwingBillClicked: (billId: String) -> Unit,
     goToPaymentConfirmation: () -> Unit,
     paymentPendingConfirmationViewModel: PaymentPendingConfirmationViewModel,
     confirmPaymentViewModel: ConfirmPaymentViewModel,
@@ -219,7 +220,8 @@ fun HomeScreen(
                 },
                 viewAllOwedBills = viewAllOwedBills,
                 viewAllOwingBills = viewAllOwingBills,
-                onBillItemClicked = onBillItemClicked
+                onOwedBillClicked = onOwedBillClicked,
+                onOwingBillClicked = onOwingBillClicked
             )
             if (showBottomSheet) {
                 ReminderModal(
@@ -296,7 +298,8 @@ fun ContentView(
     openSettleUpModal: (OwingBill) -> Unit,
     viewAllOwedBills: () -> Unit,
     viewAllOwingBills: () -> Unit,
-    onBillItemClicked: (billId: String) -> Unit,
+    onOwedBillClicked: (billId: String) -> Unit,
+    onOwingBillClicked: (billId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isOverAllLoading = owedLoading || owingLoading
@@ -331,7 +334,7 @@ fun ContentView(
                         openRecordPaymentModal = openRecordPaymentModal,
                         bills = owedBills,
                         onViewAll = {viewAllOwedBills()},
-                        onBillItemClicked = {onBillItemClicked(it)}
+                        onBillItemClicked = {onOwedBillClicked(it)}
                     )
                 }
                 Spacer(Modifier.height(Spacing.large))
@@ -342,7 +345,7 @@ fun ContentView(
                         itemCount = 5,
                     )
                 } else if (owingBills.isNotEmpty()) {
-                    OwingView(bills = owingBills, openSettleUpModal, onViewAll = {viewAllOwingBills()}, onBillItemClicked = {onBillItemClicked(it)})
+                    OwingView(bills = owingBills, openSettleUpModal, onViewAll = {viewAllOwingBills()}, onBillItemClicked = {onOwingBillClicked(it)})
                 }
             }
         }
