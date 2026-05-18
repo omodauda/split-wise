@@ -24,6 +24,7 @@ sealed interface BillDetailsUiState {
 class BillDetailsViewModel @Inject constructor(private val repo: BillsRepository, savedStateHandle: SavedStateHandle): ViewModel() {
     private val initialBillId: String? = savedStateHandle["billId"]
     private val _billId = MutableStateFlow(initialBillId)
+    val billId = _billId.asStateFlow()
 
     private val _uiState = MutableStateFlow(
         if (initialBillId != null) BillDetailsUiState.Loading else BillDetailsUiState.Idle
@@ -38,6 +39,11 @@ class BillDetailsViewModel @Inject constructor(private val repo: BillsRepository
         if (_billId.value == id) return
         _billId.value = id
         fetchBillDetails(id)
+    }
+
+    fun clearSelection() {
+        _billId.value = null
+        _uiState.update { BillDetailsUiState.Idle }
     }
 
     fun fetchBillDetails(billId: String? = _billId.value) {
