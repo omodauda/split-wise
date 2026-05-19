@@ -89,6 +89,21 @@ fun GoogleButton(
             } else {
                 Log.e(tag, "Unexpected credential type: ${credential.type}")
             }
+        } catch (e: NoCredentialException) {
+            Toast.makeText(context, "No Google accounts found", Toast.LENGTH_SHORT).show()
+            Log.e(tag, "$failureMessage: No credentials found", e)
+            caughtException = e
+
+        } catch (e: GetCredentialCancellationException) {
+            Toast.makeText(context, "Sign-in cancelled", Toast.LENGTH_SHORT).show()
+            Log.e(tag, "$failureMessage: Sign-in was cancelled", e)
+            caughtException = e
+
+        } catch (e: GetCredentialCustomException) {
+            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+            Log.e(tag, "$failureMessage: Issue with custom credential request", e)
+            caughtException = e
+
         } catch (e: GetCredentialException) {
             Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
             Log.e(tag, "$failureMessage: Failure getting credentials", e)
@@ -98,39 +113,29 @@ fun GoogleButton(
             Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
             Log.e(tag, "$failureMessage: Issue with parsing received GoogleIdToken", e)
             caughtException = e
-
-        } catch (e: NoCredentialException) {
-            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
-            Log.e(tag, "$failureMessage: No credentials found", e)
-            caughtException = e
-
-        } catch (e: GetCredentialCustomException) {
-            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
-            Log.e(tag, "$failureMessage: Issue with custom credential request", e)
-            caughtException = e
-
-        } catch (e: GetCredentialCancellationException) {
-            Toast.makeText(context, "Sign-in cancelled", Toast.LENGTH_SHORT).show()
-            Log.e(tag, "$failureMessage: Sign-in was cancelled", e)
-            caughtException = e
         }
         return caughtException
     }
 
     val onClick: () -> Unit = {
-        val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
-            .setFilterByAuthorizedAccounts(false)
-            .setServerClientId(BuildConfig.GOOGLE_SERVER_CLIENT_ID)
-            .setAutoSelectEnabled(false)
-            .setNonce(generateSecureRandomNonce())
-            .build()
+        if (BuildConfig.GOOGLE_SERVER_CLIENT_ID.isEmpty()) {
+            Log.e("xyz", "Google Server Client ID is empty. Check your local.properties.")
+            Toast.makeText(context, "Sign-in configuration error", Toast.LENGTH_SHORT).show()
+        } else {
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(BuildConfig.GOOGLE_SERVER_CLIENT_ID)
+                .setAutoSelectEnabled(false)
+                .setNonce(generateSecureRandomNonce())
+                .build()
 
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(googleIdOption)
-            .build()
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
 
-        coroutineScope.launch {
-            signIn(request, context)
+            coroutineScope.launch {
+                signIn(request, context)
+            }
         }
     }
 
