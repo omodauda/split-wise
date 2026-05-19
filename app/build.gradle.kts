@@ -26,8 +26,8 @@ android {
         applicationId = "com.omodauda.splitwise"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.1.2"
+        versionCode = 6
+        versionName = "1.1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,21 +41,21 @@ android {
                 "proguard-rules.pro"
             )
             // RELEASE BASE URL
-            val baseUrl = properties.getProperty("BASE_URL")
-            buildConfigField("String", "BASE_URL", baseUrl)
+            val baseUrl = properties.getProperty("BASE_URL")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
 
-            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
-            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", googleServerClientId)
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", "\"$googleServerClientId\"")
         }
 
         getByName("debug") {
             isMinifyEnabled = false
             // DEBUG BASE URL
-            val baseUrl = properties.getProperty("BASE_URL")
-            buildConfigField("String", "BASE_URL", baseUrl)
+            val baseUrl = properties.getProperty("BASE_URL")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
 
-            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
-            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", googleServerClientId)
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", "\"$googleServerClientId\"")
         }
     }
     compileOptions {
@@ -90,6 +90,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.googleid)
     implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
