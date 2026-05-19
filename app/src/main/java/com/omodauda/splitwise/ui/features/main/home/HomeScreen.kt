@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -78,7 +79,8 @@ fun HomeScreen(
     goToPaymentConfirmation: () -> Unit,
     paymentPendingConfirmationViewModel: PaymentPendingConfirmationViewModel,
     confirmPaymentViewModel: ConfirmPaymentViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    layoutType: NavigationSuiteType = NavigationSuiteType.NavigationBar
 ) {
     val context = LocalContext.current
     val invites = inviteViewModel.inviteFlow.collectAsLazyPagingItems()
@@ -181,8 +183,13 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
-                    LayoutDirection.Ltr), bottom = innerPadding.calculateBottomPadding())
+                .padding(
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    bottom = if (layoutType == NavigationSuiteType.NavigationRail || layoutType == NavigationSuiteType.NavigationDrawer) {
+                        innerPadding.calculateBottomPadding()
+                    } else 0.dp
+                )
                 .verticalScroll(rememberScrollState())
         ) {
             DashBoard(

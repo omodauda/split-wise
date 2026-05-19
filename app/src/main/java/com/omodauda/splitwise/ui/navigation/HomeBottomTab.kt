@@ -233,9 +233,10 @@ fun HomeBottomTab(
                     onOwingBillClicked = { billId ->
                         navController.navigate(Screen.OwingBillListDetail.createRoute(billId))
                     },
-                    goToPaymentConfirmation = { navController.navigate(Screen.PaymentConfirmation.route) },
+                    goToPaymentConfirmation = { navController.navigate(Screen.PaymentConfirmationListDetail.createRoute()) },
                     paymentPendingConfirmationViewModel = pendingConfirmationViewModel,
-                    confirmPaymentViewModel = confirmPaymentViewModel
+                    confirmPaymentViewModel = confirmPaymentViewModel,
+                    layoutType = layoutType
                 )
 
                 Screen.Activity.route -> ActivityScreen(viewModel = activityViewModel)
