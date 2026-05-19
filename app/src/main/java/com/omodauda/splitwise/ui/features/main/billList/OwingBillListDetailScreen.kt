@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.PaneAdaptedValue
 import androidx.compose.material3.adaptive.layout.ThreePaneScaffoldDestinationItem
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
@@ -44,7 +46,12 @@ fun OwingBillListDetailScreen(
     currentUserId: String,
     initialBillId: String? = null
 ) {
+    val scaffoldDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo())
+    val customDirective = scaffoldDirective.copy(
+        horizontalPartitionSpacerSize = 0.dp
+    )
     val navigator = rememberListDetailPaneScaffoldNavigator(
+        scaffoldDirective = customDirective,
         initialDestinationHistory = if (initialBillId != null) {
             listOf(
                 ThreePaneScaffoldDestinationItem(ListDetailPaneScaffoldRole.List),
