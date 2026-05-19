@@ -23,8 +23,7 @@ sealed class Screen(val route: String) {
         fun createRoute(billId: String? = null) = if (billId != null) "OwingBillListDetail?billId=$billId" else "OwingBillListDetail"
     }
 
-    object PaymentConfirmation: Screen(route = "PaymentConfirmation")
-    object ConfirmPayment: Screen(route = "ConfirmPayment/{paymentId}") {
-        fun createRoute(paymentId: String) = "ConfirmPayment/$paymentId"
+    object PaymentConfirmationListDetail: Screen(route = "PaymentConfirmationListDetail?paymentId={paymentId}") {
+        fun createRoute(paymentId: String? = null) = if (paymentId != null) "PaymentConfirmationListDetail?paymentId=$paymentId" else "PaymentConfirmationListDetail"
     }
 }

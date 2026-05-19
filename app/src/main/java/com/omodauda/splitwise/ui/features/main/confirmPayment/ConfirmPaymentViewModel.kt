@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed interface ConfirmPaymentUiState {
+    object Idle : ConfirmPaymentUiState
     object Loading : ConfirmPaymentUiState
     data class Success(val payment: PendingPayment) : ConfirmPaymentUiState
     data class Error(val message: String) : ConfirmPaymentUiState
@@ -31,26 +32,29 @@ class ConfirmPaymentViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private var paymentId: String? = savedStateHandle["paymentId"]
+    private val _paymentId = MutableStateFlow<String?>(savedStateHandle["paymentId"])
+    val paymentId = _paymentId.asStateFlow()
 
-    private val _uiState = MutableStateFlow<ConfirmPaymentUiState>(ConfirmPaymentUiState.Loading)
+    private val _uiState = MutableStateFlow<ConfirmPaymentUiState>(
+        if (_paymentId.value != null) ConfirmPaymentUiState.Loading else ConfirmPaymentUiState.Idle
+    )
     val uiState = _uiState.asStateFlow()
 
     private val _confirmActionState = MutableStateFlow<ConfirmActionState>(ConfirmActionState.Idle)
     val confirmActionState = _confirmActionState.asStateFlow()
 
     init {
-        paymentId?.let { fetchPaymentDetails(it) }
+        _paymentId.value?.let { fetchPaymentDetails(it) }
     }
 
     fun setPaymentId(id: String) {
-        if (paymentId != id) {
-            paymentId = id
+        if (_paymentId.value != id) {
+            _paymentId.value = id
             fetchPaymentDetails(id)
         }
     }
 
-    fun fetchPaymentDetails(id: String? = paymentId) {
+    fun fetchPaymentDetails(id: String? = _paymentId.value) {
         val targetId = id ?: return
         viewModelScope.launch {
             _uiState.update { ConfirmPaymentUiState.Loading }
@@ -61,7 +65,7 @@ class ConfirmPaymentViewModel @Inject constructor(
     }
 
     fun confirmPayment() {
-        val targetId = paymentId ?: return
+        val targetId = _paymentId.value ?: return
         viewModelScope.launch {
             _confirmActionState.update { ConfirmActionState.Loading }
              val result = repository.confirmPayment(targetId)
@@ -76,5 +80,10 @@ class ConfirmPaymentViewModel @Inject constructor(
 
     fun resetActionState() {
         _confirmActionState.update { ConfirmActionState.Idle }
+    }
+
+    fun clearSelection() {
+        _paymentId.value = null
+        _uiState.update { ConfirmPaymentUiState.Idle }
     }
 }

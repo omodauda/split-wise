@@ -23,12 +23,11 @@ import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScre
 import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsViewModel
 import com.omodauda.splitwise.ui.features.main.billList.OwedBillListDetailScreen
 import com.omodauda.splitwise.ui.features.main.billList.OwingBillListDetailScreen
-import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentScreen
 import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
-import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentConfirmationScreen
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentConfirmationListDetailScreen
 import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendingConfirmationViewModel
 
 fun NavGraphBuilder.mainNavGraph(
@@ -171,29 +170,28 @@ fun NavGraphBuilder.mainNavGraph(
                 initialBillId = billId
             )
         }
-        composable(route = Screen.PaymentConfirmation.route) {
+        composable(
+            route = Screen.PaymentConfirmationListDetail.route,
+            arguments = listOf(
+                navArgument("paymentId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
             val parentEntry = remember(it) {
                 navController.getBackStackEntry("main_graph")
             }
             val paymentPendingConfirmationVM: PaymentPendingConfirmationViewModel = hiltViewModel(parentEntry)
             val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
-            PaymentConfirmationScreen(
-                goBack = {navController.popBackStack()},
-                goToConfirmPayment = {paymentId ->
-                    navController.navigate(Screen.ConfirmPayment.createRoute(paymentId))
-                                     },
+            val paymentId = it.arguments?.getString("paymentId")
+
+            PaymentConfirmationListDetailScreen(
                 viewModel = paymentPendingConfirmationVM,
-                confirmPaymentViewModel = confirmPaymentViewModel
-            )
-        }
-        composable(route = Screen.ConfirmPayment.route) {
-            val parentEntry = remember(it) {
-                navController.getBackStackEntry("main_graph")
-            }
-            val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
-            ConfirmPaymentScreen(
-                goBack = {navController.popBackStack()},
-                confirmPaymentViewModel
+                confirmPaymentViewModel = confirmPaymentViewModel,
+                goBack = { navController.popBackStack() },
+                initialPaymentId = paymentId
             )
         }
     }
