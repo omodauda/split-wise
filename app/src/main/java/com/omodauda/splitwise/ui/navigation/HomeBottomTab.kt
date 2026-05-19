@@ -19,9 +19,12 @@ import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.WindowAdaptiveInfo
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -121,115 +124,128 @@ fun HomeBottomTab(
         )
     )
 
-    NavigationSuiteScaffold(
+    val myNavigationSuiteColors = NavigationSuiteDefaults.colors(
+        shortNavigationBarContainerColor = MaterialTheme.colorScheme.background,
+        shortNavigationBarContentColor = MaterialTheme.colorScheme.background,
+        navigationBarContainerColor = MaterialTheme.colorScheme.background,
+        navigationRailContainerColor = MaterialTheme.colorScheme.background,
+    )
+
+    NavigationSuiteScaffoldLayout(
         layoutType = layoutType,
-        navigationSuiteItems = {
-            if (layoutType == NavigationSuiteType.NavigationDrawer) {
-                item(
-                    selected = false,
-                    onClick = { },
-                    icon = {},
-                    label = {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.size(40.dp).background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(16.dp))
+        navigationSuite = {
+            NavigationSuite(
+                layoutType = layoutType,
+                colors = myNavigationSuiteColors,
+                modifier = if (layoutType == NavigationSuiteType.NavigationDrawer) {
+                    Modifier.width(255.dp)
+                } else Modifier
+            ) {
+                if (layoutType == NavigationSuiteType.NavigationDrawer) {
+                    item(
+                        selected = false,
+                        onClick = { },
+                        icon = {},
+                        label = {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                Text(
-                                    text = "\uD83D\uDCB0",
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            }
-                            Column {
-                                Text(
-                                    text = "Split Wise",
-                                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-                                    color = MaterialTheme.colorScheme.onBackground
-                                )
-                                Text(
-                                    text = "Bill Splitting App",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.size(40.dp).background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                ) {
+                                    Text(
+                                        text = "\uD83D\uDCB0",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                }
+                                Column {
+                                    Text(
+                                        text = "Split Wise",
+                                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                    Text(
+                                        text = "Bill Splitting App",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                             }
                         }
-                    }
-                )
-                item(
-                    selected = false,
-                    onClick = { },
-                    icon = {},
-                    label = { Spacer(Modifier.height(32.dp)) }
-                )
-            }
+                    )
+                    item(
+                        selected = false,
+                        onClick = { },
+                        icon = {},
+                        label = { Spacer(Modifier.height(32.dp)) }
+                    )
+                }
 
-            items.forEach { screen ->
-                val selected = currentTab == screen.route
-                item(
-                    selected = selected,
-                    onClick = { currentTab = screen.route },
-                    icon = {
-                        val iconRes = when (screen) {
-                            Screen.Home -> R.drawable.home_icon
-                            Screen.Activity -> R.drawable.activity_icon
-                            Screen.Friends -> R.drawable.friends_icon
-                            Screen.Profile -> R.drawable.profile_icon
-                            else -> R.drawable.home_icon
-                        }
-                        Icon(
-                            painter = painterResource(iconRes),
-                            contentDescription = null
-                        )
-                    },
-                    colors = myNavigationSuiteItemColors,
-                    label = if (showLabel) {
-                        { Text(text = screen.route.replaceFirstChar { it.uppercase() }) }
-                    } else null,
-                    modifier = Modifier
-                        .padding(horizontal = 12.dp)
-                )
+                items.forEach { screen ->
+                    val selected = currentTab == screen.route
+                    item(
+                        selected = selected,
+                        onClick = { currentTab = screen.route },
+                        icon = {
+                            val iconRes = when (screen) {
+                                Screen.Home -> R.drawable.home_icon
+                                Screen.Activity -> R.drawable.activity_icon
+                                Screen.Friends -> R.drawable.friends_icon
+                                Screen.Profile -> R.drawable.profile_icon
+                                else -> R.drawable.home_icon
+                            }
+                            Icon(
+                                painter = painterResource(iconRes),
+                                contentDescription = null
+                            )
+                        },
+                        colors = myNavigationSuiteItemColors,
+                        label = if (showLabel) {
+                            { Text(text = screen.route.replaceFirstChar { it.uppercase() }) }
+                        } else null,
+                        modifier = Modifier
+                            .padding(horizontal = 12.dp)
+                    )
+                }
             }
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-        navigationSuiteColors = NavigationSuiteDefaults.colors(
-            shortNavigationBarContainerColor = MaterialTheme.colorScheme.background,
-            shortNavigationBarContentColor = MaterialTheme.colorScheme.background,
-            navigationBarContainerColor = MaterialTheme.colorScheme.background,
-            navigationRailContainerColor = MaterialTheme.colorScheme.background,
-        )
+        }
     ) {
-        when (currentTab) {
-            Screen.Home.route -> HomeScreen(
-                goToAddBill = { navController.navigate(Screen.AddBill.route) },
-                inviteViewModel,
-                friendViewModel,
-                billsViewModel,
-                authViewModel,
-                toastHostState,
-                viewAllOwedBills = { navController.navigate(Screen.OwedBillListDetail.createRoute()) },
-                viewAllOwingBills = { navController.navigate(Screen.OwingBillListDetail.createRoute()) },
-                onOwedBillClicked = { billId ->
-                    navController.navigate(Screen.OwedBillListDetail.createRoute(billId))
-                },
-                onOwingBillClicked = { billId ->
-                    navController.navigate(Screen.OwingBillListDetail.createRoute(billId))
-                },
-                goToPaymentConfirmation = { navController.navigate(Screen.PaymentConfirmation.route) },
-                paymentPendingConfirmationViewModel = pendingConfirmationViewModel,
-                confirmPaymentViewModel = confirmPaymentViewModel
-            )
+        Surface(color = MaterialTheme.colorScheme.background) {
+            when (currentTab) {
+                Screen.Home.route -> HomeScreen(
+                    goToAddBill = { navController.navigate(Screen.AddBill.route) },
+                    inviteViewModel,
+                    friendViewModel,
+                    billsViewModel,
+                    authViewModel,
+                    toastHostState,
+                    viewAllOwedBills = { navController.navigate(Screen.OwedBillListDetail.createRoute()) },
+                    viewAllOwingBills = { navController.navigate(Screen.OwingBillListDetail.createRoute()) },
+                    onOwedBillClicked = { billId ->
+                        navController.navigate(Screen.OwedBillListDetail.createRoute(billId))
+                    },
+                    onOwingBillClicked = { billId ->
+                        navController.navigate(Screen.OwingBillListDetail.createRoute(billId))
+                    },
+                    goToPaymentConfirmation = { navController.navigate(Screen.PaymentConfirmation.route) },
+                    paymentPendingConfirmationViewModel = pendingConfirmationViewModel,
+                    confirmPaymentViewModel = confirmPaymentViewModel
+                )
 
-            Screen.Activity.route -> ActivityScreen(viewModel = activityViewModel)
-            Screen.Friends.route -> FriendScreen(viewModel = friendViewModel, inviteViewModel)
-            Screen.Profile.route -> ProfileScreen(
-                adaptiveInfo = adaptiveInfo,
-                authViewModel = authViewModel,
-                goToAccountSettings = { navController.navigate(Screen.AccountSettings.route) }
-            )
+                Screen.Activity.route -> ActivityScreen(viewModel = activityViewModel)
+                Screen.Friends.route -> FriendScreen(viewModel = friendViewModel, inviteViewModel)
+                Screen.Profile.route -> ProfileScreen(
+                    adaptiveInfo = adaptiveInfo,
+                    authViewModel = authViewModel,
+                    goToAccountSettings = { navController.navigate(Screen.AccountSettings.route) }
+                )
+            }
         }
     }
 }
