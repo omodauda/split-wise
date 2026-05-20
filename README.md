@@ -35,7 +35,7 @@ The backend is a custom-built API developed using **TypeScript** and **NestJS**,
 ## 🚀 Features
 
 ### **Core Functionality**
-- **Adaptive UI Support:** Fully optimized for both **Portrait** and **Landscape** orientations, providing an ergonomic user experience across different device configurations.
+- **Adaptive UI Support:** Fully responsive across all **Window Size Classes**, ensuring a seamless experience on **phones, foldables, and tablets**. Optimized for both **Portrait** and **Landscape** orientations to provide an ergonomic user experience across diverse device configurations.
 - **Multi-step Bill Creation:** A guided 7-step process to add bills, select participants, define payers, and choose split methods.
 - **Flexible Splitting:** Support for various split methods including:
     - **Equal:** Automatically divides the total amount among all participants.
