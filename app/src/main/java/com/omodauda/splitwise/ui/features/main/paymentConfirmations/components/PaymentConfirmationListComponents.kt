@@ -1,6 +1,7 @@
-package com.omodauda.splitwise.ui.features.main.paymentConfirmations
+package com.omodauda.splitwise.ui.features.main.paymentConfirmations.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,8 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +22,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -34,23 +32,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.data.network.model.PendingPayment
 import com.omodauda.splitwise.ui.components.AppTextField
 import com.omodauda.splitwise.ui.features.main.billList.SortButton
 import com.omodauda.splitwise.ui.features.main.billList.SortDropdownMenu
-import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.confirmPayment.PendingPaymentSortOption
 import com.omodauda.splitwise.ui.features.main.friends.FriendListPlaceholder
 import com.omodauda.splitwise.ui.features.main.friends.FriendPlaceholder
@@ -63,52 +58,6 @@ import com.omodauda.splitwise.utils.formatFromCents
 import java.text.SimpleDateFormat
 import java.util.Date
 
-@Composable
-fun PaymentConfirmationScreen(
-    viewModel: PaymentPendingConfirmationViewModel,
-    confirmPaymentViewModel: ConfirmPaymentViewModel,
-    goBack: () -> Unit,
-    goToConfirmPayment: (paymentId: String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val payments = viewModel.pendingPaymentPagingData.collectAsLazyPagingItems()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-    val selectedSort by viewModel.sort.collectAsStateWithLifecycle()
-    val totalCount by viewModel.totalCount.collectAsStateWithLifecycle()
-
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(start = innerPadding.calculateStartPadding(LayoutDirection.Ltr), end = innerPadding.calculateEndPadding(
-                    LayoutDirection.Ltr))
-        ) {
-            PaymentConfirmationHeader(
-                goBack = goBack,
-                paddingTop = innerPadding.calculateTopPadding(),
-                searchQuery = searchQuery,
-                onSearchChanged = {viewModel.onSearchQueryChanged(it)},
-                selectedSort = selectedSort,
-                onSortChanged = { viewModel.onSortChanged(it) },
-                totalCount = totalCount
-            )
-            PaymentConfirmationList(
-                payments,
-                onRefresh = {payments.refresh()},
-                searchQuery = searchQuery,
-                onClick = { paymentId ->
-                    confirmPaymentViewModel.setPaymentId(paymentId)
-                    goToConfirmPayment(paymentId)
-                }
-            )
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentConfirmationList(
@@ -116,7 +65,8 @@ fun PaymentConfirmationList(
     onRefresh: () -> Unit,
     searchQuery: String?,
     onClick: (paymentId: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    selectedPaymentId: String? = null
 ) {
     val loadState = payments.loadState
     val isRefreshing = payments.loadState.refresh is LoadState.Loading
@@ -125,7 +75,6 @@ fun PaymentConfirmationList(
         modifier = modifier.fillMaxSize()
     ) {
         if (loadState.refresh is LoadState.Loading) {
-            // handle refresh loading
             FriendListPlaceholder()
         } else if (!searchQuery.isNullOrBlank() && payments.itemCount == 0) {
             EmptyPaymentSearchView()
@@ -159,12 +108,12 @@ fun PaymentConfirmationList(
                                 datePaid = payment.createdAt,
                                 description = payment.bill.description,
                                 category = payment.bill.category,
+                                isSelected = payment.id == selectedPaymentId,
                                 modifier = Modifier
                                     .widthIn(max= 500.dp)
                                     .clickable(onClick = {onClick(payment.id)})
                             )
                         } else {
-                            // TODO: show skeleton placeholder
                             FriendPlaceholder()
                         }
                     }
@@ -262,12 +211,15 @@ fun PaymentConfirmationItem(
     datePaid: Date,
     description: String,
     category: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
 ) {
+    val borderWidth = if (isSelected) 1.dp else 0.dp
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     Column(
         modifier = modifier
             .shadow(2.dp, shape = RoundedCornerShape(14.dp))
-            .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(14.dp))
+            .border(width = borderWidth, color = borderColor)
             .padding(Spacing.medium)
     ) {
         Row(

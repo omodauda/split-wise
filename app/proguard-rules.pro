@@ -66,3 +66,9 @@
 # -----------------------------------------------------------------------------------------
 -keep class androidx.security.crypto.** { *; }
 -dontwarn androidx.security.crypto.**
+
+# 7. Credentials & Google ID (Fixes Sign-in failures in Proguard/R8 builds)
+# -----------------------------------------------------------------------------------------
+-keep class androidx.credentials.** { *; }
+-keep class com.google.android.libraries.identity.googleid.** { *; }
+-dontwarn androidx.credentials.**

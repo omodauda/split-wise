@@ -26,8 +26,8 @@ android {
         applicationId = "com.omodauda.splitwise"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "1.1.2"
+        versionCode = 7
+        versionName = "1.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,21 +41,21 @@ android {
                 "proguard-rules.pro"
             )
             // RELEASE BASE URL
-            val baseUrl = properties.getProperty("BASE_URL")
-            buildConfigField("String", "BASE_URL", baseUrl)
+            val baseUrl = properties.getProperty("BASE_URL")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
 
-            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
-            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", googleServerClientId)
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", "\"$googleServerClientId\"")
         }
 
         getByName("debug") {
             isMinifyEnabled = false
             // DEBUG BASE URL
-            val baseUrl = properties.getProperty("BASE_URL")
-            buildConfigField("String", "BASE_URL", baseUrl)
+            val baseUrl = properties.getProperty("BASE_URL")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
 
-            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")
-            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", googleServerClientId)
+            val googleServerClientId = properties.getProperty("GOOGLE_SERVER_CLIENT_ID")?.removeSurrounding("\"") ?: ""
+            buildConfigField("String", "GOOGLE_SERVER_CLIENT_ID", "\"$googleServerClientId\"")
         }
     }
     compileOptions {
@@ -77,6 +77,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.adaptive.navigation)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -85,8 +86,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.googleid)
     implementation(libs.play.services.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -109,6 +114,9 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.crashlytics)
+    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
+    implementation(libs.androidx.compose.material3.adaptive)
+    implementation(libs.androidx.compose.material3.adaptive.layout)
 
     // Hilt
     implementation(libs.hilt.android)

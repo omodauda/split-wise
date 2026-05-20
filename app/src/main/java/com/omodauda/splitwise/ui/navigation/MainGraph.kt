@@ -1,13 +1,16 @@
 package com.omodauda.splitwise.ui.navigation
 
+import androidx.compose.material3.adaptive.WindowAdaptiveInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navigation
+import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.omodauda.splitwise.ui.components.toast.ToastHostState
 import com.omodauda.splitwise.ui.features.auth.AuthViewModel
 import com.omodauda.splitwise.ui.features.main.accountSettings.AccountSettingScreen
@@ -17,21 +20,21 @@ import com.omodauda.splitwise.ui.features.main.activity.ActivityViewModel
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillScreen
 import com.omodauda.splitwise.ui.features.main.addBill.AddBillViewModel
 import com.omodauda.splitwise.ui.features.main.addBillSuccess.AddBillSuccessScreen
-import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsScreen
-import com.omodauda.splitwise.ui.features.main.billList.OwedBillListScreen
-import com.omodauda.splitwise.ui.features.main.billList.OwingBillListScreen
-import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentScreen
+import com.omodauda.splitwise.ui.features.main.billDetails.BillDetailsViewModel
+import com.omodauda.splitwise.ui.features.main.billList.OwedBillListDetailScreen
+import com.omodauda.splitwise.ui.features.main.billList.OwingBillListDetailScreen
 import com.omodauda.splitwise.ui.features.main.confirmPayment.ConfirmPaymentViewModel
 import com.omodauda.splitwise.ui.features.main.friends.FriendViewModel
 import com.omodauda.splitwise.ui.features.main.home.BillsViewModel
 import com.omodauda.splitwise.ui.features.main.invites.InviteViewModel
-import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentConfirmationScreen
+import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentConfirmationListDetailScreen
 import com.omodauda.splitwise.ui.features.main.paymentConfirmations.PaymentPendingConfirmationViewModel
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
     authViewModel: AuthViewModel,
-    toastHostState: ToastHostState
+    toastHostState: ToastHostState,
+    adaptiveInfo: WindowAdaptiveInfo
 ) {
     navigation(
         startDestination = Screen.Home.route,
@@ -56,6 +59,7 @@ fun NavGraphBuilder.mainNavGraph(
 
             HomeBottomTab(
                 navController = navController,
+                adaptiveInfo = adaptiveInfo,
                 authViewModel = authViewModel,
                 inviteViewModel = inviteViewModel,
                 friendViewModel = friendViewModel,
@@ -118,62 +122,76 @@ fun NavGraphBuilder.mainNavGraph(
                 toastHostState
             )
         }
-        composable(route = Screen.OwedBillList.route) {
-            val parentEntry = remember(it) {
-                navController.getBackStackEntry("main_graph")
-            }
-            val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
-            OwedBillListScreen(
-                viewModel = billsViewModel,
-                goBack = {navController.popBackStack()},
-                goToBillDetails = {billId ->
-                    navController.navigate(Screen.BillDetails.createRoute(billId))
+        composable(
+            route = Screen.OwedBillListDetail.route,
+            arguments = listOf(
+                navArgument("billId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
                 }
             )
-        }
-        composable(route = Screen.OwingBillList.route) {
-            val parentEntry = remember(it) {
-                navController.getBackStackEntry("main_graph")
-            }
+        ) {
+            val parentEntry = remember(it) { navController.getBackStackEntry("main_graph") }
             val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
-            OwingBillListScreen(
-                viewModel = billsViewModel,
-                goBack = {navController.popBackStack()},
-                goToBillDetails = {billId ->
-                    navController.navigate(Screen.BillDetails.createRoute(billId))
-                }
-            )
-        }
-        composable(route = Screen.BillDetails.route) {
+            val detailsViewModel: BillDetailsViewModel = hiltViewModel()
             val currentUser by authViewModel.user.collectAsStateWithLifecycle()
-            BillDetailsScreen(
+            val billId = it.arguments?.getString("billId")
+
+            OwedBillListDetailScreen(
+                billsViewModel = billsViewModel,
+                detailsViewModel = detailsViewModel,
+                goBack = { navController.popBackStack() },
                 currentUserId = currentUser?.id ?: "",
-                onBackClick = {navController.popBackStack()}
+                initialBillId = billId
             )
         }
-        composable(route = Screen.PaymentConfirmation.route) {
+        composable(
+            route = Screen.OwingBillListDetail.route,
+            arguments = listOf(
+                navArgument("billId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
+            val parentEntry = remember(it) { navController.getBackStackEntry("main_graph") }
+            val billsViewModel: BillsViewModel = hiltViewModel(parentEntry)
+            val detailsViewModel: BillDetailsViewModel = hiltViewModel()
+            val currentUser by authViewModel.user.collectAsStateWithLifecycle()
+            val billId = it.arguments?.getString("billId")
+
+            OwingBillListDetailScreen(
+                billsViewModel = billsViewModel,
+                detailsViewModel = detailsViewModel,
+                goBack = { navController.popBackStack() },
+                currentUserId = currentUser?.id ?: "",
+                initialBillId = billId
+            )
+        }
+        composable(
+            route = Screen.PaymentConfirmationListDetail.route,
+            arguments = listOf(
+                navArgument("paymentId") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) {
             val parentEntry = remember(it) {
                 navController.getBackStackEntry("main_graph")
             }
             val paymentPendingConfirmationVM: PaymentPendingConfirmationViewModel = hiltViewModel(parentEntry)
             val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
-            PaymentConfirmationScreen(
-                goBack = {navController.popBackStack()},
-                goToConfirmPayment = {paymentId ->
-                    navController.navigate(Screen.ConfirmPayment.createRoute(paymentId))
-                                     },
+            val paymentId = it.arguments?.getString("paymentId")
+
+            PaymentConfirmationListDetailScreen(
                 viewModel = paymentPendingConfirmationVM,
-                confirmPaymentViewModel = confirmPaymentViewModel
-            )
-        }
-        composable(route = Screen.ConfirmPayment.route) {
-            val parentEntry = remember(it) {
-                navController.getBackStackEntry("main_graph")
-            }
-            val confirmPaymentViewModel: ConfirmPaymentViewModel = hiltViewModel(parentEntry)
-            ConfirmPaymentScreen(
-                goBack = {navController.popBackStack()},
-                confirmPaymentViewModel
+                confirmPaymentViewModel = confirmPaymentViewModel,
+                goBack = { navController.popBackStack() },
+                initialPaymentId = paymentId
             )
         }
     }

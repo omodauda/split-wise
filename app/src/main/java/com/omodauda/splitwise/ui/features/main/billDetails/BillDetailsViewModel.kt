@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface BillDetailsUiState {
+    object Idle: BillDetailsUiState
     object Loading: BillDetailsUiState
     data class Success(val bill: BillDetails): BillDetailsUiState
     data class Error(val message: String): BillDetailsUiState
@@ -21,19 +22,35 @@ sealed interface BillDetailsUiState {
 
 @HiltViewModel
 class BillDetailsViewModel @Inject constructor(private val repo: BillsRepository, savedStateHandle: SavedStateHandle): ViewModel() {
-    private val billId: String = checkNotNull(savedStateHandle["billId"])
+    private val initialBillId: String? = savedStateHandle["billId"]
+    private val _billId = MutableStateFlow(initialBillId)
+    val billId = _billId.asStateFlow()
 
-    private val _uiState = MutableStateFlow<BillDetailsUiState>(BillDetailsUiState.Loading)
+    private val _uiState = MutableStateFlow(
+        if (initialBillId != null) BillDetailsUiState.Loading else BillDetailsUiState.Idle
+    )
     val uiState = _uiState.asStateFlow()
 
     init {
-        fetchBillDetails()
+        initialBillId?.let { fetchBillDetails(it) }
     }
 
-    fun fetchBillDetails() {
+    fun setBillId(id: String) {
+        if (_billId.value == id) return
+        _billId.value = id
+        fetchBillDetails(id)
+    }
+
+    fun clearSelection() {
+        _billId.value = null
+        _uiState.update { BillDetailsUiState.Idle }
+    }
+
+    fun fetchBillDetails(billId: String? = _billId.value) {
+        val targetId = billId ?: return
         viewModelScope.launch {
             _uiState.update { BillDetailsUiState.Loading }
-            repo.getBillDetails(data = GetBillDetailsRequest(billId))
+            repo.getBillDetails(data = GetBillDetailsRequest(targetId))
                 .onSuccess { data ->
                     _uiState.update { BillDetailsUiState.Success(data) }
                 }

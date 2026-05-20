@@ -7,39 +7,27 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.omodauda.splitwise.R
 import com.omodauda.splitwise.ui.components.AppIconTextButton
-import com.omodauda.splitwise.ui.components.LoadingView
-import com.omodauda.splitwise.ui.features.main.billDetails.ErrorView
 import com.omodauda.splitwise.ui.features.main.home.components.AvatarView
 import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
@@ -59,96 +47,9 @@ enum class PendingPaymentSortOption(val label: Int) {
 }
 
 @Composable
-fun ConfirmPaymentScreen(
-    goBack: () -> Unit,
-    confirmPaymentViewModel: ConfirmPaymentViewModel,
-    modifier: Modifier = Modifier
-) {
-    val uiState by confirmPaymentViewModel.uiState.collectAsStateWithLifecycle()
-    val confirmActionState by confirmPaymentViewModel.confirmActionState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(confirmActionState) {
-        if (confirmActionState is ConfirmActionState.Success) {
-            confirmPaymentViewModel.resetActionState()
-            goBack()
-        }
-    }
-
-    Box(modifier = modifier.fillMaxSize()) {
-        when (val state = uiState) {
-            is ConfirmPaymentUiState.Loading -> LoadingView()
-            is ConfirmPaymentUiState.Error -> ErrorView(
-                message = state.message,
-                onRetry = { confirmPaymentViewModel.fetchPaymentDetails() })
-
-            is ConfirmPaymentUiState.Success -> {
-                val payment = state.payment
-
-                Scaffold(
-                    bottomBar = {
-                        ConfirmPaymentFooter(
-                            onConfirm = { confirmPaymentViewModel.confirmPayment() }
-                        )
-                    },
-                    modifier = Modifier.fillMaxSize()
-                ) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = MaterialTheme.colorScheme.background)
-                            .padding(
-                                bottom = innerPadding.calculateBottomPadding(),
-                                start = innerPadding.calculateStartPadding(
-                                    LayoutDirection.Ltr
-                                ),
-                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                            )
-                    ) {
-                        ConfirmPaymentHeader(goBack)
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(Spacing.medium),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(
-                                    start = Spacing.medium,
-                                    end = Spacing.medium
-                                )
-                                .verticalScroll(state = rememberScrollState())
-                        ) {
-                            Spacer(Modifier.height(Spacing.medium))
-                            BillDetailsView(
-                                category = payment.bill.category,
-                                description = payment.bill.description,
-                                totalBillAmount = payment.bill.totalAmount,
-                                splitAmount = payment.split.amount
-                            )
-                            PaymentInfo(
-                                fullName = payment.payer.fullName,
-//                        email = payment.payer,
-                                amountPaid = payment.amount,
-                                datePaid = payment.createdAt
-                            )
-                            ConfirmationNote(
-                                fullName = payment.payer.fullName,
-                                paidAmount = formatFromCents(payment.amount)
-                            )
-                            Spacer(Modifier.height(Spacing.medium))
-                        }
-
-                    }
-                }
-            }
-        }
-
-        if (confirmActionState is ConfirmActionState.Loading) {
-            LoadingView()
-        }
-    }
-}
-
-@Composable
 fun ConfirmPaymentHeader(
     goBack: () -> Unit,
+    showBackButton: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -160,14 +61,16 @@ fun ConfirmPaymentHeader(
             .shadow(1.dp)
             .padding(horizontal = Spacing.medium, vertical = ScreenDimensions.sectionSpacing)
     ) {
-        IconButton(
-            onClick = goBack
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.caret_left),
-                contentDescription = "back icon",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
+        if (showBackButton) {
+            IconButton(
+                onClick = goBack
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.caret_left),
+                    contentDescription = "back icon",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
         Text(
             text = stringResource(R.string.confirm_payment),
@@ -275,7 +178,6 @@ fun BillDetailsView(
 @Composable
 fun PaymentInfo(
     fullName: String,
-//    email: String,
     amountPaid: Int,
     datePaid: Date,
     modifier: Modifier = Modifier
@@ -309,11 +211,6 @@ fun PaymentInfo(
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-//                Text(
-//                    text = email,
-//                    style = MaterialTheme.typography.bodySmall,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
             }
         }
         HorizontalDivider(Modifier.padding(vertical = Spacing.medium))

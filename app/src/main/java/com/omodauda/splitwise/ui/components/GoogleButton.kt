@@ -2,11 +2,8 @@ package com.omodauda.splitwise.ui.components
 
 import android.content.Context
 import android.content.res.Configuration
-import android.credentials.GetCredentialException
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +27,8 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialCustomException
 import androidx.credentials.exceptions.NoCredentialException
-import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import com.omodauda.splitwise.BuildConfig
@@ -40,7 +38,6 @@ import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
 import com.omodauda.splitwise.ui.theme.SplitWiseShapes
 import com.omodauda.splitwise.ui.theme.SplitWiseTheme
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import java.util.Base64
@@ -59,13 +56,11 @@ fun GoogleButton(
         return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes)
     }
 
-    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     suspend fun signIn(request: GetCredentialRequest, context: Context): Exception? {
         val credentialManager = CredentialManager.create(context)
         val failureMessage = "Sign in failed!"
         val tag = "xyz"
-        val e: Exception? = null
-        delay(250)
+        var caughtException: Exception? = null
         try {
             val result = credentialManager.getCredential(
                 context,
@@ -84,56 +79,63 @@ fun GoogleButton(
 
                     val idToken = googleIdTokenCredential.idToken
 
-                    Log.d(tag, "ID Token: $idToken")
-                    Log.d(tag, "User Email: ${googleIdTokenCredential.id}")
-                    Log.d(tag, "Display Name: ${googleIdTokenCredential.displayName}")
-                    Log.d(tag, "Profile Picture: ${googleIdTokenCredential.profilePictureUri}")
-
-                    // TODO: Send idToken to your backend API for authentication
+                    // Send idToken to your backend API for authentication
                     continueWithGoogle(idToken)
 
                 } catch (e: GoogleIdTokenParsingException) {
                     Log.e(tag, "Received invalid Google ID token response", e)
+                    caughtException = e
                 }
             } else {
                 Log.e(tag, "Unexpected credential type: ${credential.type}")
             }
-        } catch (e: GetCredentialException) {
-            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
-            Log.e(tag, "$failureMessage: Failure getting credentials", e)
-
-        } catch (e: GoogleIdTokenParsingException) {
-            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
-            Log.e(tag, "$failureMessage: Issue with parsing received GoogleIdToken", e)
-
         } catch (e: NoCredentialException) {
-            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "No Google accounts found", Toast.LENGTH_SHORT).show()
             Log.e(tag, "$failureMessage: No credentials found", e)
-            return e
+            caughtException = e
+
+        } catch (e: GetCredentialCancellationException) {
+            Toast.makeText(context, "Sign-in cancelled", Toast.LENGTH_SHORT).show()
+            Log.e(tag, "$failureMessage: Sign-in was cancelled", e)
+            caughtException = e
 
         } catch (e: GetCredentialCustomException) {
             Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
             Log.e(tag, "$failureMessage: Issue with custom credential request", e)
+            caughtException = e
 
-        } catch (e: GetCredentialCancellationException) {
-            Toast.makeText(context, ": Sign-in cancelled", Toast.LENGTH_SHORT).show()
-            Log.e(tag, "$failureMessage: Sign-in was cancelled", e)
+        } catch (e: GetCredentialException) {
+            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+            Log.e(tag, "$failureMessage: Failure getting credentials", e)
+            caughtException = e
+
+        } catch (e: GoogleIdTokenParsingException) {
+            Toast.makeText(context, failureMessage, Toast.LENGTH_SHORT).show()
+            Log.e(tag, "$failureMessage: Issue with parsing received GoogleIdToken", e)
+            caughtException = e
         }
-        return e
+        return caughtException
     }
 
     val onClick: () -> Unit = {
-        val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption
-            .Builder(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
-            .setNonce(generateSecureRandomNonce())
-            .build()
+        if (BuildConfig.GOOGLE_SERVER_CLIENT_ID.isEmpty()) {
+            Log.e("xyz", "Google Server Client ID is empty. Check your local.properties.")
+            Toast.makeText(context, "Sign-in configuration error", Toast.LENGTH_SHORT).show()
+        } else {
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(BuildConfig.GOOGLE_SERVER_CLIENT_ID)
+                .setAutoSelectEnabled(false)
+                .setNonce(generateSecureRandomNonce())
+                .build()
 
-        val request: GetCredentialRequest = GetCredentialRequest.Builder()
-            .addCredentialOption(signInWithGoogleOption)
-            .build()
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
 
-        coroutineScope.launch {
-            signIn(request, context)
+            coroutineScope.launch {
+                signIn(request, context)
+            }
         }
     }
 

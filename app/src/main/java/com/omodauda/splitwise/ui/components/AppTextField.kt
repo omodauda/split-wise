@@ -20,6 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -37,6 +39,7 @@ import com.omodauda.splitwise.ui.theme.SplitWiseTheme
 fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     readOnly: Boolean? = false,
     label: String? = null,
     placeholder: String? = null,
@@ -46,8 +49,8 @@ fun AppTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
     errorMessage: String? = null,
-    modifier: Modifier = Modifier,
-    enabled: Boolean? = true
+    enabled: Boolean? = true,
+    focusRequester: FocusRequester? = null
 ) {
     var isFocused by remember { mutableStateOf(false
     )}
@@ -108,14 +111,9 @@ fun AppTextField(
             colors = OutlinedTextFieldDefaults.colors(
                 unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
                 focusedBorderColor = MaterialTheme.colorScheme.primary
-//                focusedBorderColor = MaterialTheme.colorScheme.primary,
-//                unfocusedBorderColor = MaterialTheme.colorScheme.inverseOnSurface,
-//                cursorColor = MaterialTheme.colorScheme.primary,
-//                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-//                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
             ),
             enabled = enabled == true,
-            modifier = Modifier.fillMaxWidth().onFocusChanged {focusState -> isFocused = focusState.isFocused}
+            modifier = Modifier.fillMaxWidth().then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier).onFocusChanged { focusState -> isFocused = focusState.isFocused}
         )
         if (isError && !errorMessage.isNullOrEmpty()) {
             Spacer(Modifier.height(Spacing.extraSmall))

@@ -13,7 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -54,8 +55,10 @@ fun Friends(
             color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(Modifier.height(ScreenDimensions.itemSpacing))
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 300.dp),
             verticalArrangement = Arrangement.spacedBy(ScreenDimensions.itemSpacing),
+            horizontalArrangement = Arrangement.spacedBy(Spacing.medium),
             contentPadding = PaddingValues(bottom = Spacing.extraMedium)
         ) {
             items(friends.itemCount) {index ->
