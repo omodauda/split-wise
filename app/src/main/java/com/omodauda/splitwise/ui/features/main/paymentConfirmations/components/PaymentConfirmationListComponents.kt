@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -53,7 +54,6 @@ import com.omodauda.splitwise.ui.theme.ScreenDimensions
 import com.omodauda.splitwise.ui.theme.Spacing
 import com.omodauda.splitwise.ui.theme.black
 import com.omodauda.splitwise.ui.theme.crystalPeak
-import com.omodauda.splitwise.ui.theme.emerald_50
 import com.omodauda.splitwise.utils.formatFromCents
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -214,10 +214,12 @@ fun PaymentConfirmationItem(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
 ) {
+    val borderWidth = if (isSelected) 1.dp else 0.dp
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
     Column(
         modifier = modifier
             .shadow(2.dp, shape = RoundedCornerShape(14.dp))
-            .background(color = if (isSelected) emerald_50 else MaterialTheme.colorScheme.background, shape = RoundedCornerShape(14.dp))
+            .border(width = borderWidth, color = borderColor)
             .padding(Spacing.medium)
     ) {
         Row(

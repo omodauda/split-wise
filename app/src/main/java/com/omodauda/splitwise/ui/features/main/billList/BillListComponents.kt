@@ -2,6 +2,7 @@ package com.omodauda.splitwise.ui.features.main.billList
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -114,6 +115,9 @@ fun OwedBillList(
                         val bill = bills[index]
                         if (bill !== null) {
                             val remainder = bill.amount - bill.paidAmount
+                            val isSelected = selectedBillId == bill.bill.id
+                            val borderWidth = if (isSelected) 1.dp else 0.dp
+                            val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
                             OwedBillListItem(
                                 personName = bill.user.fullName,
                                 remainingAmount = formatFromCents(remainder),
@@ -121,8 +125,8 @@ fun OwedBillList(
                                 date = bill.createdAt,
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
+                                    .border(width = borderWidth, color = borderColor)
                                     .clickable(enabled = true, onClick = { onClick(bill.bill.id) })
-                                    .background(color = if (selectedBillId == bill.bill.id) emerald_50 else Color.Transparent)
                                 )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -179,6 +183,9 @@ fun OwingBillList(
                         val bill = bills[index]
                         if (bill !== null) {
                             val remainder = bill.amount - bill.paidAmount
+                            val isSelected = selectedBillId == bill.bill.id
+                            val borderWidth = if (isSelected) 1.dp else 0.dp
+                            val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
                             OwingBillListItem(
                                 personName = bill.bill.paidBy.fullName,
                                 remainingAmount = formatFromCents(remainder),
@@ -186,8 +193,8 @@ fun OwingBillList(
                                 date = bill.createdAt,
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
+                                    .border(width = borderWidth, color = borderColor)
                                     .clickable(enabled = true, onClick = { onClick(bill.bill.id) })
-                                    .background(color = if (selectedBillId == bill.bill.id) emerald_50 else Color.Transparent)
                                 )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
