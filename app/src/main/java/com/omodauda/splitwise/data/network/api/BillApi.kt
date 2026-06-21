@@ -59,8 +59,8 @@ interface BillApi {
     @POST("bill/send-reminder")
     suspend fun sendBillReminder(@Body request: SendBillReminderRequest): Response<SendBillReminderResponse>
 
-    @GET("bill/{billId}")
-    suspend fun getBillDetails(@Path("billId") billId: String): Response<GetBillDetailsResponse>
+    @GET("bill/split/{splitId}")
+    suspend fun getBillDetails(@Path("splitId") splitId: String): Response<GetBillDetailsResponse>
 
     @GET("bill/pending-confirmation")
     suspend fun getPaymentPendingConfirmation(
