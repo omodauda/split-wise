@@ -60,7 +60,7 @@ fun OwedItem(
         actOnBill = { openRecordPaymentModal() },
         sendReminder = { openReminderModal() },
         modifier = modifier
-            .clickable(enabled = true, onClick = {onBillItemClicked(bill.bill.id)})
+            .clickable(enabled = true, onClick = {onBillItemClicked(bill.id)})
     )
 }
 
@@ -86,7 +86,7 @@ fun OwingItem(
         buttonContentColor = MaterialTheme.colorScheme.error,
         actOnBill = { openSettleUpModal() },
         modifier = modifier
-            .clickable(enabled = true, onClick = {onBillItemClicked(bill.bill.id)})
+            .clickable(enabled = true, onClick = {onBillItemClicked(bill.id)})
     )
 }
 
