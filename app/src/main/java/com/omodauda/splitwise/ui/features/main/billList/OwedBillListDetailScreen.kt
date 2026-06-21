@@ -77,7 +77,7 @@ fun OwedBillListDetailScreen(
             navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded &&
             navigator.currentDestination?.contentKey == null
         ) {
-            val firstBillId = bills[0]?.bill?.id
+            val firstBillId = bills[0]?.id
             if (firstBillId != null) {
                 detailsViewModel.setBillId(firstBillId)
                 scope.launch {
@@ -123,6 +123,7 @@ fun OwedBillListDetailScreen(
                         selectedBillId = selectedBillId,
                         onRefresh = { bills.refresh() },
                         searchQuery = searchQuery,
+                        isExpanded = navigator.scaffoldValue[ListDetailPaneScaffoldRole.Detail] == PaneAdaptedValue.Expanded,
                         onClick = { billId ->
                             detailsViewModel.setBillId(billId)
                             // Navigate to detail pane internally
@@ -164,7 +165,7 @@ fun OwedBillListDetailScreen(
                             BillDetailsContent(
                                 currentUserId = currentUserId,
                                 bill = state.bill,
-                                paddingBottom = 0.dp
+                                paddingBottom = Spacing.massive
                             )
                         }
                     }

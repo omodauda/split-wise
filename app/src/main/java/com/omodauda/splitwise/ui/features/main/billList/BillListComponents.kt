@@ -81,7 +81,8 @@ fun OwedBillList(
     onRefresh: () -> Unit,
     searchQuery: String?,
     onClick: (billId: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isExpanded: Boolean = false
 ) {
     val loadState = bills.loadState
     val isRefreshing = bills.loadState.refresh is LoadState.Loading
@@ -102,7 +103,7 @@ fun OwedBillList(
                 LazyColumn(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(
-                        bottom = Spacing.large,
+                        bottom = Spacing.massive,
                         top = Spacing.medium
                     ),
                     modifier = Modifier
@@ -115,18 +116,19 @@ fun OwedBillList(
                         val bill = bills[index]
                         if (bill !== null) {
                             val remainder = bill.amount - bill.paidAmount
-                            val isSelected = selectedBillId == bill.bill.id
-                            val borderWidth = if (isSelected) 1.dp else 0.dp
-                            val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                            val isSelected = selectedBillId == bill.id
+                            val borderWidth = if (isSelected && isExpanded) 1.dp else 0.dp
+                            val borderColor = if (isSelected && isExpanded) MaterialTheme.colorScheme.primary else Color.Transparent
                             OwedBillListItem(
                                 personName = bill.user.fullName,
                                 remainingAmount = formatFromCents(remainder),
                                 descriptionText = bill.bill.description,
                                 date = bill.createdAt,
+                                isExpanded = isExpanded,
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
                                     .border(width = borderWidth, color = borderColor)
-                                    .clickable(enabled = true, onClick = { onClick(bill.bill.id) })
+                                    .clickable(enabled = true, onClick = { onClick(bill.id) })
                                 )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -149,7 +151,8 @@ fun OwingBillList(
     onRefresh: () -> Unit,
     searchQuery: String?,
     onClick: (billId: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isExpanded: Boolean = false
 ) {
     val loadState = bills.loadState
     val isRefreshing = bills.loadState.refresh is LoadState.Loading
@@ -170,7 +173,7 @@ fun OwingBillList(
                 LazyColumn(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     contentPadding = PaddingValues(
-                        bottom = Spacing.large,
+                        bottom = Spacing.massive,
                         top = Spacing.medium
                     ),
                     modifier = Modifier
@@ -183,18 +186,19 @@ fun OwingBillList(
                         val bill = bills[index]
                         if (bill !== null) {
                             val remainder = bill.amount - bill.paidAmount
-                            val isSelected = selectedBillId == bill.bill.id
-                            val borderWidth = if (isSelected) 1.dp else 0.dp
-                            val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+                            val isSelected = selectedBillId == bill.id
+                            val borderWidth = if (isSelected && isExpanded) 1.dp else 0.dp
+                            val borderColor = if (isSelected && isExpanded) MaterialTheme.colorScheme.primary else Color.Transparent
                             OwingBillListItem(
                                 personName = bill.bill.paidBy.fullName,
                                 remainingAmount = formatFromCents(remainder),
                                 descriptionText = bill.bill.description,
                                 date = bill.createdAt,
+                                isExpanded = isExpanded,
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
                                     .border(width = borderWidth, color = borderColor)
-                                    .clickable(enabled = true, onClick = { onClick(bill.bill.id) })
+                                    .clickable(enabled = true, onClick = { onClick(bill.id) })
                                 )
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant
@@ -429,6 +433,7 @@ private fun OwedBillListItem(
     descriptionText: String,
     remainingAmount: String,
     date: Date,
+    isExpanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val avatarText = personName[0].uppercase()
@@ -490,13 +495,15 @@ private fun OwedBillListItem(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            Icon(
-                painter = painterResource(R.drawable.caret_right),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .size(12.dp)
-            )
+            if (!isExpanded) {
+                Icon(
+                    painter = painterResource(R.drawable.caret_right),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(12.dp)
+                )
+            }
         }
     }
 }
@@ -507,6 +514,7 @@ private fun OwingBillListItem(
     descriptionText: String,
     remainingAmount: String,
     date: Date,
+    isExpanded: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val avatarText = personName[0].uppercase()
@@ -568,13 +576,15 @@ private fun OwingBillListItem(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            Icon(
-                painter = painterResource(R.drawable.caret_right),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .size(12.dp)
-            )
+            if (!isExpanded) {
+                Icon(
+                    painter = painterResource(R.drawable.caret_right),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .size(12.dp)
+                )
+            }
         }
     }
 }
