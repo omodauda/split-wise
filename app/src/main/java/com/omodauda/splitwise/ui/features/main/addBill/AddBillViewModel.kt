@@ -32,6 +32,32 @@ class AddBillViewModel @Inject constructor(
     private var currentUser: Friend? = null
 
     init {
+        /**
+        https://developer.android.com/topic/architecture/ui-layer/state-production#stateflow
+         Problem:  Never call an async fun in the init/ constructor of a view model.
+         Solution: Create the StateFlow by converting the user cold flow to a state flow and constructing its initial value in the process
+
+         val uiState: StateFlow<MyUiState> = authRepository.user
+         .map { user ->
+         val me = user?.let {
+         Friend(
+         friendshipId = it.id,
+         userId = it.id,
+         fullName = it.fullName,
+         email = it.email,
+         avatar = it.avatar
+         )
+         }
+         val participants = if (me != null) listOf(me) else emptyList()
+         MyUiState(participants = participants)
+         }
+         .stateIn(
+         scope = viewModelScope,
+         started = SharingStarted.WhileSubscribed(5_000), // Pauses when UI is no longer visible
+         initialValue = MyUiState()
+         )
+         * **/
+
         viewModelScope.launch {
             authRepository.user.collect { user ->
                 if (user !== null) {

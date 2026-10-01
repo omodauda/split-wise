@@ -64,6 +64,7 @@ interface BillApi {
 
     @GET("bill/pending-confirmation")
     suspend fun getPaymentPendingConfirmation(
+        // TODO: combine query params
         @Query("cursorId") cursorId: String?,
         @Query("limit") limit: Int?,
         @Query("search") search: String?,
